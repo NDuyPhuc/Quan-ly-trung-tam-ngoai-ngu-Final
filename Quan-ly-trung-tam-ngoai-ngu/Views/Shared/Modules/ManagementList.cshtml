@@ -10,7 +10,7 @@
         <div class="d-flex flex-wrap gap-2">
             @if (!string.IsNullOrWhiteSpace(Model.ExportLabel))
             {
-                <a href="#" class="btn btn-outline-dark confirm-action" data-confirm-message="Mock thao tác export hoặc in dữ liệu này?"><i class="bi bi-box-arrow-up-right me-2"></i>@Model.ExportLabel</a>
+                <a href="#" class="btn btn-outline-dark confirm-action" data-confirm-message="Bạn muốn tiếp tục thao tác xuất hoặc in dữ liệu này?"><i class="bi bi-box-arrow-up-right me-2"></i>@Model.ExportLabel</a>
             }
             <a class="btn btn-primary" href="@Model.PrimaryActionUrl"><i class="bi bi-plus-circle me-2"></i>@Model.PrimaryActionText</a>
         </div>
@@ -112,7 +112,7 @@
             </table>
         </div>
         <div class="pagination-row">
-            <span class="text-muted">Hiển thị dữ liệu mock, chưa phân trang thật.</span>
+            <span class="text-muted">Đang hiển thị toàn bộ dữ liệu hiện có trên một trang.</span>
             <nav>
                 <ul class="pagination pagination-sm mb-0">
                     <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>

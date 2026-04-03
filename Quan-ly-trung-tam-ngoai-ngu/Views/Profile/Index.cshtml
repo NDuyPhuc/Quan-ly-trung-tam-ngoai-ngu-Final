@@ -1,15 +1,40 @@
 @model ProfileViewModel
 
-<section class="py-5">
+<section class="page-section">
     <div class="container">
         @await Html.PartialAsync("~/Views/Shared/Partials/_Breadcrumbs.cshtml", Model.Breadcrumbs)
-        <div class="page-header">
-            <div>
-                <h1>@Model.Title</h1>
-                <p class="page-subtitle">@Model.Subtitle</p>
+
+        <div class="page-banner">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-8">
+                    <span class="eyebrow">Hồ sơ người dùng</span>
+                    <h1>@Model.Title</h1>
+                    <p class="page-subtitle">@Model.Subtitle</p>
+                    <div class="banner-pill-row">
+                        <span class="info-pill">@Model.FullName</span>
+                        <span class="info-pill">@Model.Email</span>
+                        <span class="info-pill">@Model.Phone</span>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="banner-side-card">
+                        <span class="banner-side-label">Hành động nhanh</span>
+                        <div class="preview-list">
+                            <div class="preview-list-item">
+                                <strong>Vai trò hiện tại</strong>
+                                <span>@Model.CurrentRole</span>
+                            </div>
+                            <div class="preview-list-item">
+                                <strong>Truy cập tiếp theo</strong>
+                                <span>Chuyển sang tài khoản khác mà không đổi luồng đăng nhập.</span>
+                            </div>
+                        </div>
+                        <a class="btn btn-outline-primary w-100 mt-3" asp-controller="Account" asp-action="Login">Đổi tài khoản</a>
+                    </div>
+                </div>
             </div>
-            <a class="btn btn-outline-primary" asp-controller="Account" asp-action="Login">Đổi tài khoản demo</a>
         </div>
+
         <div class="row g-4 mb-4">
             @foreach (var card in Model.SummaryCards)
             {
@@ -25,17 +50,23 @@
                 </div>
             }
         </div>
+
         <div class="row g-4">
-        @foreach (var detailSection in Model.Sections)
-        {
-            <div class="col-lg-6">
-                <div class="panel-card h-100">
-                    <div class="panel-card-header"><div><h3>@detailSection.Title</h3><p>@(detailSection.Description)</p></div></div>
-                    <div class="detail-grid">
-                        @foreach (var item in detailSection.Items)
-                        {
-                            <div class="detail-item">
-                                <span>@item.Label</span>
+            @foreach (var detailSection in Model.Sections)
+            {
+                <div class="col-lg-6">
+                    <div class="panel-card h-100">
+                        <div class="panel-card-header">
+                            <div>
+                                <h3>@detailSection.Title</h3>
+                                <p>@detailSection.Description</p>
+                            </div>
+                        </div>
+                        <div class="detail-grid">
+                            @foreach (var item in detailSection.Items)
+                            {
+                                <div class="detail-item">
+                                    <span>@item.Label</span>
                                     @if (item.IsBadge)
                                     {
                                         <strong><span class="badge @item.BadgeClass">@item.Value</span></strong>
@@ -51,15 +82,24 @@
                 </div>
             }
         </div>
+
         <div class="panel-card mt-4">
-            <div class="panel-card-header"><div><h3>Hoạt động gần đây</h3><p>Nhật ký mock cho mục đích demo.</p></div></div>
+            <div class="panel-card-header">
+                <div>
+                    <h3>Hoạt động gần đây</h3>
+                    <p>Nhật ký gần nhất trong phiên thao tác hiện tại.</p>
+                </div>
+            </div>
             <div class="timeline-list">
                 @foreach (var item in Model.RecentActivities)
                 {
                     <div class="timeline-item">
                         <span class="timeline-dot bg-@item.AccentClass"></span>
                         <div>
-                            <div class="d-flex gap-2 align-items-center mb-1"><strong>@item.Title</strong><span class="small text-muted">@item.Meta</span></div>
+                            <div class="d-flex gap-2 align-items-center mb-1">
+                                <strong>@item.Title</strong>
+                                <span class="small text-muted">@item.Meta</span>
+                            </div>
                             <p class="mb-0 text-secondary">@item.Description</p>
                         </div>
                     </div>

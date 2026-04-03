@@ -20,7 +20,7 @@ public class CoursesController : Controller
         var model = new CourseCatalogPageViewModel
         {
             Title = "Danh sách khóa học",
-            Subtitle = "Danh mục khóa học theo mục tiêu đầu ra và lịch học linh hoạt.",
+            Subtitle = "Danh mục khóa học theo mục tiêu đầu ra, học phí rõ ràng và lịch học linh hoạt.",
             Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Khóa học", IsActive = true }],
             Filters =
             [
@@ -36,7 +36,7 @@ public class CoursesController : Controller
 
     public IActionResult Details(string id)
     {
-        var course = _dataService.GetCourses().FirstOrDefault(x => x.Slug == id);
+        var course = _dataService.GetCourses().FirstOrDefault(item => item.Slug == id);
         if (course is null)
         {
             return RedirectToAction(nameof(Index));
@@ -52,7 +52,7 @@ public class CoursesController : Controller
             TargetOutput = course.TargetOutput,
             Objectives = course.Objectives,
             Highlights = course.Highlights,
-            RelatedClasses = _dataService.GetClasses().Where(x => x.CourseName == course.Name).Select(AppUi.ToClassCard).ToList()
+            RelatedClasses = _dataService.GetClasses().Where(item => item.CourseName == course.Name).Select(AppUi.ToClassCard).ToList()
         };
 
         return View(model);

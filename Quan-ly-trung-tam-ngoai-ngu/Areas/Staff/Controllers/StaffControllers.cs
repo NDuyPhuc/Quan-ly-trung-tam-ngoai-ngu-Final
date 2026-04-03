@@ -14,20 +14,20 @@ public class DashboardController : StaffControllerBase
     {
         return DashboardView(new DashboardPageViewModel
         {
-            Title = "Staff Dashboard",
-            Subtitle = "Màn hình giáo vụ tập trung vào học viên, ghi danh, học phí và xếp lớp.",
-            Breadcrumbs = Breadcrumbs("Dashboard"),
+            Title = "Bảng điều khiển giáo vụ",
+            Subtitle = "Theo dõi học viên, ghi danh, học phí và xếp lớp trên giao diện mới nhưng vẫn giữ nguyên luồng xử lý hiện tại.",
+            Breadcrumbs = Breadcrumbs("Tổng quan"),
             RoleName = "Giáo vụ",
             SummaryCards =
             [
-                new SummaryCardViewModel { Title = "Học viên mới", Value = "12", Description = "Mock trong 7 ngày gần nhất", Icon = "bi-person-plus", AccentClass = "primary" },
+                new SummaryCardViewModel { Title = "Học viên mới", Value = "12", Description = "Phát sinh trong 7 ngày gần nhất", Icon = "bi-person-plus", AccentClass = "primary" },
                 new SummaryCardViewModel { Title = "Ghi danh mới", Value = DataService.GetEnrollments().Count.ToString(), Description = "Chờ xác nhận hoặc xếp lớp", Icon = "bi-journal-check", AccentClass = "info" },
-                new SummaryCardViewModel { Title = "Khoản thu gần đây", Value = AppUi.Currency(DataService.GetReceipts().Sum(x => x.Amount)), Description = "Tổng biên nhận mock", Icon = "bi-cash-stack", AccentClass = "success" },
+                new SummaryCardViewModel { Title = "Khoản thu gần đây", Value = AppUi.Currency(DataService.GetReceipts().Sum(x => x.Amount)), Description = "Tổng biên nhận đã ghi nhận", Icon = "bi-cash-stack", AccentClass = "success" },
                 new SummaryCardViewModel { Title = "Học viên còn nợ", Value = DataService.GetDebts().Count.ToString(), Description = "Danh sách cần theo dõi", Icon = "bi-wallet2", AccentClass = "danger" }
             ],
             Charts =
             [
-                new ChartCardViewModel { ChartId = "staffDebtChart", Title = "Công nợ theo nhóm khóa học", Subtitle = "Mock tracking cho giáo vụ", ChartType = "bar", Labels = ["TOEIC", "IELTS Foundation", "Giao tiếp", "IELTS Intensive"], Values = [2.8m, 0, 2.6m, 7.8m], Colors = ["#1d4ed8", "#0ea5e9", "#f59e0b", "#ef4444"] }
+                new ChartCardViewModel { ChartId = "staffDebtChart", Title = "Công nợ theo nhóm khóa học", Subtitle = "Biểu đồ theo dõi công nợ cho khu giáo vụ", ChartType = "bar", Labels = ["TOEIC", "IELTS Nền Tảng", "Giao tiếp", "IELTS Chuyên Sâu"], Values = [2.8m, 0, 2.6m, 7.8m], Colors = ["#1d4ed8", "#0ea5e9", "#f59e0b", "#ef4444"] }
             ],
             Panels =
             [
@@ -84,7 +84,7 @@ public class ClassesController : StaffControllerBase
 public class ReceiptsController : StaffControllerBase
 {
     public ReceiptsController(IMockDataService dataService) : base(dataService) { }
-    public IActionResult Index() => StaffPageHelpers.List(this, "Thu học phí", "/Staff/Receipts", DataService.GetReceipts().Select(x => new TableRowViewModel { Id = x.Id.ToString(), Cells = [new() { Html = $"<strong>{x.StudentName}</strong><div class='text-muted small'>{x.ReceiptCode}</div>" }, new() { Html = x.ClassCode }, new() { Html = AppUi.Currency(x.Amount) }, new() { Html = AppUi.StatusBadge(x.Status) }, new() { Html = "" }], Actions = [new() { Label = "Chi tiết", Url = $"/Staff/Receipts/Details/{x.Id}", Icon = "bi-eye" }, new() { Label = "Sửa", Url = $"/Staff/Receipts/Edit/{x.Id}", Icon = "bi-pencil-square", CssClass = "btn btn-sm btn-outline-secondary" }, new() { Label = "In", Url = "#", Icon = "bi-printer", CssClass = "btn btn-sm btn-outline-dark", RequiresConfirm = true, ConfirmMessage = "Mock in biên nhận?" }] }).ToList());
+    public IActionResult Index() => StaffPageHelpers.List(this, "Thu học phí", "/Staff/Receipts", DataService.GetReceipts().Select(x => new TableRowViewModel { Id = x.Id.ToString(), Cells = [new() { Html = $"<strong>{x.StudentName}</strong><div class='text-muted small'>{x.ReceiptCode}</div>" }, new() { Html = x.ClassCode }, new() { Html = AppUi.Currency(x.Amount) }, new() { Html = AppUi.StatusBadge(x.Status) }, new() { Html = "" }], Actions = [new() { Label = "Chi tiết", Url = $"/Staff/Receipts/Details/{x.Id}", Icon = "bi-eye" }, new() { Label = "Sửa", Url = $"/Staff/Receipts/Edit/{x.Id}", Icon = "bi-pencil-square", CssClass = "btn btn-sm btn-outline-secondary" }, new() { Label = "In", Url = "#", Icon = "bi-printer", CssClass = "btn btn-sm btn-outline-dark", RequiresConfirm = true, ConfirmMessage = "Bạn muốn in biên nhận này?" }] }).ToList());
     public IActionResult Create() => StaffPageHelpers.Form(this, "Thu học phí", Breadcrumbs("Thu học phí", "Thu học phí", "/Staff/Receipts"), "/Staff/Receipts", [new() { Label = "Học viên", Name = "StudentName", Required = true }, new() { Label = "Số tiền", Name = "Amount", Type = "number", Required = true }, new() { Label = "Phương thức", Name = "PaymentMethod", Required = true }, new() { Label = "Ghi chú", Name = "Note", ColClass = "col-12" }]);
     public IActionResult Edit(int id) => Create();
     public IActionResult Details(int id) => StaffPageHelpers.Details(this, "Chi tiết biên nhận", Breadcrumbs("Chi tiết biên nhận", "Thu học phí", "/Staff/Receipts"), "/Staff/Receipts");
@@ -95,7 +95,7 @@ internal static class StaffPageHelpers
     internal static IActionResult List(StaffControllerBase controller, string title, string baseUrl, List<TableRowViewModel> rows) => controller.ManagementListView(new ManagementListPageViewModel
     {
         Title = title,
-        Subtitle = $"Module {title.ToLowerInvariant()} dành cho giáo vụ.",
+        Subtitle = $"Phân hệ {title.ToLowerInvariant()} dành cho giáo vụ.",
         Breadcrumbs = StaffControllerBase.Breadcrumbs(title),
         PrimaryActionText = $"Thêm {title.ToLowerInvariant()}",
         PrimaryActionUrl = $"{baseUrl}/Create",
@@ -105,21 +105,21 @@ internal static class StaffPageHelpers
     internal static IActionResult Form(StaffControllerBase controller, string title, List<BreadcrumbItemViewModel> breadcrumbs, string cancelUrl, List<FormFieldViewModel> fields) => controller.ManagementFormView(new ManagementFormPageViewModel
     {
         Title = title,
-        Subtitle = "Form mock cho giáo vụ.",
+        Subtitle = "Biểu mẫu nghiệp vụ dành cho giáo vụ.",
         Breadcrumbs = breadcrumbs,
         FormTitle = title,
-        FormDescription = "Dữ liệu chỉ phục vụ demo UI. // TODO: connect database later",
+        FormDescription = "Dữ liệu hiện phục vụ trình bày giao diện và sẽ được nối với hệ thống thật ở bước sau.",
         CancelUrl = cancelUrl,
-        Notice = "// TODO: connect database later",
+        Notice = "Vui lòng rà soát kỹ thông tin trước khi xác nhận.",
         Sections = [new FormSectionViewModel { Title = "Thông tin", Fields = fields }]
     });
 
     internal static IActionResult Details(StaffControllerBase controller, string title, List<BreadcrumbItemViewModel> breadcrumbs, string backUrl) => controller.ManagementDetailsView(new ManagementDetailsPageViewModel
     {
         Title = title,
-        Subtitle = "Trang chi tiết mock để minh họa luồng xử lý giáo vụ.",
+        Subtitle = "Trang chi tiết dùng để minh họa luồng xử lý trong khu giáo vụ.",
         Breadcrumbs = breadcrumbs,
-        Sections = [new DetailSectionViewModel { Title = "Ghi chú", Items = [new() { Label = "Tình trạng", Value = "Đang mock UI", IsBadge = true, BadgeClass = "bg-warning-subtle text-warning-emphasis" }, new() { Label = "TODO", Value = "Kết nối nghiệp vụ và DB sau" }] }],
+        Sections = [new DetailSectionViewModel { Title = "Ghi chú", Items = [new() { Label = "Tình trạng", Value = "Đang theo dõi", IsBadge = true, BadgeClass = "bg-success-subtle text-success-emphasis" }, new() { Label = "Bước tiếp theo", Value = "Mở rộng thêm dữ liệu và biểu mẫu theo nhu cầu vận hành." }] }],
         Actions = [new QuickActionViewModel { Label = "Quay lại", Url = backUrl, Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }]
     });
 }

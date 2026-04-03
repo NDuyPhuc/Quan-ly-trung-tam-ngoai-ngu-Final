@@ -1,24 +1,60 @@
 @model RegisterViewModel
 
-<section class="py-5 auth-section">
+<section class="auth-showcase-section">
     <div class="container">
-        @await Html.PartialAsync("~/Views/Shared/Partials/_Breadcrumbs.cshtml", Model.Breadcrumbs)
-        <div class="row justify-content-center">
-            <div class="col-lg-7">
-                <div class="panel-card">
-                    <div class="panel-card-header"><div><h3>@Model.Title</h3><p>@Model.Subtitle</p></div></div>
-                    <form asp-action="Register" method="post" class="row g-4">
-                        <div class="col-md-6"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control" /><span asp-validation-for="FullName" class="text-danger small"></span></div>
-                        <div class="col-md-6"><label asp-for="Phone" class="form-label"></label><input asp-for="Phone" class="form-control" /><span asp-validation-for="Phone" class="text-danger small"></span></div>
-                        <div class="col-12"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger small"></span></div>
-                        <div class="col-md-6"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control" /><span asp-validation-for="Password" class="text-danger small"></span></div>
-                        <div class="col-md-6"><label asp-for="ConfirmPassword" class="form-label"></label><input asp-for="ConfirmPassword" class="form-control" /><span asp-validation-for="ConfirmPassword" class="text-danger small"></span></div>
-                        <div class="col-12 d-flex gap-2">
-                            <button class="btn btn-primary" type="submit">Tạo tài khoản mock</button>
-                            <a class="btn btn-outline-secondary" asp-action="Login">Quay lại đăng nhập</a>
-                        </div>
-                    </form>
+        <div class="auth-showcase-layout">
+            <div class="auth-showcase-visual register">
+                <img src="@AppUi.PublicImageUrl("register")" alt="Minh họa đăng ký NorthStar English" />
+                <div class="auth-showcase-overlay">
+                    <span class="auth-spotlight-pill">Hành trình học tập mới</span>
+                    <h1>Tạo tài khoản để bắt đầu lộ trình cùng NorthStar English</h1>
+                    <p>Biểu mẫu đăng ký được làm lại theo bố cục hiện đại, nhiều khoảng thở và phần minh họa lớn giống tinh thần của giao diện mẫu.</p>
+                    <div class="auth-benefit-list">
+                        <div><i class="bi bi-check-circle-fill"></i>Giữ nguyên tất cả trường dữ liệu hiện có</div>
+                        <div><i class="bi bi-check-circle-fill"></i>Trình bày rõ ràng hơn cho học viên mới</div>
+                        <div><i class="bi bi-check-circle-fill"></i>Đồng bộ ngôn ngữ với toàn bộ trang công khai</div>
+                    </div>
                 </div>
+            </div>
+
+            <div class="auth-showcase-card">
+                <span class="auth-card-kicker">Tạo tài khoản mới</span>
+                <h2>@Model.Title</h2>
+                <p class="page-subtitle">@Model.Subtitle</p>
+
+                <form asp-action="Register" method="post" class="row g-4">
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" placeholder="Nguyễn Văn A" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" class="form-control" placeholder="0901 234 567" />
+                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" placeholder="********" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="********" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 d-flex flex-wrap gap-2">
+                        <button class="btn btn-primary auth-submit-btn" type="submit">Tạo tài khoản <i class="bi bi-arrow-right"></i></button>
+                        <a class="btn btn-outline-primary" asp-action="Login">Quay lại đăng nhập</a>
+                    </div>
+                </form>
+
+                <p class="auth-switch-copy">Đã có tài khoản? <a asp-action="Login">Đăng nhập ngay</a></p>
             </div>
         </div>
     </div>

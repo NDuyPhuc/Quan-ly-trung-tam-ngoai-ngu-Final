@@ -1,28 +1,59 @@
 @model NewsListPageViewModel
+@{
+    var featuredArticle = Model.Articles.FirstOrDefault();
+}
 
-<section class="py-5">
+<section class="page-section page-section-spacious">
     <div class="container">
         @await Html.PartialAsync("~/Views/Shared/Partials/_Breadcrumbs.cshtml", Model.Breadcrumbs)
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow text-primary">Bản tin trung tâm</span>
-                <h1>@Model.Title</h1>
-                <p class="page-subtitle">@Model.Subtitle</p>
+
+        <div class="catalog-hero-card">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <span class="landing-label">Bản tin trung tâm</span>
+                    <h1>@Model.Title</h1>
+                    <p class="page-subtitle">@Model.Subtitle</p>
+                    <div class="hero-chip-row">
+                        <span class="info-pill">@Model.Articles.Count bài viết</span>
+                        <span class="info-pill">Thông báo - sự kiện - chia sẻ</span>
+                        <span class="info-pill">Thẻ ảnh giống giao diện tham chiếu</span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    @if (featuredArticle is not null)
+                    {
+                        <a class="featured-news-panel" asp-action="Details" asp-route-id="@featuredArticle.Slug">
+                            <div class="featured-news-media">
+                                <img src="@AppUi.NewsImageUrl(featuredArticle.Slug)" alt="@featuredArticle.Title" />
+                            </div>
+                            <div class="featured-news-body">
+                                <span>@featuredArticle.Category</span>
+                                <h3>@featuredArticle.Title</h3>
+                                <p>@featuredArticle.Summary</p>
+                            </div>
+                        </a>
+                    }
+                </div>
             </div>
         </div>
+
         <div class="row g-4">
             @foreach (var article in Model.Articles)
             {
                 <div class="col-lg-4">
-                    <article class="news-card h-100">
-                        <div class="news-card-meta">
-                            <span>@article.Category</span>
-                            <span>@article.PublishedOn.ToString("dd/MM/yyyy")</span>
+                    <article class="news-media-card h-100">
+                        <div class="news-media-thumb">
+                            <img src="@AppUi.NewsImageUrl(article.Slug)" alt="@article.Title" />
                         </div>
-                        <h3>@article.Title</h3>
-                        <p>@article.Summary</p>
-                        <div class="small text-muted mb-3">Tác giả: @article.Author</div>
-                        <a class="btn btn-outline-primary" asp-action="Details" asp-route-id="@article.Slug">Đọc chi tiết</a>
+                        <div class="news-media-body">
+                            <div class="news-meta-top">
+                                <span>@article.Category</span>
+                                <span>@article.PublishedOn.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <h3>@article.Title</h3>
+                            <p>@article.Summary</p>
+                            <a asp-action="Details" asp-route-id="@article.Slug">Đọc chi tiết</a>
+                        </div>
                     </article>
                 </div>
             }
