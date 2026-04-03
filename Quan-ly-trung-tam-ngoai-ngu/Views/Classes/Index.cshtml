@@ -1,47 +1,96 @@
 @model ClassCatalogPageViewModel
 
-<section class="py-5">
+<section class="page-section page-section-spacious">
     <div class="container">
         @await Html.PartialAsync("~/Views/Shared/Partials/_Breadcrumbs.cshtml", Model.Breadcrumbs)
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow text-primary">Lịch khai giảng</span>
-                <h1>@Model.Title</h1>
-                <p class="page-subtitle">@Model.Subtitle</p>
+
+        <div class="catalog-hero-card">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <span class="landing-label">Lịch khai giảng</span>
+                    <h1>@Model.Title</h1>
+                    <p class="page-subtitle">@Model.Subtitle</p>
+                    <div class="hero-chip-row">
+                        <span class="info-pill">@Model.Classes.Count lớp đang hiển thị</span>
+                        <span class="info-pill">Theo dõi giáo viên và phòng học</span>
+                        <span class="info-pill">Bố cục giống bảng lịch của mẫu</span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="catalog-hero-media">
+                        <img src="@AppUi.PublicImageUrl("about")" alt="Minh họa lớp học đang mở" />
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="toolbar-row mb-4">
-            <div class="toolbar-search"><i class="bi bi-search"></i><input class="form-control" placeholder="Tìm theo mã lớp hoặc khóa học..." /></div>
-            <div class="toolbar-filters">
-                @foreach (var filter in Model.Filters)
-                {
-                    <select class="form-select">
-                        <option>@filter.Label</option>
-                        @foreach (var option in filter.Options)
-                        {
-                            <option value="@option.Value">@option.Label</option>
-                        }
-                    </select>
-                }
+
+        <div class="panel-card modern-toolbar-card mb-4">
+            <div class="toolbar-row mb-0">
+                <div class="toolbar-search">
+                    <i class="bi bi-search"></i>
+                    <input class="form-control" placeholder="Tìm theo mã lớp hoặc khóa học..." />
+                </div>
+                <div class="toolbar-filters">
+                    @foreach (var filter in Model.Filters)
+                    {
+                        <select class="form-select">
+                            <option>@filter.Label</option>
+                            @foreach (var option in filter.Options)
+                            {
+                                <option value="@option.Value">@option.Label</option>
+                            }
+                        </select>
+                    }
+                </div>
             </div>
         </div>
-        <div class="row g-4">
+
+        <div class="schedule-table-card spacious">
+            <div class="schedule-table-head extended">
+                <div>Mã lớp</div>
+                <div>Khóa học</div>
+                <div>Thời gian</div>
+                <div>Phòng</div>
+                <div>Giáo viên</div>
+                <div>Trạng thái</div>
+                <div></div>
+            </div>
             @foreach (var item in Model.Classes)
             {
-                <div class="col-lg-4">
-                    <div class="schedule-card h-100">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div>
-                                <h3>@item.Code</h3>
-                                <p class="mb-0 text-secondary">@item.CourseName</p>
-                            </div>
-                            <span class="badge @AppUi.StatusBadgeClass(item.Status)">@item.Status</span>
+                <div class="schedule-table-row extended">
+                    <div class="schedule-cell">
+                        <span class="mobile-label">Mã lớp</span>
+                        <strong>@item.Code</strong>
+                        <small>Khai giảng @item.StartDate.ToString("dd/MM/yyyy")</small>
+                    </div>
+                    <div class="schedule-cell">
+                        <span class="mobile-label">Khóa học</span>
+                        @item.CourseName
+                    </div>
+                    <div class="schedule-cell">
+                        <span class="mobile-label">Thời gian</span>
+                        @item.Schedule
+                    </div>
+                    <div class="schedule-cell">
+                        <span class="mobile-label">Phòng</span>
+                        @item.Room
+                    </div>
+                    <div class="schedule-cell">
+                        <span class="mobile-label">Giáo viên</span>
+                        <div class="teacher-inline">
+                            <span class="teacher-avatar @AppUi.ToneClass(item.TeacherName)">@AppUi.TeacherInitials(item.TeacherName)</span>
+                            <span>@item.TeacherName</span>
                         </div>
-                        <div class="schedule-meta"><i class="bi bi-person-workspace"></i>@item.TeacherName</div>
-                        <div class="schedule-meta"><i class="bi bi-clock"></i>@item.Schedule</div>
-                        <div class="schedule-meta"><i class="bi bi-door-open"></i>@item.Room</div>
-                        <div class="schedule-meta"><i class="bi bi-calendar-event"></i>@item.StartDate.ToString("dd/MM/yyyy")</div>
-                        <div class="seat-pill mt-3">Còn @item.SeatsLeft chỗ</div>
+                    </div>
+                    <div class="schedule-cell">
+                        <span class="mobile-label">Trạng thái</span>
+                        <div class="d-flex flex-column align-items-start gap-2">
+                            <span class="badge @AppUi.StatusBadgeClass(item.Status)">@item.Status</span>
+                            <small>Còn @item.SeatsLeft chỗ</small>
+                        </div>
+                    </div>
+                    <div class="schedule-cell action">
+                        <a class="btn btn-primary btn-sm" asp-controller="Contact" asp-action="Index">Đăng ký</a>
                     </div>
                 </div>
             }

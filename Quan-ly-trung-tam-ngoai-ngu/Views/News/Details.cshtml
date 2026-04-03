@@ -1,30 +1,56 @@
 @model NewsDetailPageViewModel
 
-<section class="py-5">
+<section class="page-section page-section-spacious">
     <div class="container">
         @await Html.PartialAsync("~/Views/Shared/Partials/_Breadcrumbs.cshtml", Model.Breadcrumbs)
-        <div class="row g-5">
-            <div class="col-lg-8">
-                <div class="news-card h-100 p-4">
-                    <div class="news-card-meta">
-                        <span>@Model.Article.Category</span>
-                        <span>@Model.Article.PublishedOn.ToString("dd/MM/yyyy")</span>
-                    </div>
+
+        <div class="catalog-hero-card">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <span class="landing-label">@Model.Article.Category</span>
                     <h1>@Model.Article.Title</h1>
                     <p class="page-subtitle">@Model.Article.Summary</p>
-                    <div class="small text-muted mb-4">Tác giả: @Model.Article.Author</div>
-                    <div class="article-content">@Model.Content</div>
+                    <div class="hero-chip-row">
+                        <span class="info-pill">@Model.Article.Author</span>
+                        <span class="info-pill">@Model.Article.PublishedOn.ToString("dd/MM/yyyy")</span>
+                    </div>
                 </div>
+                <div class="col-lg-6">
+                    <div class="catalog-hero-media">
+                        <img src="@AppUi.NewsImageUrl(Model.Article.Slug)" alt="@Model.Article.Title" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <article class="news-media-card h-100">
+                    <div class="news-media-body article-body">
+                        <div class="news-meta-top">
+                            <span>@Model.Article.Category</span>
+                            <span>@Model.Article.PublishedOn.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <h3>@Model.Article.Title</h3>
+                        <p class="text-muted mb-4">Tác giả: @Model.Article.Author</p>
+                        <div class="article-content">@Model.Content</div>
+                    </div>
+                </article>
             </div>
             <div class="col-lg-4">
                 <div class="panel-card">
-                    <div class="panel-card-header"><div><h3>Bài viết liên quan</h3><p>Tiếp tục khám phá các nội dung khác từ trung tâm.</p></div></div>
-                    <div class="list-group list-group-flush panel-list">
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>Bài viết liên quan</h3>
+                            <p>Tiếp tục khám phá các nội dung khác từ trung tâm.</p>
+                        </div>
+                    </div>
+                    <div class="preview-list">
                         @foreach (var article in Model.RelatedArticles)
                         {
-                            <a class="list-group-item text-decoration-none" asp-action="Details" asp-route-id="@article.Slug">
+                            <a class="preview-list-item preview-link-item" asp-action="Details" asp-route-id="@article.Slug">
                                 <strong>@article.Title</strong>
-                                <div class="small text-muted">@article.PublishedOn.ToString("dd/MM/yyyy") • @article.Category</div>
+                                <span>@article.PublishedOn.ToString("dd/MM/yyyy") | @article.Category</span>
                             </a>
                         }
                     </div>

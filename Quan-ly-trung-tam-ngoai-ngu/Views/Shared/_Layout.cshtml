@@ -1,72 +1,122 @@
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    var pageModel = ViewData.Model as AppPageViewModel;
+    var pageTitle = ViewData["Title"]?.ToString() ?? pageModel?.Title ?? "NorthStar English";
+    var demoRole = Context.Session.GetString("DemoUserRole");
+    var demoName = Context.Session.GetString("DemoUserDisplayName");
+    var dashboardUrl = demoRole switch
+    {
+        "Admin" => Url.Action("Index", "Dashboard", new { area = "Admin" }) ?? "/Admin",
+        "Staff" => Url.Action("Index", "Dashboard", new { area = "Staff" }) ?? "/Staff",
+        "Teacher" => Url.Action("Index", "Dashboard", new { area = "Teacher" }) ?? "/Teacher",
+        _ => Url.Action("Index", "Home") ?? "/"
+    };
+
+    string NavClass(string controller)
+        => currentController.Equals(controller, StringComparison.OrdinalIgnoreCase) ? "nav-link active" : "nav-link";
+}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - NorthStar English Center</title>
+    <title>@pageTitle - NorthStar English</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Quan_ly_trung_tam_ngoai_ngu.styles.css" asp-append-version="true" />
 </head>
-<body class="app-body">
+<body class="app-body public-body">
     <header class="site-header sticky-top">
-        <nav class="navbar navbar-expand-lg navbar-dark border-bottom border-white border-opacity-10">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center gap-3" asp-controller="Home" asp-action="Index">
-                    <span class="brand-mark"><i class="bi bi-mortarboard-fill"></i></span>
-                    <span>
-                        <strong>NorthStar English</strong>
-                        <small>Quản lý trung tâm ngoại ngữ</small>
-                    </span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg site-navbar public-navbar">
+                <a class="navbar-brand brand-wordmark" asp-controller="Home" asp-action="Index">NorthStar English</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Mở điều hướng">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav mx-auto gap-lg-2">
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="About" asp-action="Index">Giới thiệu</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Courses" asp-action="Index">Khóa học</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Classes" asp-action="Index">Lớp học</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="News" asp-action="Index">Tin tức</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Contact" asp-action="Index">Liên hệ</a></li>
+                    <ul class="navbar-nav mx-auto public-nav-list">
+                        <li class="nav-item"><a class="@NavClass("Home")" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                        <li class="nav-item"><a class="@NavClass("About")" asp-controller="About" asp-action="Index">Giới thiệu</a></li>
+                        <li class="nav-item"><a class="@NavClass("Courses")" asp-controller="Courses" asp-action="Index">Khóa học</a></li>
+                        <li class="nav-item"><a class="@NavClass("Classes")" asp-controller="Classes" asp-action="Index">Lớp học</a></li>
+                        <li class="nav-item"><a class="@NavClass("News")" asp-controller="News" asp-action="Index">Tin tức</a></li>
+                        <li class="nav-item"><a class="@NavClass("Contact")" asp-controller="Contact" asp-action="Index">Liên hệ</a></li>
                     </ul>
-                    <div class="d-flex flex-wrap gap-2">
-                        @if (Context.Session.GetString("DemoUserRole") is not null)
+
+                    <div class="site-action-stack">
+                        @if (demoRole is not null)
                         {
-                            <a class="btn btn-light btn-sm" asp-controller="Profile" asp-action="Index"><i class="bi bi-person-circle me-2"></i>Hồ sơ</a>
-                            <a class="btn btn-outline-light btn-sm" asp-controller="Account" asp-action="Logout">Đăng xuất</a>
+                            <span class="nav-user-chip">
+                                <i class="bi bi-person-circle"></i>
+                                @demoName
+                            </span>
+                            <a class="btn btn-outline-primary btn-sm" href="@dashboardUrl">Bảng điều khiển</a>
+                            <a class="btn btn-primary btn-sm" asp-controller="Account" asp-action="Logout">Đăng xuất</a>
                         }
                         else
                         {
-                            <a class="btn btn-outline-light btn-sm" asp-controller="Account" asp-action="Login">Đăng nhập</a>
-                            <a class="btn btn-warning btn-sm" asp-controller="Account" asp-action="Register">Đăng ký</a>
+                            <a class="btn btn-ghost btn-sm" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                            <a class="btn btn-primary btn-sm" asp-controller="Account" asp-action="Register">Đăng ký</a>
                         }
                     </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </div>
     </header>
 
-    <main>
+    <main class="site-main">
         @RenderBody()
     </main>
 
-    <footer class="site-footer">
+    <footer class="site-footer public-footer">
         <div class="container">
-            <div class="row g-4 align-items-center">
-                <div class="col-lg-6">
-                    <h5>NorthStar English Center</h5>
-                    <p class="mb-0 text-secondary">Frontend skeleton cho đồ án “Xây dựng hệ thống website quản lý trung tâm ngoại ngữ”. Tập trung UI/UX, module nghiệp vụ và điều hướng sẵn sàng để nối backend sau.</p>
+            <div class="public-footer-shell">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="public-footer-brand">
+                            <a class="brand-wordmark" asp-controller="Home" asp-action="Index">NorthStar English</a>
+                            <p>Giải pháp giao diện cho trung tâm ngoại ngữ theo hướng sáng, học thuật và rõ nghiệp vụ, giữ nguyên toàn bộ luồng chức năng hiện có.</p>
+                            <div class="footer-socials">
+                                <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                                <a href="#" aria-label="Youtube"><i class="bi bi-youtube"></i></a>
+                                <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-2">
+                        <h6 class="footer-title">Khóa học</h6>
+                        <div class="footer-links">
+                            <a asp-controller="Courses" asp-action="Index">TOEIC 650+</a>
+                            <a asp-controller="Courses" asp-action="Index">IELTS nền tảng</a>
+                            <a asp-controller="Courses" asp-action="Index">Tiếng Anh giao tiếp</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-2">
+                        <h6 class="footer-title">Hỗ trợ</h6>
+                        <div class="footer-links">
+                            <a asp-controller="Home" asp-action="Privacy">Chính sách riêng tư</a>
+                            <a asp-controller="Contact" asp-action="Index">Liên hệ tư vấn</a>
+                            <a asp-controller="Account" asp-action="Login">Đăng nhập hệ thống</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <h6 class="footer-title">Nhận thông tin</h6>
+                        <p class="footer-subtitle">Đăng ký nhận các bản tin về lịch khai giảng, workshop và thông báo mới nhất từ trung tâm.</p>
+                        <div class="footer-newsletter-form">
+                            <input type="email" class="form-control" placeholder="Email của bạn" aria-label="Email của bạn" />
+                            <button type="button" class="btn btn-primary btn-sm">Gửi</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-lg-6 text-lg-end">
-                    <div class="footer-meta">Địa chỉ mock: 120 Nguyễn Văn Linh, Đà Nẵng</div>
-                    <div class="footer-meta">Hotline mock: 0901 001 001</div>
-                    <div class="footer-meta">Email: hello@northstarenglish.vn</div>
+                <div class="footer-bottom">
+                    <span>&copy; 2026 NorthStar English.</span>
+                    <span>Giao diện được làm mới theo mẫu tham chiếu nhưng không thay đổi chức năng.</span>
                 </div>
             </div>
         </div>

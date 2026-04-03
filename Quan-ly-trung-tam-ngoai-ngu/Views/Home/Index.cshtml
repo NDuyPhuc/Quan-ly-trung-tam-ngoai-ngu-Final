@@ -1,29 +1,43 @@
 @model HomePageViewModel
+@{
+    var coreValues = new[]
+    {
+        new { Title = "Chất lượng thực học", Description = "Cam kết kết quả dựa trên lộ trình học rõ ràng và có đo lường." },
+        new { Title = "Tận tâm", Description = "Đồng hành với học viên ở mọi chặng của quá trình học tập." },
+        new { Title = "Sáng tạo", Description = "Liên tục cập nhật phương pháp giảng dạy và giao diện vận hành." },
+        new { Title = "Kết nối", Description = "Xây dựng cộng đồng học tập văn minh, hỗ trợ lẫn nhau." }
+    };
+    var advantages = new[]
+    {
+        "Theo dõi tiến độ học tập 24/7 qua hệ thống.",
+        "Kho tài liệu số không bị phân mảnh theo từng bộ phận.",
+        "Tương tác trực tiếp với giáo viên và giáo vụ nhanh hơn."
+    };
+}
 
-<section class="hero-section">
+<section class="landing-hero-section">
     <div class="container">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-7">
-                <span class="eyebrow">Đồ án quản lý trung tâm ngoại ngữ</span>
-                <h1>@Model.HeroTitle</h1>
-                <p class="hero-copy">@Model.HeroSubtitle</p>
-                <div class="d-flex flex-wrap gap-3">
-                    <a class="btn btn-warning btn-lg" asp-controller="Courses" asp-action="Index">Xem khóa học</a>
-                    <a class="btn btn-outline-light btn-lg" asp-controller="Contact" asp-action="Index">Đăng ký tư vấn</a>
+        <div class="landing-hero-shell">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <span class="landing-label">Tiếng Anh cho mọi người</span>
+                    <h1 class="landing-hero-title">@Model.HeroTitle</h1>
+                    <p class="landing-hero-copy">@Model.HeroSubtitle</p>
+                    <div class="landing-hero-actions">
+                        <a class="btn btn-primary btn-lg" asp-controller="Courses" asp-action="Index">Xem khóa học</a>
+                        <a class="btn btn-outline-primary btn-lg" asp-controller="Contact" asp-action="Index">Đăng ký tư vấn</a>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-5">
-                <div class="hero-panel">
-                    <div class="hero-panel-badge"><i class="bi bi-stars me-2"></i>Frontend skeleton sẵn sàng demo</div>
-                    <div class="hero-panel-grid">
-                        @foreach (var stat in Model.HighlightStats)
-                        {
-                            <div class="hero-mini-card">
-                                <span>@stat.Title</span>
-                                <strong>@stat.Value</strong>
-                                <small>@stat.Description</small>
+                <div class="col-lg-6">
+                    <div class="landing-hero-media">
+                        <img src="@AppUi.PublicImageUrl("hero")" alt="Minh họa lớp học NorthStar English" />
+                        <div class="landing-hero-overlay">
+                            <span class="overlay-icon"><i class="bi bi-stars"></i></span>
+                            <div>
+                                <strong>Giảng viên bản ngữ</strong>
+                                <span>100+ buổi chuyên đề kỹ năng được tổ chức định kỳ mỗi quý.</span>
                             </div>
-                        }
+                        </div>
                     </div>
                 </div>
             </div>
@@ -31,29 +45,78 @@
     </div>
 </section>
 
-<section class="py-5">
+<section class="landing-section">
     <div class="container">
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow text-primary">Khóa học nổi bật</span>
-                <h2>Lộ trình rõ ràng cho TOEIC, IELTS và giao tiếp</h2>
-            </div>
-            <a class="btn btn-outline-primary" asp-controller="Courses" asp-action="Index">Tất cả khóa học</a>
+        <div class="landing-section-header centered">
+            <h2>Giá Trị Cốt Lõi &amp; Lợi Thế</h2>
+            <p>Những nguyên tắc vận hành và các điểm mạnh giúp giao diện mới bám sát tinh thần học thuật hiện đại của mẫu tham chiếu.</p>
         </div>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="landing-panel soft">
+                    <div class="panel-heading-with-icon">
+                        <span class="panel-heading-icon"><i class="bi bi-gem"></i></span>
+                        <h3>Giá trị cốt lõi</h3>
+                    </div>
+                    <div class="value-grid">
+                        @foreach (var item in coreValues)
+                        {
+                            <div class="value-card">
+                                <h4>@item.Title</h4>
+                                <p>@item.Description</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="landing-panel accent">
+                    <h3>Lợi thế hệ thống hiện đại</h3>
+                    <p>Thiết kế mới giữ nguyên nghiệp vụ nhưng trình bày sáng hơn, có điểm nhấn hình ảnh giống bố cục bạn gửi.</p>
+                    <ul class="accent-list">
+                        @foreach (var item in advantages)
+                        {
+                            <li><i class="bi bi-check-circle-fill"></i>@item</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="landing-section muted">
+    <div class="container">
+        <div class="landing-section-header between">
+            <div>
+                <h2>Khóa Học Nổi Bật</h2>
+                <p>Lộ trình học được tách rõ trên trang riêng, nhưng vẫn có bản xem nhanh ngay tại trang chủ.</p>
+            </div>
+            <a class="section-link" asp-controller="Courses" asp-action="Index">Xem tất cả khóa học <i class="bi bi-arrow-right"></i></a>
+        </div>
+
         <div class="row g-4">
             @foreach (var course in Model.FeaturedCourses)
             {
                 <div class="col-lg-4">
-                    <article class="feature-card h-100">
-                        <span class="badge @AppUi.StatusBadgeClass(course.Status)">@course.Status</span>
-                        <h3>@course.Name</h3>
-                        <p>@course.ShortDescription</p>
-                        <ul class="feature-list">
-                            <li><i class="bi bi-bar-chart"></i>@course.Level</li>
-                            <li><i class="bi bi-clock-history"></i>@course.Duration</li>
-                            <li><i class="bi bi-cash-coin"></i>@AppUi.Currency(course.TuitionFee)</li>
-                        </ul>
-                        <a class="btn btn-link px-0" asp-controller="Courses" asp-action="Details" asp-route-id="@course.Slug">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
+                    <article class="catalog-media-card h-100">
+                        <div class="catalog-media-thumb">
+                            <img src="@AppUi.CourseImageUrl(course.Slug)" alt="@course.Name" />
+                            <span class="catalog-chip catalog-chip-primary">@AppUi.CourseTag(course.Slug)</span>
+                            <span class="catalog-chip catalog-chip-light">@course.Level</span>
+                        </div>
+                        <div class="catalog-media-body">
+                            <div class="catalog-meta-row">
+                                <span>@course.ScheduleSummary</span>
+                                <span>@course.Duration</span>
+                            </div>
+                            <h3>@course.Name</h3>
+                            <p>@course.ShortDescription</p>
+                            <div class="catalog-card-footer">
+                                <strong>@AppUi.Currency(course.TuitionFee)</strong>
+                                <a asp-controller="Courses" asp-action="Details" asp-route-id="@course.Slug">Xem chi tiết</a>
+                            </div>
+                        </div>
                     </article>
                 </div>
             }
@@ -61,32 +124,50 @@
     </div>
 </section>
 
-<section class="py-5 bg-soft">
+<section class="landing-section">
     <div class="container">
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow text-primary">Lớp học đang mở</span>
-                <h2>Lịch học linh hoạt cho sinh viên và người đi làm</h2>
-            </div>
-            <a class="btn btn-outline-primary" asp-controller="Classes" asp-action="Index">Xem lịch lớp</a>
+        <div class="landing-section-header centered">
+            <h2>Lịch Khai Giảng Dự Kiến</h2>
+            <p>Lịch học linh hoạt, nhịp học rõ ràng và có giáo viên phụ trách hiển thị ngay trên giao diện.</p>
         </div>
-        <div class="row g-4">
-            @foreach (var classItem in Model.OpenClasses)
+
+        <div class="schedule-table-card">
+            <div class="schedule-table-head">
+                <div>Mã lớp</div>
+                <div>Khóa học</div>
+                <div>Thời gian</div>
+                <div>Giáo viên</div>
+                <div>Trạng thái</div>
+                <div></div>
+            </div>
+            @foreach (var item in Model.OpenClasses)
             {
-                <div class="col-lg-4">
-                    <div class="schedule-card h-100">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div>
-                                <h3>@classItem.Code</h3>
-                                <p class="mb-0 text-secondary">@classItem.CourseName</p>
-                            </div>
-                            <span class="badge @AppUi.StatusBadgeClass(classItem.Status)">@classItem.Status</span>
+                <div class="schedule-table-row">
+                    <div class="schedule-cell">
+                        <span class="mobile-label">Mã lớp</span>
+                        <strong>@item.Code</strong>
+                    </div>
+                    <div class="schedule-cell">
+                        <span class="mobile-label">Khóa học</span>
+                        @item.CourseName
+                    </div>
+                    <div class="schedule-cell">
+                        <span class="mobile-label">Thời gian</span>
+                        @item.Schedule
+                    </div>
+                    <div class="schedule-cell">
+                        <span class="mobile-label">Giáo viên</span>
+                        <div class="teacher-inline">
+                            <span class="teacher-avatar @AppUi.ToneClass(item.TeacherName)">@AppUi.TeacherInitials(item.TeacherName)</span>
+                            <span>@item.TeacherName</span>
                         </div>
-                        <div class="schedule-meta"><i class="bi bi-person-workspace"></i>@classItem.TeacherName</div>
-                        <div class="schedule-meta"><i class="bi bi-clock"></i>@classItem.Schedule</div>
-                        <div class="schedule-meta"><i class="bi bi-door-open"></i>@classItem.Room</div>
-                        <div class="schedule-meta"><i class="bi bi-calendar-event"></i>Khai giảng: @classItem.StartDate.ToString("dd/MM/yyyy")</div>
-                        <div class="seat-pill mt-3">Còn @classItem.SeatsLeft chỗ</div>
+                    </div>
+                    <div class="schedule-cell">
+                        <span class="mobile-label">Trạng thái</span>
+                        <span class="badge @AppUi.StatusBadgeClass(item.Status)">@item.Status</span>
+                    </div>
+                    <div class="schedule-cell action">
+                        <a class="btn btn-primary btn-sm" asp-controller="Contact" asp-action="Index">Đăng ký</a>
                     </div>
                 </div>
             }
@@ -94,27 +175,33 @@
     </div>
 </section>
 
-<section class="py-5">
+<section class="landing-section muted">
     <div class="container">
-        <div class="section-heading">
+        <div class="landing-section-header between">
             <div>
-                <span class="eyebrow text-primary">Tin tức mới</span>
-                <h2>Cập nhật thông báo, workshop và kinh nghiệm học tập</h2>
+                <h2>Tin Tức &amp; Sự Kiện</h2>
+                <p>Bản tin được trình bày theo kiểu thẻ ảnh để gần hơn với giao diện mẫu bạn gửi.</p>
             </div>
-            <a class="btn btn-outline-primary" asp-controller="News" asp-action="Index">Xem tất cả</a>
+            <a class="section-link" asp-controller="News" asp-action="Index">Xem tất cả <i class="bi bi-arrow-right"></i></a>
         </div>
+
         <div class="row g-4">
             @foreach (var article in Model.LatestNews)
             {
                 <div class="col-lg-4">
-                    <article class="news-card h-100">
-                        <div class="news-card-meta">
-                            <span>@article.Category</span>
-                            <span>@article.PublishedOn.ToString("dd/MM/yyyy")</span>
+                    <article class="news-media-card h-100">
+                        <div class="news-media-thumb">
+                            <img src="@AppUi.NewsImageUrl(article.Slug)" alt="@article.Title" />
                         </div>
-                        <h3>@article.Title</h3>
-                        <p>@article.Summary</p>
-                        <a class="btn btn-link px-0" asp-controller="News" asp-action="Details" asp-route-id="@article.Slug">Đọc bài viết <i class="bi bi-arrow-right"></i></a>
+                        <div class="news-media-body">
+                            <div class="news-meta-top">
+                                <span>@article.Category</span>
+                                <span>@article.PublishedOn.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <h3>@article.Title</h3>
+                            <p>@article.Summary</p>
+                            <a asp-controller="News" asp-action="Details" asp-route-id="@article.Slug">Đọc chi tiết</a>
+                        </div>
                     </article>
                 </div>
             }

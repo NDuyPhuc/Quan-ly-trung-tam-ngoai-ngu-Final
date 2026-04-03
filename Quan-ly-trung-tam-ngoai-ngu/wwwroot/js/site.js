@@ -9,10 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
       if (!confirmModal || !confirmMessageElement || !confirmButtonElement) return;
 
-      confirmMessageElement.textContent = trigger.getAttribute("data-confirm-message") || "Ban co chac chan muon tiep tuc?";
+      confirmMessageElement.textContent = trigger.getAttribute("data-confirm-message") || "Bạn có chắc chắn muốn tiếp tục?";
       confirmButtonElement.onclick = () => {
         confirmModal.hide();
-        showInlineToast("Da xac nhan thao tac mock thanh cong.", "success");
+        showInlineToast("Đã xác nhận thao tác mô phỏng thành công.", "success");
       };
       confirmModal.show();
     });
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".mock-submit-form").forEach((form) => {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      showInlineToast("Da luu tam giao dien mock. // TODO: connect database later", "success");
+      showInlineToast("Đã lưu tạm dữ liệu giao diện mô phỏng. Chức năng xử lý thật sẽ được nối ở bước sau.", "success");
     });
   });
 
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const raw = canvas.getAttribute("data-chart-config");
     if (!raw) return;
     const config = JSON.parse(raw);
-    const colors = config.Colors?.length ? config.Colors : ["#1d4ed8"];
+    const colors = config.Colors?.length ? config.Colors : ["#446a9f"];
 
     new Chart(canvas, {
       type: config.ChartType || "bar",
@@ -39,10 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
           label: config.Title,
           data: config.Values,
           borderColor: colors[0],
-          backgroundColor: config.ChartType === "line" ? "rgba(37,99,235,0.15)" : colors,
+          backgroundColor: config.ChartType === "line" ? "rgba(68,106,159,0.14)" : colors,
           fill: config.ChartType === "line",
           borderWidth: 2,
-          borderRadius: 10,
+          borderRadius: 12,
           tension: 0.35
         }]
       },
@@ -68,8 +68,8 @@ function showInlineToast(message, type) {
   toastContainer.innerHTML = `
     <div class="toast show border-0 app-toast app-toast-${type}" role="alert">
       <div class="toast-header border-0">
-        <strong class="me-auto">Thong bao</strong>
-        <small>vua xong</small>
+        <strong class="me-auto">Thông báo</strong>
+        <small>vừa xong</small>
         <button type="button" class="btn-close ms-2 mb-1" data-bs-dismiss="toast"></button>
       </div>
       <div class="toast-body">${message}</div>

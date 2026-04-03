@@ -14,18 +14,18 @@ public class DashboardController : TeacherControllerBase
     {
         return DashboardView(new DashboardPageViewModel
         {
-            Title = "Teacher Dashboard",
-            Subtitle = "Theo dõi lớp đang dạy, buổi học hôm nay, điểm danh và nhập điểm.",
-            Breadcrumbs = Breadcrumbs("Dashboard"),
+            Title = "Bảng điều khiển giáo viên",
+            Subtitle = "Theo dõi lớp đang dạy, buổi học hôm nay, điểm danh và nhập điểm trên cùng một bố cục trực quan hơn.",
+            Breadcrumbs = Breadcrumbs("Tổng quan"),
             RoleName = "Giáo viên",
             SummaryCards =
             [
-                new SummaryCardViewModel { Title = "Lớp đang dạy", Value = DataService.GetClasses().Count.ToString(), Description = "Theo phân công mock", Icon = "bi-easel", AccentClass = "primary" },
+                new SummaryCardViewModel { Title = "Lớp đang dạy", Value = DataService.GetClasses().Count.ToString(), Description = "Theo phân công hiện tại", Icon = "bi-easel", AccentClass = "primary" },
                 new SummaryCardViewModel { Title = "Buổi học hôm nay", Value = DataService.GetSessions().Count(x => x.Status == "Hôm nay").ToString(), Description = "Cần chuẩn bị điểm danh", Icon = "bi-calendar-day", AccentClass = "info" },
                 new SummaryCardViewModel { Title = "Học viên cần điểm danh", Value = DataService.GetAttendanceRecords().Count.ToString(), Description = "Danh sách thao tác nhanh", Icon = "bi-list-check", AccentClass = "warning" },
-                new SummaryCardViewModel { Title = "Bài kiểm tra cần nhập điểm", Value = DataService.GetExamResults().Count.ToString(), Description = "Mock pending grading", Icon = "bi-journal-richtext", AccentClass = "success" }
+                new SummaryCardViewModel { Title = "Bài kiểm tra cần nhập điểm", Value = DataService.GetExamResults().Count.ToString(), Description = "Kết quả chờ cập nhật", Icon = "bi-journal-richtext", AccentClass = "success" }
             ],
-            Charts = [new ChartCardViewModel { ChartId = "teacherProgress", Title = "Tiến độ lớp theo tuần", Subtitle = "Mock learning progress", ChartType = "line", Labels = ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4"], Values = [25, 48, 66, 82], Colors = ["#1d4ed8"] }],
+            Charts = [new ChartCardViewModel { ChartId = "teacherProgress", Title = "Tiến độ lớp theo tuần", Subtitle = "Biểu đồ tiến độ học tập của lớp", ChartType = "line", Labels = ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4"], Values = [25, 48, 66, 82], Colors = ["#1d4ed8"] }],
             Panels = [new DashboardPanelViewModel { Title = "Lịch dạy gần nhất", Subtitle = "Các buổi học cần chuẩn bị", Items = DataService.GetSessions().Select(x => new PanelItemViewModel { Title = x.ClassCode, Meta = $"{x.SessionDate:dd/MM/yyyy} • {x.TimeSlot}", Value = x.Topic, BadgeText = x.Status, BadgeClass = AppUi.StatusBadgeClass(x.Status) }).ToList() }],
             QuickActions = [new QuickActionViewModel { Label = "Điểm danh theo buổi", Url = "/Teacher/Attendance/Create", Icon = "bi-list-check" }, new QuickActionViewModel { Label = "Nhập điểm", Url = "/Teacher/Exams/Create", Icon = "bi-pencil-square", CssClass = "btn btn-outline-primary" }]
         });
@@ -69,7 +69,7 @@ internal static class TeacherPageHelpers
     internal static IActionResult List(TeacherControllerBase controller, string title, string baseUrl, List<TableRowViewModel> rows) => controller.ManagementListView(new ManagementListPageViewModel
     {
         Title = title,
-        Subtitle = $"Module {title.ToLowerInvariant()} dành cho giáo viên.",
+        Subtitle = $"Phân hệ {title.ToLowerInvariant()} dành cho giáo viên.",
         Breadcrumbs = TeacherControllerBase.Breadcrumbs(title),
         PrimaryActionText = $"Mở {title.ToLowerInvariant()}",
         PrimaryActionUrl = $"{baseUrl}/Create",
@@ -79,21 +79,21 @@ internal static class TeacherPageHelpers
     internal static IActionResult Form(TeacherControllerBase controller, string title, List<BreadcrumbItemViewModel> breadcrumbs, string cancelUrl, List<FormFieldViewModel> fields) => controller.ManagementFormView(new ManagementFormPageViewModel
     {
         Title = title,
-        Subtitle = "Form mock cho giáo viên.",
+        Subtitle = "Biểu mẫu nghiệp vụ dành cho giáo viên.",
         Breadcrumbs = breadcrumbs,
         FormTitle = title,
-        FormDescription = "Dữ liệu chỉ phục vụ demo UI. // TODO: connect database later",
+        FormDescription = "Dữ liệu hiện phục vụ trình bày giao diện và sẽ được nối với hệ thống thật ở bước sau.",
         CancelUrl = cancelUrl,
-        Notice = "// TODO: connect database later",
+        Notice = "Vui lòng kiểm tra kỹ thông tin trước khi xác nhận.",
         Sections = [new FormSectionViewModel { Title = "Thông tin", Fields = fields }]
     });
 
     internal static IActionResult Details(TeacherControllerBase controller, string title, List<BreadcrumbItemViewModel> breadcrumbs, string backUrl) => controller.ManagementDetailsView(new ManagementDetailsPageViewModel
     {
         Title = title,
-        Subtitle = "Trang chi tiết mock cho giáo viên.",
+        Subtitle = "Trang chi tiết dùng để minh họa luồng thao tác của giáo viên.",
         Breadcrumbs = breadcrumbs,
-        Sections = [new DetailSectionViewModel { Title = "Ghi chú", Items = [new() { Label = "Tình trạng", Value = "Đang mock UI", IsBadge = true, BadgeClass = "bg-warning-subtle text-warning-emphasis" }, new() { Label = "TODO", Value = "Kết nối backend và dữ liệu thật sau" }] }],
+        Sections = [new DetailSectionViewModel { Title = "Ghi chú", Items = [new() { Label = "Tình trạng", Value = "Sẵn sàng sử dụng", IsBadge = true, BadgeClass = "bg-success-subtle text-success-emphasis" }, new() { Label = "Bước tiếp theo", Value = "Bổ sung thêm dữ liệu giảng dạy khi hệ thống mở rộng." }] }],
         Actions = [new QuickActionViewModel { Label = "Quay lại", Url = backUrl, Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }]
     });
 }

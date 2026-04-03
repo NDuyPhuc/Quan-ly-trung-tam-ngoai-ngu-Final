@@ -20,12 +20,12 @@ public class ClassesController : Controller
         var model = new ClassCatalogPageViewModel
         {
             Title = "Lớp học đang mở",
-            Subtitle = "Theo dõi nhanh lịch học, giáo viên phụ trách và số chỗ còn trống.",
+            Subtitle = "Theo dõi nhanh lịch học, giáo viên phụ trách, phòng học và số chỗ còn trống.",
             Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Lớp học", IsActive = true }],
             Filters =
             [
                 new FilterGroupViewModel { Label = "Ca học", InputId = "schedule", Options = [new() { Label = "Tất cả", Value = "" }, new() { Label = "Tối 2-4-6", Value = "246" }, new() { Label = "Tối 3-5-7", Value = "357" }, new() { Label = "Cuối tuần", Value = "weekend" }] },
-                new FilterGroupViewModel { Label = "Giáo viên", InputId = "teacher", Options = [new() { Label = "Tất cả", Value = "" }, .. _dataService.GetTeachers().Select(x => new SelectOptionViewModel { Label = x.FullName, Value = x.Id.ToString() })] },
+                new FilterGroupViewModel { Label = "Giáo viên", InputId = "teacher", Options = [new() { Label = "Tất cả", Value = "" }, .. _dataService.GetTeachers().Select(item => new SelectOptionViewModel { Label = item.FullName, Value = item.Id.ToString() })] },
                 new FilterGroupViewModel { Label = "Trạng thái", InputId = "status", Options = [new() { Label = "Tất cả", Value = "" }, new() { Label = "Đang hoạt động", Value = "running" }, new() { Label = "Sắp khai giảng", Value = "upcoming" }, new() { Label = "Mở đăng ký", Value = "open" }] }
             ],
             Classes = _dataService.GetClasses().Select(AppUi.ToClassCard).ToList()

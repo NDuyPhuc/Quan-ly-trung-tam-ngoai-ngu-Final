@@ -1,50 +1,74 @@
 @model LoginViewModel
 
-<section class="py-5 auth-section">
+<section class="auth-showcase-section">
     <div class="container">
-        @await Html.PartialAsync("~/Views/Shared/Partials/_Breadcrumbs.cshtml", Model.Breadcrumbs)
-        <div class="row g-5 justify-content-center">
-            <div class="col-lg-5">
-                <div class="panel-card h-100">
-                    <div class="panel-card-header"><div><h3>@Model.Title</h3><p>@Model.Subtitle</p></div></div>
-                    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
-                    {
-                        <div class="alert alert-danger">@Model.ErrorMessage</div>
-                    }
-                    <form asp-action="Login" method="post" class="row g-4">
-                        <div class="col-12">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" />
-                            <span asp-validation-for="Email" class="text-danger small"></span>
-                        </div>
-                        <div class="col-12">
-                            <label asp-for="Password" class="form-label"></label>
-                            <input asp-for="Password" class="form-control" />
-                            <span asp-validation-for="Password" class="text-danger small"></span>
-                        </div>
-                        <div class="col-12 d-flex justify-content-between align-items-center">
-                            <div class="form-check">
-                                <input asp-for="RememberMe" class="form-check-input" />
-                                <label asp-for="RememberMe" class="form-check-label"></label>
-                            </div>
-                            <a asp-action="ForgotPassword">Quên mật khẩu?</a>
-                        </div>
-                        <div class="col-12">
-                            <button class="btn btn-primary w-100" type="submit">Đăng nhập demo</button>
-                        </div>
-                    </form>
+        <div class="auth-showcase-layout">
+            <div class="auth-showcase-visual">
+                <img src="@AppUi.PublicImageUrl("login")" alt="Minh họa đăng nhập NorthStar English" />
+                <div class="auth-showcase-overlay">
+                    <span class="auth-spotlight-pill">Học thuật xuất sắc</span>
+                    <h1>Mở lại không gian quản trị cùng NorthStar English</h1>
+                    <p>Giao diện đăng nhập mới bám sát bố cục mẫu với cột visual lớn, tông xanh học thuật và phần form sáng rõ ở bên phải.</p>
+                    <div class="auth-avatar-group">
+                        <span class="teacher-avatar tone-blue">MA</span>
+                        <span class="teacher-avatar tone-gold">MK</span>
+                        <span class="teacher-avatar tone-indigo">TV</span>
+                        <strong>Hơn 10.000 lượt truy cập học viên và giáo vụ đã được mô phỏng.</strong>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-5">
-                <div class="panel-card h-100">
-                    <div class="panel-card-header"><div><h3>Tài khoản demo</h3><p>Dùng mật khẩu mặc định <strong>123456</strong> cho mọi tài khoản.</p></div></div>
-                    <div class="demo-account-list">
-                        <div class="demo-account-item"><strong>admin@demo.com</strong><span>Admin Dashboard</span></div>
-                        <div class="demo-account-item"><strong>staff@demo.com</strong><span>Staff / Giáo vụ Dashboard</span></div>
-                        <div class="demo-account-item"><strong>teacher@demo.com</strong><span>Teacher Dashboard</span></div>
+
+            <div class="auth-showcase-card">
+                <span class="auth-card-kicker">Chào mừng quay lại</span>
+                <h2>@Model.Title</h2>
+                <p class="page-subtitle">@Model.Subtitle</p>
+
+                @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger">@Model.ErrorMessage</div>
+                }
+
+                <form asp-action="Login" method="post" class="row g-4">
+                    <div class="col-12">
+                        <label asp-for="Email" class="form-label"></label>
+                        <div class="input-icon">
+                            <i class="bi bi-envelope-fill"></i>
+                            <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
                     </div>
-                    <div class="alert alert-info-soft mt-4 mb-0">Flow đăng nhập hiện dùng session mock, chưa tích hợp Identity hoặc database thật.</div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label asp-for="Password" class="form-label mb-0"></label>
+                            <a asp-action="ForgotPassword" class="auth-inline-link">Quên mật khẩu?</a>
+                        </div>
+                        <div class="input-icon">
+                            <i class="bi bi-lock-fill"></i>
+                            <input asp-for="Password" class="form-control" placeholder="********" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check auth-check">
+                            <input asp-for="RememberMe" class="form-check-input" />
+                            <label asp-for="RememberMe" class="form-check-label"></label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary w-100 auth-submit-btn" type="submit">Đăng nhập tài khoản <i class="bi bi-arrow-right"></i></button>
+                    </div>
+                </form>
+
+                <div class="auth-mini-panel">
+                    <div class="auth-mini-panel-title">Tài khoản mẫu đang dùng</div>
+                    <div class="demo-account-list">
+                        <div class="demo-account-item"><strong>admin@demo.com</strong><span>Quản trị viên</span></div>
+                        <div class="demo-account-item"><strong>staff@demo.com</strong><span>Giáo vụ</span></div>
+                        <div class="demo-account-item"><strong>teacher@demo.com</strong><span>Giáo viên</span></div>
+                    </div>
                 </div>
+
+                <p class="auth-switch-copy">Chưa có tài khoản? <a asp-action="Register">Đăng ký miễn phí</a></p>
             </div>
         </div>
     </div>

@@ -1,48 +1,79 @@
 @model CourseCatalogPageViewModel
+@{
+    var heroCourse = Model.Courses.FirstOrDefault();
+}
 
-<section class="py-5">
+<section class="page-section page-section-spacious">
     <div class="container">
         @await Html.PartialAsync("~/Views/Shared/Partials/_Breadcrumbs.cshtml", Model.Breadcrumbs)
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow text-primary">Danh mục đào tạo</span>
-                <h1>@Model.Title</h1>
-                <p class="page-subtitle">@Model.Subtitle</p>
+
+        <div class="catalog-hero-card">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <span class="landing-label">Danh mục đào tạo</span>
+                    <h1>@Model.Title</h1>
+                    <p class="page-subtitle">@Model.Subtitle</p>
+                    <div class="hero-chip-row">
+                        <span class="info-pill">@Model.Courses.Count khóa học</span>
+                        <span class="info-pill">TOEIC - IELTS - Giao tiếp</span>
+                        <span class="info-pill">Lịch khai giảng minh bạch</span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="catalog-hero-media">
+                        <img src="@AppUi.CourseImageUrl(heroCourse?.Slug ?? string.Empty)" alt="Tổng quan khóa học" />
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="toolbar-row mb-4">
-            <div class="toolbar-search">
-                <i class="bi bi-search"></i>
-                <input type="text" class="form-control" placeholder="Tìm kiếm khóa học..." />
-            </div>
-            <div class="toolbar-filters">
-                @foreach (var filter in Model.Filters)
-                {
-                    <select class="form-select">
-                        <option>@filter.Label</option>
-                        @foreach (var option in filter.Options)
-                        {
-                            <option value="@option.Value">@option.Label</option>
-                        }
-                    </select>
-                }
+
+        <div class="panel-card modern-toolbar-card mb-4">
+            <div class="toolbar-row mb-0">
+                <div class="toolbar-search">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" placeholder="Tìm kiếm khóa học..." />
+                </div>
+                <div class="toolbar-filters">
+                    @foreach (var filter in Model.Filters)
+                    {
+                        <select class="form-select">
+                            <option>@filter.Label</option>
+                            @foreach (var option in filter.Options)
+                            {
+                                <option value="@option.Value">@option.Label</option>
+                            }
+                        </select>
+                    }
+                </div>
             </div>
         </div>
+
         <div class="row g-4">
             @foreach (var course in Model.Courses)
             {
                 <div class="col-lg-4">
-                    <article class="feature-card h-100">
-                        <span class="badge @AppUi.StatusBadgeClass(course.Status)">@course.Status</span>
-                        <h3>@course.Name</h3>
-                        <p>@course.ShortDescription</p>
-                        <ul class="feature-list">
-                            <li><i class="bi bi-bar-chart"></i>@course.Level</li>
-                            <li><i class="bi bi-calendar2-week"></i>@course.Duration</li>
-                            <li><i class="bi bi-cash-coin"></i>@AppUi.Currency(course.TuitionFee)</li>
-                        </ul>
-                        <div class="text-muted small mb-3">Khai giảng dự kiến: @course.NextOpening</div>
-                        <a class="btn btn-primary w-100" asp-action="Details" asp-route-id="@course.Slug">Xem chi tiết</a>
+                    <article class="catalog-media-card h-100">
+                        <div class="catalog-media-thumb">
+                            <img src="@AppUi.CourseImageUrl(course.Slug)" alt="@course.Name" />
+                            <span class="catalog-chip catalog-chip-primary">@AppUi.CourseTag(course.Slug)</span>
+                            <span class="catalog-chip catalog-chip-light">@course.Status</span>
+                        </div>
+                        <div class="catalog-media-body">
+                            <div class="catalog-meta-row">
+                                <span>@course.Level</span>
+                                <span>@course.Duration</span>
+                            </div>
+                            <h3>@course.Name</h3>
+                            <p>@course.ShortDescription</p>
+                            <div class="course-facts">
+                                <span><i class="bi bi-calendar-event"></i>@course.NextOpening</span>
+                                <span><i class="bi bi-clock"></i>@course.ScheduleSummary</span>
+                            </div>
+                            <div class="catalog-card-footer">
+                                <strong>@AppUi.Currency(course.TuitionFee)</strong>
+                                <a asp-action="Details" asp-route-id="@course.Slug">Xem chi tiết</a>
+                            </div>
+                        </div>
                     </article>
                 </div>
             }

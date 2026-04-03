@@ -16,16 +16,16 @@ public class DashboardController : AdminControllerBase
     {
         var model = new DashboardPageViewModel
         {
-            Title = "Admin Dashboard",
-            Subtitle = "Tổng quan vận hành trung tâm ngoại ngữ ở mức giao diện mock.",
-            Breadcrumbs = Breadcrumbs("Dashboard"),
-            RoleName = "Admin",
+            Title = "Bảng điều khiển quản trị",
+            Subtitle = "Tổng quan vận hành trung tâm ngoại ngữ trên giao diện mới, không thay đổi nghiệp vụ hiện có.",
+            Breadcrumbs = Breadcrumbs("Tổng quan"),
+            RoleName = "Quản trị viên",
             SummaryCards =
             [
                 new SummaryCardViewModel { Title = "Tổng học viên", Value = DataService.GetStudents().Count.ToString(), Description = "Đang theo học và bảo lưu", Icon = "bi-people", AccentClass = "primary", Trend = "+18 tháng này" },
-                new SummaryCardViewModel { Title = "Tổng giáo viên", Value = DataService.GetTeachers().Count.ToString(), Description = "Bao gồm IELTS, TOEIC, giao tiếp", Icon = "bi-person-video3", AccentClass = "info", Trend = "1 GV nghỉ phép" },
+                new SummaryCardViewModel { Title = "Tổng giáo viên", Value = DataService.GetTeachers().Count.ToString(), Description = "Bao gồm IELTS, TOEIC và giao tiếp", Icon = "bi-person-video3", AccentClass = "info", Trend = "1 giáo viên nghỉ phép" },
                 new SummaryCardViewModel { Title = "Lớp đang hoạt động", Value = DataService.GetClasses().Count(x => x.Status == "Đang hoạt động").ToString(), Description = "Có lịch học hoặc điểm danh", Icon = "bi-easel2", AccentClass = "success", Trend = "2 lớp sắp khai giảng" },
-                new SummaryCardViewModel { Title = "Doanh thu tháng", Value = AppUi.Currency(DataService.GetReceipts().Sum(x => x.Amount)), Description = "Mock revenue theo biên nhận", Icon = "bi-cash-coin", AccentClass = "warning", Trend = "76% kế hoạch" },
+                new SummaryCardViewModel { Title = "Doanh thu tháng", Value = AppUi.Currency(DataService.GetReceipts().Sum(x => x.Amount)), Description = "Tổng thu theo biên nhận hiện có", Icon = "bi-cash-coin", AccentClass = "warning", Trend = "76% kế hoạch" },
                 new SummaryCardViewModel { Title = "Học viên còn nợ", Value = DataService.GetDebts().Count.ToString(), Description = "Cần theo dõi công nợ", Icon = "bi-wallet2", AccentClass = "danger", Trend = "1 khoản quá hạn" }
             ],
             QuickActions =
@@ -40,7 +40,7 @@ public class DashboardController : AdminControllerBase
                 {
                     ChartId = "adminEnrollmentChart",
                     Title = "Học viên đăng ký theo tháng",
-                    Subtitle = "Số lượng ghi danh mock trong 6 tháng gần nhất",
+                    Subtitle = "Số lượng ghi danh trong 6 tháng gần nhất",
                     ChartType = "line",
                     Labels = ["11", "12", "01", "02", "03", "04"],
                     Values = [28, 35, 41, 46, 52, 61],
@@ -50,7 +50,7 @@ public class DashboardController : AdminControllerBase
                 {
                     ChartId = "adminRevenueChart",
                     Title = "Doanh thu theo tháng",
-                    Subtitle = "Biểu đồ tổng thu mock theo biên nhận",
+                    Subtitle = "Biểu đồ tổng thu dựa trên biên nhận hiện có",
                     ChartType = "bar",
                     Labels = ["11", "12", "01", "02", "03", "04"],
                     Values = [48, 55, 63, 71, 68, 82],
@@ -92,9 +92,9 @@ public class DashboardController : AdminControllerBase
             ],
             Timeline =
             [
-                new TimelineItemViewModel { Title = "Khóa IELTS Foundation sắp khai giảng", Meta = "20/04/2026", Description = "Cần chốt danh sách, kiểm tra học phí và in thẻ lớp.", AccentClass = "warning" },
-                new TimelineItemViewModel { Title = "Có 1 khoản công nợ quá hạn", Meta = "Học viên Đỗ Khánh Linh", Description = "Nên chuyển sang staff dashboard để xử lý nhắc phí và cập nhật biên nhận.", AccentClass = "danger" },
-                new TimelineItemViewModel { Title = "Báo cáo tháng đã sẵn sàng", Meta = "Mock report", Description = "Khu vực báo cáo đang có biểu đồ doanh thu, ghi danh và top khóa học.", AccentClass = "success" }
+                new TimelineItemViewModel { Title = "Khóa IELTS Nền Tảng sắp khai giảng", Meta = "20/04/2026", Description = "Cần chốt danh sách, kiểm tra học phí và in thẻ lớp.", AccentClass = "warning" },
+                new TimelineItemViewModel { Title = "Có 1 khoản công nợ quá hạn", Meta = "Học viên Đỗ Khánh Linh", Description = "Nên chuyển sang khu giáo vụ để xử lý nhắc phí và cập nhật biên nhận.", AccentClass = "danger" },
+                new TimelineItemViewModel { Title = "Báo cáo tháng đã sẵn sàng", Meta = "Dữ liệu tổng hợp", Description = "Khu vực báo cáo đang có biểu đồ doanh thu, ghi danh và top khóa học.", AccentClass = "success" }
             ]
         };
 

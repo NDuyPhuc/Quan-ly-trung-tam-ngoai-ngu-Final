@@ -1,127 +1,190 @@
 @using System.Text.Json
 @model DashboardPageViewModel
 
-<div class="app-page">
+<div class="app-page dashboard-page">
     @await Html.PartialAsync("~/Views/Shared/Partials/_Breadcrumbs.cshtml", Model.Breadcrumbs)
-    <div class="page-header">
-        <div>
-            <p class="eyebrow">@Model.RoleName</p>
-            <h1>@Model.Title</h1>
-            <p class="page-subtitle">@Model.Subtitle</p>
-        </div>
-        @if (Model.QuickActions.Any())
-        {
-            <div class="d-flex flex-wrap gap-2">
-                @foreach (var action in Model.QuickActions)
-                {
-                    <a class="@action.CssClass" href="@action.Url"><i class="@action.Icon me-2"></i>@action.Label</a>
-                }
-            </div>
-        }
-    </div>
 
-    <div class="row g-4 mb-4">
-        @foreach (var card in Model.SummaryCards)
-        {
-            <div class="col-md-6 col-xl-3">
-                <div class="stat-card stat-@card.AccentClass">
-                    <div class="stat-icon"><i class="@card.Icon"></i></div>
-                    <div class="stat-content">
-                        <span>@card.Title</span>
-                        <strong>@card.Value</strong>
-                        <p>@card.Description</p>
-                        @if (!string.IsNullOrWhiteSpace(card.Trend))
+    <section class="dashboard-stage">
+        <div class="page-header dashboard-page-header">
+            <div>
+                <p class="eyebrow">@Model.RoleName</p>
+                <h1>@Model.Title</h1>
+                <p class="page-subtitle">@Model.Subtitle</p>
+            </div>
+            <div class="dashboard-stage-meta">
+                <div class="stage-mini-card">
+                    <span>Tổng chỉ số</span>
+                    <strong>@Model.SummaryCards.Count</strong>
+                    <small>thẻ theo dõi nhanh</small>
+                </div>
+                <div class="stage-mini-card">
+                    <span>Thao tác nhanh</span>
+                    <strong>@Model.QuickActions.Count</strong>
+                    <small>phím tắt nghiệp vụ</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-tabs mb-4">
+            <ul class="nav nav-pills" id="dashboardSectionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="tab-overview" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">Tổng quan</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-charts" data-bs-toggle="tab" data-bs-target="#charts" type="button" role="tab" aria-controls="charts" aria-selected="false">Biểu đồ</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-activity" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab" aria-controls="activity" aria-selected="false">Hoạt động</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-quickactions" data-bs-toggle="tab" data-bs-target="#quickactions" type="button" role="tab" aria-controls="quickactions" aria-selected="false">Nút nhanh</button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="tab-content" id="dashboardSectionContent">
+            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="tab-overview">
+                @if (Model.QuickActions.Any())
+                {
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        @foreach (var action in Model.QuickActions)
                         {
-                            <small>@card.Trend</small>
+                            <a class="@action.CssClass" href="@action.Url"><i class="@action.Icon me-2"></i>@action.Label</a>
                         }
                     </div>
-                </div>
-            </div>
-        }
-    </div>
+                }
 
-    <div class="row g-4">
-        @foreach (var chart in Model.Charts)
-        {
-            <div class="col-xl-6">
-                <div class="panel-card h-100">
-                    <div class="panel-card-header">
-                        <div>
-                            <h3>@chart.Title</h3>
-                            <p>@chart.Subtitle</p>
+                <div class="row g-4 mb-4">
+                    @foreach (var card in Model.SummaryCards)
+                    {
+                        <div class="col-md-6 col-xl-3">
+                            <div class="stat-card stat-@card.AccentClass">
+                                <div class="stat-icon"><i class="@card.Icon"></i></div>
+                                <div class="stat-content">
+                                    <span>@card.Title</span>
+                                    <strong>@card.Value</strong>
+                                    <p>@card.Description</p>
+                                    @if (!string.IsNullOrWhiteSpace(card.Trend))
+                                    {
+                                        <small>@card.Trend</small>
+                                    }
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <canvas class="app-chart" data-chart-config='@Html.Raw(JsonSerializer.Serialize(chart))'></canvas>
+                    }
                 </div>
-            </div>
-        }
-    </div>
 
-    @if (Model.Panels.Any())
-    {
-        <div class="row g-4 mt-1">
-            @foreach (var panel in Model.Panels)
-            {
-                <div class="col-xl-6">
-                    <div class="panel-card h-100">
+                @if (Model.Timeline.Any())
+                {
+                    <div class="panel-card mt-4">
                         <div class="panel-card-header">
                             <div>
-                                <h3>@panel.Title</h3>
-                                <p>@panel.Subtitle</p>
+                                <h3>Dòng sự kiện vận hành</h3>
+                                <p>Các điểm nhấn cần theo dõi trong kỳ tuyển sinh hiện tại.</p>
                             </div>
-                            @if (!string.IsNullOrWhiteSpace(panel.ActionUrl))
-                            {
-                                <a class="btn btn-sm btn-outline-primary" href="@panel.ActionUrl">@panel.ActionLabel</a>
-                            }
                         </div>
-                        <div class="list-group list-group-flush panel-list">
-                            @foreach (var item in panel.Items)
+                        <div class="timeline-list">
+                            @foreach (var item in Model.Timeline)
                             {
-                                <div class="list-group-item">
+                                <div class="timeline-item">
+                                    <span class="timeline-dot bg-@item.AccentClass"></span>
                                     <div>
-                                        <strong>@item.Title</strong>
-                                        <div class="text-muted small">@item.Meta</div>
-                                    </div>
-                                    <div class="text-end">
-                                        <div class="fw-semibold">@item.Value</div>
-                                        @if (!string.IsNullOrWhiteSpace(item.BadgeText))
-                                        {
-                                            <span class="badge @item.BadgeClass">@item.BadgeText</span>
-                                        }
+                                        <div class="d-flex flex-wrap gap-2 align-items-center mb-1">
+                                            <strong>@item.Title</strong>
+                                            <span class="text-muted small">@item.Meta</span>
+                                        </div>
+                                        <p class="mb-0 text-secondary">@item.Description</p>
                                     </div>
                                 </div>
                             }
                         </div>
                     </div>
-                </div>
-            }
-        </div>
-    }
+                }
+            </div>
 
-    @if (Model.Timeline.Any())
-    {
-        <div class="panel-card mt-4">
-            <div class="panel-card-header">
-                <div>
-                    <h3>Dòng sự kiện vận hành</h3>
-                    <p>Các điểm nhấn cần theo dõi trong kỳ tuyển sinh hiện tại.</p>
+            <div class="tab-pane fade" id="charts" role="tabpanel" aria-labelledby="tab-charts">
+                <div class="row g-4">
+                    @foreach (var chart in Model.Charts)
+                    {
+                        <div class="col-xl-6">
+                            <div class="panel-card h-100">
+                                <div class="panel-card-header">
+                                    <div>
+                                        <h3>@chart.Title</h3>
+                                        <p>@chart.Subtitle</p>
+                                    </div>
+                                </div>
+                                <canvas class="app-chart" data-chart-config='@Html.Raw(JsonSerializer.Serialize(chart))'></canvas>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
-            <div class="timeline-list">
-                @foreach (var item in Model.Timeline)
+
+            <div class="tab-pane fade" id="activity" role="tabpanel" aria-labelledby="tab-activity">
+                @if (Model.Panels.Any())
                 {
-                    <div class="timeline-item">
-                        <span class="timeline-dot bg-@item.AccentClass"></span>
-                        <div>
-                            <div class="d-flex flex-wrap gap-2 align-items-center mb-1">
-                                <strong>@item.Title</strong>
-                                <span class="text-muted small">@item.Meta</span>
+                    <div class="row g-4">
+                        @foreach (var panel in Model.Panels)
+                        {
+                            <div class="col-xl-6">
+                                <div class="panel-card h-100">
+                                    <div class="panel-card-header">
+                                        <div>
+                                            <h3>@panel.Title</h3>
+                                            <p>@panel.Subtitle</p>
+                                        </div>
+                                        @if (!string.IsNullOrWhiteSpace(panel.ActionUrl))
+                                        {
+                                            <a class="btn btn-sm btn-outline-primary" href="@panel.ActionUrl">@panel.ActionLabel</a>
+                                        }
+                                    </div>
+                                    <div class="list-group list-group-flush panel-list">
+                                        @foreach (var item in panel.Items)
+                                        {
+                                            <div class="list-group-item">
+                                                <div>
+                                                    <strong>@item.Title</strong>
+                                                    <div class="text-muted small">@item.Meta</div>
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fw-semibold">@item.Value</div>
+                                                    @if (!string.IsNullOrWhiteSpace(item.BadgeText))
+                                                    {
+                                                        <span class="badge @item.BadgeClass">@item.BadgeText</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
                             </div>
-                            <p class="mb-0 text-secondary">@item.Description</p>
-                        </div>
+                        }
                     </div>
                 }
             </div>
+
+            <div class="tab-pane fade" id="quickactions" role="tabpanel" aria-labelledby="tab-quickactions">
+                @if (Model.QuickActions.Any())
+                {
+                    <div class="row g-3">
+                        @foreach (var action in Model.QuickActions)
+                        {
+                            <div class="col-md-4">
+                                <a class="dashboard-shortcut-card" href="@action.Url">
+                                    <span class="quick-nav-icon"><i class="@action.Icon"></i></span>
+                                    <h5>@action.Label</h5>
+                                    <p>Điều hướng trực tiếp tới màn hình nghiệp vụ liên quan.</p>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">Chưa có hành động nhanh nào.</p>
+                }
+            </div>
         </div>
-    }
+    </section>
 </div>

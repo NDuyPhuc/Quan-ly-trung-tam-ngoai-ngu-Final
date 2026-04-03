@@ -1,44 +1,60 @@
 @{
     var area = (ViewContext.RouteData.Values["area"]?.ToString() ?? "").ToLowerInvariant();
+    var controller = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "").ToLowerInvariant();
+
+    string LinkClass(string targetController) => controller == targetController ? "active" : string.Empty;
 }
+
 <div class="sidebar-brand">
     <span class="brand-mark"><i class="bi bi-buildings-fill"></i></span>
     <div>
-        <strong>NorthStar</strong>
-        <small>Language Center</small>
+        <strong>NorthStar English</strong>
+        <small>Trung tâm ngoại ngữ</small>
     </div>
 </div>
+
+<div class="sidebar-summary-card">
+    <span class="sidebar-summary-label">Không đổi chức năng</span>
+    <strong>Chỉ làm mới giao diện</strong>
+    <p class="mb-0">Mọi màn quản trị, giáo vụ và giảng dạy vẫn giữ nguyên luồng điều hướng hiện tại.</p>
+</div>
+
 <div class="sidebar-section">Điều hướng</div>
 <nav class="sidebar-nav">
     @if (area == "admin")
     {
-        <a href="/Admin"><i class="bi bi-grid-1x2-fill"></i><span>Tổng quan</span></a>
-        <a href="/Admin/Accounts"><i class="bi bi-people"></i><span>Tài khoản</span></a>
-        <a href="/Admin/Students"><i class="bi bi-person-lines-fill"></i><span>Học viên</span></a>
-        <a href="/Admin/Teachers"><i class="bi bi-person-video3"></i><span>Giáo viên</span></a>
-        <a href="/Admin/Courses"><i class="bi bi-journal-text"></i><span>Khóa học</span></a>
-        <a href="/Admin/Classes"><i class="bi bi-easel2"></i><span>Lớp học</span></a>
-        <a href="/Admin/Enrollments"><i class="bi bi-journal-check"></i><span>Ghi danh</span></a>
-        <a href="/Admin/Receipts"><i class="bi bi-receipt-cutoff"></i><span>Học phí</span></a>
-        <a href="/Admin/Sessions"><i class="bi bi-calendar-week"></i><span>Buổi học</span></a>
-        <a href="/Admin/Attendance"><i class="bi bi-list-check"></i><span>Điểm danh</span></a>
-        <a href="/Admin/Exams"><i class="bi bi-clipboard2-data"></i><span>Điểm số</span></a>
-        <a href="/Admin/Reports"><i class="bi bi-bar-chart-line"></i><span>Báo cáo</span></a>
+        <a class="@LinkClass("dashboard")" href="/Admin"><i class="bi bi-grid-1x2-fill"></i><span>Tổng quan</span></a>
+        <a class="@LinkClass("accounts")" href="/Admin/Accounts"><i class="bi bi-people"></i><span>Tài khoản</span></a>
+        <a class="@LinkClass("students")" href="/Admin/Students"><i class="bi bi-person-lines-fill"></i><span>Học viên</span></a>
+        <a class="@LinkClass("teachers")" href="/Admin/Teachers"><i class="bi bi-person-video3"></i><span>Giáo viên</span></a>
+        <a class="@LinkClass("courses")" href="/Admin/Courses"><i class="bi bi-journal-text"></i><span>Khóa học</span></a>
+        <a class="@LinkClass("classes")" href="/Admin/Classes"><i class="bi bi-easel2"></i><span>Lớp học</span></a>
+        <a class="@LinkClass("enrollments")" href="/Admin/Enrollments"><i class="bi bi-journal-check"></i><span>Ghi danh</span></a>
+        <a class="@LinkClass("receipts")" href="/Admin/Receipts"><i class="bi bi-receipt-cutoff"></i><span>Học phí</span></a>
+        <a class="@LinkClass("sessions")" href="/Admin/Sessions"><i class="bi bi-calendar-week"></i><span>Buổi học</span></a>
+        <a class="@LinkClass("attendance")" href="/Admin/Attendance"><i class="bi bi-list-check"></i><span>Điểm danh</span></a>
+        <a class="@LinkClass("exams")" href="/Admin/Exams"><i class="bi bi-clipboard2-data"></i><span>Điểm số</span></a>
+        <a class="@LinkClass("reports")" href="/Admin/Reports"><i class="bi bi-bar-chart-line"></i><span>Báo cáo</span></a>
     }
     else if (area == "staff")
     {
-        <a href="/Staff"><i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span></a>
-        <a href="/Staff/Students"><i class="bi bi-person-lines-fill"></i><span>Học viên</span></a>
-        <a href="/Staff/Enrollments"><i class="bi bi-journal-check"></i><span>Ghi danh</span></a>
-        <a href="/Staff/Classes"><i class="bi bi-diagram-3"></i><span>Xếp lớp</span></a>
-        <a href="/Staff/Receipts"><i class="bi bi-receipt"></i><span>Thu học phí</span></a>
+        <a class="@LinkClass("dashboard")" href="/Staff"><i class="bi bi-grid-1x2-fill"></i><span>Tổng quan</span></a>
+        <a class="@LinkClass("students")" href="/Staff/Students"><i class="bi bi-person-lines-fill"></i><span>Học viên</span></a>
+        <a class="@LinkClass("enrollments")" href="/Staff/Enrollments"><i class="bi bi-journal-check"></i><span>Ghi danh</span></a>
+        <a class="@LinkClass("classes")" href="/Staff/Classes"><i class="bi bi-diagram-3"></i><span>Xếp lớp</span></a>
+        <a class="@LinkClass("receipts")" href="/Staff/Receipts"><i class="bi bi-receipt"></i><span>Thu học phí</span></a>
     }
     else
     {
-        <a href="/Teacher"><i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span></a>
-        <a href="/Teacher/Classes"><i class="bi bi-easel2"></i><span>Lớp được phân công</span></a>
-        <a href="/Teacher/Attendance"><i class="bi bi-list-check"></i><span>Điểm danh</span></a>
-        <a href="/Teacher/Exams"><i class="bi bi-pencil-square"></i><span>Nhập điểm</span></a>
-        <a href="/Teacher/Schedule"><i class="bi bi-calendar-week"></i><span>Lịch dạy</span></a>
+        <a class="@LinkClass("dashboard")" href="/Teacher"><i class="bi bi-grid-1x2-fill"></i><span>Tổng quan</span></a>
+        <a class="@LinkClass("classes")" href="/Teacher/Classes"><i class="bi bi-easel2"></i><span>Lớp được phân công</span></a>
+        <a class="@LinkClass("attendance")" href="/Teacher/Attendance"><i class="bi bi-list-check"></i><span>Điểm danh</span></a>
+        <a class="@LinkClass("exams")" href="/Teacher/Exams"><i class="bi bi-pencil-square"></i><span>Nhập điểm</span></a>
+        <a class="@LinkClass("schedule")" href="/Teacher/Schedule"><i class="bi bi-calendar-week"></i><span>Lịch dạy</span></a>
     }
 </nav>
+
+<div class="sidebar-footer">
+    <strong>NorthStar Admin UI</strong>
+    <span>Bố cục mới, dữ liệu và tuyến điều hướng giữ nguyên.</span>
+</div>

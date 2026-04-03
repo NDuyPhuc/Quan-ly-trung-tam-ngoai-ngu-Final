@@ -1,25 +1,62 @@
 @model ContactViewModel
 
-<section class="py-5">
+<section class="page-section page-section-spacious">
     <div class="container">
         @await Html.PartialAsync("~/Views/Shared/Partials/_Breadcrumbs.cshtml", Model.Breadcrumbs)
-        <div class="row g-5">
-            <div class="col-lg-5">
-                <span class="eyebrow text-primary">Liên hệ tư vấn</span>
-                <h1>@Model.Title</h1>
-                <p class="page-subtitle">@Model.Subtitle</p>
-                <div class="panel-card mt-4">
-                    <div class="detail-grid">
-                        <div class="detail-item"><span>Hotline</span><strong>0901 001 001</strong></div>
-                        <div class="detail-item"><span>Email</span><strong>hello@northstarenglish.vn</strong></div>
-                        <div class="detail-item"><span>Địa chỉ</span><strong>120 Nguyễn Văn Linh, Đà Nẵng</strong></div>
-                        <div class="detail-item"><span>Ca tư vấn</span><strong>08:00 - 20:30</strong></div>
+
+        <div class="catalog-hero-card">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <span class="landing-label">Liên hệ tư vấn</span>
+                    <h1>@Model.Title</h1>
+                    <p class="page-subtitle">@Model.Subtitle</p>
+                    <div class="hero-chip-row">
+                        <span class="info-pill">Hotline 0901 001 001</span>
+                        <span class="info-pill">Tư vấn TOEIC - IELTS - Giao tiếp</span>
+                        <span class="info-pill">Hỗ trợ 08:00 - 20:30</span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="catalog-hero-media">
+                        <img src="@AppUi.PublicImageUrl("contact")" alt="Minh họa tư vấn học viên" />
                     </div>
                 </div>
             </div>
-            <div class="col-lg-7">
-                <div class="panel-card">
-                    <div class="panel-card-header"><div><h3>Đăng ký tư vấn</h3><p>Form này đang là mock flow, chưa lưu database.</p></div></div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="contact-info-stack">
+                    <div class="contact-info-card">
+                        <span class="contact-info-icon"><i class="bi bi-telephone"></i></span>
+                        <strong>Hotline</strong>
+                        <p>0901 001 001</p>
+                    </div>
+                    <div class="contact-info-card">
+                        <span class="contact-info-icon"><i class="bi bi-envelope"></i></span>
+                        <strong>Email</strong>
+                        <p>hello@northstarenglish.vn</p>
+                    </div>
+                    <div class="contact-info-card">
+                        <span class="contact-info-icon"><i class="bi bi-geo-alt"></i></span>
+                        <strong>Địa chỉ</strong>
+                        <p>120 Nguyễn Văn Linh, Đà Nẵng</p>
+                    </div>
+                    <div class="contact-info-card">
+                        <span class="contact-info-icon"><i class="bi bi-clock"></i></span>
+                        <strong>Khung giờ hỗ trợ</strong>
+                        <p>08:00 - 20:30 mỗi ngày</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="form-display-card">
+                    <div class="landing-section-header">
+                        <div>
+                            <h2>Đăng ký tư vấn</h2>
+                            <p>Giữ nguyên form và luồng xử lý hiện có, chỉ trình bày lại gần hơn với phong cách mẫu.</p>
+                        </div>
+                    </div>
                     <form asp-action="Index" method="post" class="row g-4">
                         <div class="col-md-6">
                             <label asp-for="FullName" class="form-label"></label>
@@ -53,7 +90,7 @@
                             <span asp-validation-for="Message" class="text-danger small"></span>
                         </div>
                         <div class="col-12">
-                            <button class="btn btn-primary" type="submit">Gửi yêu cầu</button>
+                            <button class="btn btn-primary" type="submit">Gửi yêu cầu tư vấn</button>
                         </div>
                     </form>
                 </div>

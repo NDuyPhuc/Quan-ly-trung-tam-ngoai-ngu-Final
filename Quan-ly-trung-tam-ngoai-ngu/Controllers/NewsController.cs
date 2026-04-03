@@ -19,10 +19,10 @@ public class NewsController : Controller
     {
         var model = new NewsListPageViewModel
         {
-            Title = "Tin tức - bài viết",
-            Subtitle = "Cập nhật lịch khai giảng, workshop và chia sẻ học tập từ trung tâm.",
+            Title = "Tin tức và bài viết",
+            Subtitle = "Cập nhật lịch khai giảng, workshop và chia sẻ học tập mới nhất từ trung tâm.",
             Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Tin tức", IsActive = true }],
-            Articles = _dataService.GetNewsArticles().OrderByDescending(x => x.PublishedOn).Select(AppUi.ToNewsCard).ToList()
+            Articles = _dataService.GetNewsArticles().OrderByDescending(item => item.PublishedOn).Select(AppUi.ToNewsCard).ToList()
         };
 
         return View(model);
@@ -30,7 +30,7 @@ public class NewsController : Controller
 
     public IActionResult Details(string id)
     {
-        var article = _dataService.GetNewsArticles().FirstOrDefault(x => x.Slug == id);
+        var article = _dataService.GetNewsArticles().FirstOrDefault(item => item.Slug == id);
         if (article is null)
         {
             return RedirectToAction(nameof(Index));
@@ -44,8 +44,8 @@ public class NewsController : Controller
             Article = AppUi.ToNewsCard(article),
             Content = article.Content,
             RelatedArticles = _dataService.GetNewsArticles()
-                .Where(x => x.Id != article.Id)
-                .OrderByDescending(x => x.PublishedOn)
+                .Where(item => item.Id != article.Id)
+                .OrderByDescending(item => item.PublishedOn)
                 .Take(2)
                 .Select(AppUi.ToNewsCard)
                 .ToList()

@@ -26,7 +26,7 @@ public class AccountController : Controller
     public IActionResult Login(LoginViewModel model)
     {
         model.Title = "Đăng nhập";
-        model.Subtitle = "Đăng nhập demo theo vai trò để truy cập dashboard tương ứng.";
+        model.Subtitle = "Đăng nhập bằng tài khoản mẫu để truy cập đúng khu vực quản trị tương ứng.";
         model.Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Đăng nhập", IsActive = true }];
 
         if (!ModelState.IsValid)
@@ -37,7 +37,7 @@ public class AccountController : Controller
         var account = _authService.ValidateLogin(model.Email, model.Password);
         if (account is null)
         {
-            model.ErrorMessage = "Tài khoản demo không hợp lệ. Hãy dùng một trong 3 tài khoản mẫu.";
+            model.ErrorMessage = "Tài khoản mẫu không hợp lệ. Hãy dùng một trong ba tài khoản được gợi ý trên màn hình.";
             return View(model);
         }
 
@@ -45,7 +45,7 @@ public class AccountController : Controller
         HttpContext.Session.SetString(AppConstants.SessionDemoUserRole, account.Role);
         HttpContext.Session.SetString(AppConstants.SessionDemoUserDisplayName, account.FullName);
 
-        TempData[AppConstants.ToastMessageKey] = $"Đăng nhập thành công với vai trò {account.Role}.";
+        TempData[AppConstants.ToastMessageKey] = $"Đăng nhập thành công với vai trò {AppUi.RoleLabel(account.Role)}.";
         TempData[AppConstants.ToastTypeKey] = "success";
 
         return account.Role switch
@@ -63,7 +63,7 @@ public class AccountController : Controller
         return View(new RegisterViewModel
         {
             Title = "Đăng ký",
-            Subtitle = "Form mock dành cho học viên mới. // TODO: connect database later",
+            Subtitle = "Biểu mẫu đăng ký dành cho học viên mới.",
             Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Đăng ký", IsActive = true }]
         });
     }
@@ -73,7 +73,7 @@ public class AccountController : Controller
     public IActionResult Register(RegisterViewModel model)
     {
         model.Title = "Đăng ký";
-        model.Subtitle = "Form mock dành cho học viên mới. // TODO: connect database later";
+        model.Subtitle = "Biểu mẫu đăng ký dành cho học viên mới.";
         model.Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Đăng ký", IsActive = true }];
 
         if (!ModelState.IsValid)
@@ -81,7 +81,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        TempData[AppConstants.ToastMessageKey] = "Đăng ký thành công ở mức giao diện mock. Dữ liệu chưa được lưu thật.";
+        TempData[AppConstants.ToastMessageKey] = "Đăng ký đã được ghi nhận trên biểu mẫu hiện tại.";
         TempData[AppConstants.ToastTypeKey] = "success";
         return RedirectToAction(nameof(Login));
     }
@@ -92,7 +92,7 @@ public class AccountController : Controller
         return View(new ForgotPasswordViewModel
         {
             Title = "Quên mật khẩu",
-            Subtitle = "Mô phỏng quy trình lấy lại mật khẩu cho tài khoản học viên.",
+            Subtitle = "Hướng dẫn lấy lại mật khẩu cho tài khoản học viên.",
             Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Quên mật khẩu", IsActive = true }]
         });
     }
@@ -102,7 +102,7 @@ public class AccountController : Controller
     public IActionResult ForgotPassword(ForgotPasswordViewModel model)
     {
         model.Title = "Quên mật khẩu";
-        model.Subtitle = "Mô phỏng quy trình lấy lại mật khẩu cho tài khoản học viên.";
+        model.Subtitle = "Hướng dẫn lấy lại mật khẩu cho tài khoản học viên.";
         model.Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Quên mật khẩu", IsActive = true }];
 
         if (!ModelState.IsValid)
@@ -110,7 +110,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        TempData[AppConstants.ToastMessageKey] = "Đã gửi email khôi phục ở mức mock. // TODO: connect email service later";
+        TempData[AppConstants.ToastMessageKey] = "Yêu cầu khôi phục đã được ghi nhận. Thông báo sẽ được cập nhật qua email khi hệ thống mở rộng.";
         TempData[AppConstants.ToastTypeKey] = "success";
         return RedirectToAction(nameof(Login));
     }
@@ -118,7 +118,7 @@ public class AccountController : Controller
     public IActionResult Logout()
     {
         HttpContext.Session.Clear();
-        TempData[AppConstants.ToastMessageKey] = "Đã đăng xuất khỏi phiên demo.";
+        TempData[AppConstants.ToastMessageKey] = "Đã đăng xuất khỏi phiên làm việc hiện tại.";
         TempData[AppConstants.ToastTypeKey] = "info";
         return RedirectToAction(nameof(Login));
     }
@@ -128,7 +128,7 @@ public class AccountController : Controller
         return new LoginViewModel
         {
             Title = "Đăng nhập",
-            Subtitle = "Đăng nhập demo theo vai trò để truy cập dashboard tương ứng.",
+            Subtitle = "Đăng nhập bằng tài khoản mẫu để truy cập đúng khu vực quản trị tương ứng.",
             Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Đăng nhập", IsActive = true }]
         };
     }

@@ -1,20 +1,44 @@
 @model CourseDetailPageViewModel
 
-<section class="py-5">
+<section class="page-section page-section-spacious">
     <div class="container">
         @await Html.PartialAsync("~/Views/Shared/Partials/_Breadcrumbs.cshtml", Model.Breadcrumbs)
-        <div class="row g-5">
+
+        <div class="catalog-hero-card">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <span class="badge @AppUi.StatusBadgeClass(Model.Course.Status) mb-3">@Model.Course.Status</span>
+                    <h1>@Model.Course.Name</h1>
+                    <p class="page-subtitle">@Model.Description</p>
+                    <div class="hero-chip-row">
+                        <span class="info-pill">@Model.Course.Level</span>
+                        <span class="info-pill">@Model.Course.Duration</span>
+                        <span class="info-pill">@Model.Course.NextOpening</span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="catalog-hero-media">
+                        <img src="@AppUi.CourseImageUrl(Model.Course.Slug)" alt="@Model.Course.Name" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
             <div class="col-lg-8">
-                <span class="badge @AppUi.StatusBadgeClass(Model.Course.Status) mb-3">@Model.Course.Status</span>
-                <h1>@Model.Course.Name</h1>
-                <p class="page-subtitle">@Model.Description</p>
                 <div class="row g-3 mb-4">
                     <div class="col-md-4"><div class="detail-box"><span>Trình độ</span><strong>@Model.Course.Level</strong></div></div>
                     <div class="col-md-4"><div class="detail-box"><span>Thời lượng</span><strong>@Model.Course.Duration</strong></div></div>
                     <div class="col-md-4"><div class="detail-box"><span>Học phí</span><strong>@AppUi.Currency(Model.Course.TuitionFee)</strong></div></div>
                 </div>
+
                 <div class="panel-card mb-4">
-                    <div class="panel-card-header"><div><h3>Mục tiêu khóa học</h3><p>@Model.TargetOutput</p></div></div>
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>Mục tiêu khóa học</h3>
+                            <p>@Model.TargetOutput</p>
+                        </div>
+                    </div>
                     <ul class="feature-list">
                         @foreach (var item in Model.Objectives)
                         {
@@ -22,8 +46,14 @@
                         }
                     </ul>
                 </div>
+
                 <div class="panel-card">
-                    <div class="panel-card-header"><div><h3>Điểm nổi bật</h3><p>Những tiện ích học viên nhận được trong lộ trình này.</p></div></div>
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>Điểm nổi bật</h3>
+                            <p>Lợi ích nổi bật mà học viên nhận được trong suốt lộ trình học.</p>
+                        </div>
+                    </div>
                     <ul class="feature-list">
                         @foreach (var item in Model.Highlights)
                         {
@@ -32,24 +62,36 @@
                     </ul>
                 </div>
             </div>
+
             <div class="col-lg-4">
                 <div class="panel-card mb-4">
-                    <div class="panel-card-header"><div><h3>Thông tin nhanh</h3><p>Tóm tắt để học viên ra quyết định.</p></div></div>
-                    <div class="detail-grid">
-                        <div class="detail-item"><span>Lịch học</span><strong>@Model.Course.ScheduleSummary</strong></div>
-                        <div class="detail-item"><span>Khai giảng</span><strong>@Model.Course.NextOpening</strong></div>
-                        <div class="detail-item"><span>CTA</span><strong><a asp-controller="Contact" asp-action="Index">Đăng ký tư vấn</a></strong></div>
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>Thông tin nhanh</h3>
+                            <p>Các dữ liệu cốt lõi được gom lại trong một khối dễ quét.</p>
+                        </div>
                     </div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span>Lịch học gợi ý</span><strong>@Model.Course.ScheduleSummary</strong></div>
+                        <div class="detail-item"><span>Khai giảng gần nhất</span><strong>@Model.Course.NextOpening</strong></div>
+                        <div class="detail-item"><span>Liên hệ</span><strong>Nhận tư vấn lộ trình và xếp lớp phù hợp.</strong></div>
+                    </div>
+                    <a class="btn btn-primary w-100 mt-3" asp-controller="Contact" asp-action="Index">Đăng ký tư vấn khóa học</a>
                 </div>
+
                 <div class="panel-card">
-                    <div class="panel-card-header"><div><h3>Lớp học liên quan</h3><p>Các lớp đang mở cho khóa này.</p></div></div>
-                    <div class="list-group list-group-flush panel-list">
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>Lớp học liên quan</h3>
+                            <p>Các lớp đang mở cho đúng khóa học này.</p>
+                        </div>
+                    </div>
+                    <div class="preview-list">
                         @foreach (var classItem in Model.RelatedClasses)
                         {
-                            <div class="list-group-item">
+                            <div class="preview-list-item">
                                 <strong>@classItem.Code</strong>
-                                <div class="small text-muted">@classItem.Schedule</div>
-                                <span class="badge @AppUi.StatusBadgeClass(classItem.Status) mt-2">@classItem.Status</span>
+                                <span>@classItem.Schedule | @classItem.TeacherName | @classItem.Status</span>
                             </div>
                         }
                     </div>

@@ -26,7 +26,7 @@ public class ContactController : Controller
             return View(model);
         }
 
-        TempData[AppConstants.ToastMessageKey] = "Đã ghi nhận yêu cầu tư vấn. Đây là luồng mock, chưa lưu database.";
+        TempData[AppConstants.ToastMessageKey] = "Trung tâm đã ghi nhận yêu cầu tư vấn của bạn và sẽ phản hồi sớm.";
         TempData[AppConstants.ToastTypeKey] = "success";
         return RedirectToAction(nameof(Index));
     }

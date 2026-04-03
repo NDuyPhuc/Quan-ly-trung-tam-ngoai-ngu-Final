@@ -24,18 +24,18 @@ public class HomeController : ModuleControllerBase
         {
             Title = "Trang chủ",
             Subtitle = "Hệ thống quản lý trung tâm ngoại ngữ NorthStar English",
-            HeroTitle = "Nền tảng quản lý trung tâm ngoại ngữ hiện đại, trực quan và sẵn sàng mở rộng",
-            HeroSubtitle = "Tập trung vào trải nghiệm demo, quy trình nghiệp vụ và giao diện quản trị rõ ràng cho trung tâm TOEIC, IELTS và giao tiếp.",
+            HeroTitle = "Nền tảng quản lý trung tâm ngoại ngữ hiện đại và trực quan.",
+            HeroSubtitle = "Hệ thống hỗ trợ tuyển sinh, quản lý lớp học, theo dõi giảng dạy và cập nhật tin tức trong cùng một không gian rõ ràng, sáng và dễ dùng.",
             HighlightStats =
             [
-                new SummaryCardViewModel { Title = "Học viên đang theo học", Value = DataService.GetStudents().Count.ToString(), Description = "Theo dõi realtime theo lớp và trạng thái", Icon = "bi-people", AccentClass = "primary", Trend = "+12% tháng này" },
-                new SummaryCardViewModel { Title = "Lớp đang mở", Value = DataService.GetClasses().Count(x => x.Status != "Đã đủ chỗ").ToString(), Description = "Có thể điều phối ngay từ dashboard", Icon = "bi-easel2", AccentClass = "info", Trend = "4 lớp sắp khai giảng" },
-                new SummaryCardViewModel { Title = "Giáo viên phụ trách", Value = DataService.GetTeachers().Count.ToString(), Description = "Phân công và theo dõi lịch dạy", Icon = "bi-person-workspace", AccentClass = "success", Trend = "3 GV đang hoạt động" },
-                new SummaryCardViewModel { Title = "Tổng học phí dự kiến", Value = AppUi.Currency(DataService.GetEnrollments().Sum(x => x.TotalFee)), Description = "Mock revenue cho kỳ tuyển sinh hiện tại", Icon = "bi-cash-stack", AccentClass = "warning", Trend = "Thu tốt ở nhóm IELTS" }
+                new SummaryCardViewModel { Title = "Học viên đang theo học", Value = DataService.GetStudents().Count.ToString(), Description = "Theo dõi theo lớp và trạng thái hiện tại", Icon = "bi-people", AccentClass = "primary", Trend = "+12% trong tháng này" },
+                new SummaryCardViewModel { Title = "Lớp đang mở", Value = DataService.GetClasses().Count(item => item.Status != "Đã đủ chỗ").ToString(), Description = "Có thể điều phối ngay từ bảng điều khiển", Icon = "bi-easel2", AccentClass = "info", Trend = "4 lớp sắp khai giảng" },
+                new SummaryCardViewModel { Title = "Giáo viên phụ trách", Value = DataService.GetTeachers().Count.ToString(), Description = "Phân công và theo dõi lịch dạy", Icon = "bi-person-workspace", AccentClass = "success", Trend = "3 giảng viên đang hoạt động" },
+                new SummaryCardViewModel { Title = "Tổng học phí dự kiến", Value = AppUi.Currency(DataService.GetEnrollments().Sum(item => item.TotalFee)), Description = "Doanh thu dự kiến cho kỳ tuyển sinh hiện tại", Icon = "bi-cash-stack", AccentClass = "warning", Trend = "Nhu cầu cao ở nhóm IELTS" }
             ],
             FeaturedCourses = DataService.GetCourses().Take(3).Select(AppUi.ToCourseCard).ToList(),
-            OpenClasses = DataService.GetClasses().Where(x => x.Status != "Đã đủ chỗ").Take(3).Select(AppUi.ToClassCard).ToList(),
-            LatestNews = DataService.GetNewsArticles().OrderByDescending(x => x.PublishedOn).Take(3).Select(AppUi.ToNewsCard).ToList()
+            OpenClasses = DataService.GetClasses().Where(item => item.Status != "Đã đủ chỗ").Take(3).Select(AppUi.ToClassCard).ToList(),
+            LatestNews = DataService.GetNewsArticles().OrderByDescending(item => item.PublishedOn).Take(3).Select(AppUi.ToNewsCard).ToList()
         };
 
         return View(model);

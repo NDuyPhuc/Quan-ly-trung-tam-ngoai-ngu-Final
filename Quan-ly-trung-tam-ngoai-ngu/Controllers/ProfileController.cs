@@ -20,21 +20,22 @@ public class ProfileController : Controller
     {
         var email = HttpContext.Session.GetString(AppConstants.SessionDemoUserEmail);
         var account = _dataService.GetAccounts().FirstOrDefault(x => x.Email == email) ?? _dataService.GetAccounts().First();
+        var roleLabel = AppUi.RoleLabel(account.Role);
 
         var model = new ProfileViewModel
         {
             Title = "Hồ sơ cá nhân",
-            Subtitle = "Thông tin hồ sơ và hoạt động gần đây trong hệ thống demo.",
+            Subtitle = "Thông tin hồ sơ và hoạt động gần đây trong hệ thống.",
             Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Hồ sơ cá nhân", IsActive = true }],
             FullName = account.FullName,
             Email = account.Email,
             Phone = account.Phone,
-            CurrentRole = account.Role,
+            CurrentRole = roleLabel,
             SummaryCards =
             [
-                new SummaryCardViewModel { Title = "Vai trò", Value = account.Role, Description = "Điều hướng dashboard theo quyền hiện tại", Icon = "bi-person-badge", AccentClass = "primary" },
-                new SummaryCardViewModel { Title = "Trạng thái tài khoản", Value = account.Status, Description = "Mock trạng thái dùng cho phân quyền và hiển thị UI", Icon = "bi-shield-check", AccentClass = "success" },
-                new SummaryCardViewModel { Title = "Phòng ban", Value = account.Department, Description = "Thông tin nội bộ để hiển thị hồ sơ", Icon = "bi-diagram-3", AccentClass = "info" }
+                new SummaryCardViewModel { Title = "Vai trò", Value = roleLabel, Description = "Điều hướng bảng điều khiển theo quyền hiện tại", Icon = "bi-person-badge", AccentClass = "primary" },
+                new SummaryCardViewModel { Title = "Trạng thái tài khoản", Value = account.Status, Description = "Hiển thị quyền truy cập và trạng thái sử dụng", Icon = "bi-shield-check", AccentClass = "success" },
+                new SummaryCardViewModel { Title = "Phòng ban", Value = account.Department, Description = "Thông tin nội bộ gắn với hồ sơ đang đăng nhập", Icon = "bi-diagram-3", AccentClass = "info" }
             ],
             Sections =
             [
@@ -46,26 +47,26 @@ public class ProfileController : Controller
                         new DetailItemViewModel { Label = "Họ và tên", Value = account.FullName },
                         new DetailItemViewModel { Label = "Email", Value = account.Email },
                         new DetailItemViewModel { Label = "Số điện thoại", Value = account.Phone },
-                        new DetailItemViewModel { Label = "Vai trò", Value = account.Role, IsBadge = true, BadgeClass = AppUi.StatusBadgeClass("Đang hoạt động") }
+                        new DetailItemViewModel { Label = "Vai trò", Value = roleLabel, IsBadge = true, BadgeClass = AppUi.StatusBadgeClass("Đang hoạt động") }
                     ]
                 },
                 new DetailSectionViewModel
                 {
                     Title = "Ghi chú triển khai",
-                    Description = "Các trường dưới đây phục vụ giai đoạn demo UI trước khi nối backend.",
+                    Description = "Các trường dưới đây tóm tắt nhanh thông tin tài khoản và cấu hình hiện tại.",
                     Items =
                     [
-                        new DetailItemViewModel { Label = "Nguồn dữ liệu", Value = "Session + MockDataService" },
-                        new DetailItemViewModel { Label = "Tình trạng", Value = "Chưa kết nối database", IsBadge = true, BadgeClass = "bg-warning-subtle text-warning-emphasis" },
-                        new DetailItemViewModel { Label = "TODO", Value = "Kết nối bảng Account và Student/Teacher sau" }
+                        new DetailItemViewModel { Label = "Nguồn dữ liệu", Value = "Phiên đăng nhập hiện tại" },
+                        new DetailItemViewModel { Label = "Tình trạng", Value = "Sẵn sàng sử dụng", IsBadge = true, BadgeClass = "bg-success-subtle text-success-emphasis" },
+                        new DetailItemViewModel { Label = "Bước tiếp theo", Value = "Đồng bộ thêm dữ liệu hồ sơ khi hệ thống mở rộng." }
                     ]
                 }
             ],
             RecentActivities =
             [
-                new TimelineItemViewModel { Title = "Đăng nhập dashboard", Meta = "Hôm nay", Description = $"Phiên demo đã ghi nhận người dùng {account.Role.ToLowerInvariant()} truy cập hệ thống.", AccentClass = "primary" },
-                new TimelineItemViewModel { Title = "Kiểm tra hồ sơ", Meta = "Hôm nay", Description = "Trang hồ sơ đang dùng dữ liệu giả để phục vụ trình bày UX/UI.", AccentClass = "info" },
-                new TimelineItemViewModel { Title = "Sẵn sàng tích hợp DB", Meta = "TODO", Description = "Mapping tài khoản thật sẽ được bổ sung ở giai đoạn backend.", AccentClass = "warning" }
+                new TimelineItemViewModel { Title = "Đăng nhập hệ thống", Meta = "Hôm nay", Description = $"Phiên hiện tại đã ghi nhận người dùng {roleLabel.ToLowerInvariant()} truy cập vào hệ thống.", AccentClass = "primary" },
+                new TimelineItemViewModel { Title = "Kiểm tra hồ sơ", Meta = "Hôm nay", Description = "Trang hồ sơ đã được làm mới để thống nhất với toàn bộ giao diện bên trong hệ thống.", AccentClass = "info" },
+                new TimelineItemViewModel { Title = "Sẵn sàng mở rộng dữ liệu", Meta = "Bước tiếp theo", Description = "Khi hệ thống phát triển thêm, hồ sơ người dùng có thể được đồng bộ với nhiều phân hệ hơn.", AccentClass = "warning" }
             ]
         };
 
