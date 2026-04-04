@@ -1,4 +1,13 @@
 @model ContactViewModel
+@{
+    var sectionTitle = ViewData["ContactSectionTitle"]?.ToString() ?? "Liên hệ NorthStar English";
+    var sectionSubtitle = ViewData["ContactSectionSubtitle"]?.ToString() ?? "Để lại thông tin chi tiết để trung tâm tư vấn đúng khóa học, khung giờ và lộ trình phù hợp nhất cho bạn.";
+    var formTitle = ViewData["ContactFormTitle"]?.ToString() ?? "Gửi yêu cầu tư vấn chi tiết";
+    var formSubtitle = ViewData["ContactFormSubtitle"]?.ToString() ?? "Điền càng rõ nhu cầu, trung tâm càng dễ tư vấn đúng lớp, mức học phí và lịch học phù hợp cho bạn.";
+    var supportEmail = ViewData["SupportEmail"]?.ToString() ?? "nguyenthanhdanhctk42@gmail.com";
+    var supportPhone = ViewData["SupportPhone"]?.ToString() ?? "0901 001 001";
+    var supportHours = ViewData["SupportHours"]?.ToString() ?? "08:00 - 20:30 mỗi ngày";
+}
 
 <section class="page-section page-section-spacious">
     <div class="container">
@@ -8,12 +17,12 @@
             <div class="row g-5 align-items-center">
                 <div class="col-lg-6">
                     <span class="landing-label">Liên hệ tư vấn</span>
-                    <h1>@Model.Title</h1>
-                    <p class="page-subtitle">@Model.Subtitle</p>
+                    <h1>@sectionTitle</h1>
+                    <p class="page-subtitle">@sectionSubtitle</p>
                     <div class="hero-chip-row">
-                        <span class="info-pill">Hotline 0901 001 001</span>
+                        <span class="info-pill">Hotline @supportPhone</span>
                         <span class="info-pill">Tư vấn TOEIC - IELTS - Giao tiếp</span>
-                        <span class="info-pill">Hỗ trợ 08:00 - 20:30</span>
+                        <span class="info-pill">Hỗ trợ @supportHours</span>
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -29,70 +38,40 @@
                 <div class="contact-info-stack">
                     <div class="contact-info-card">
                         <span class="contact-info-icon"><i class="bi bi-telephone"></i></span>
-                        <strong>Hotline</strong>
-                        <p>0901 001 001</p>
+                        <strong>Hotline tư vấn</strong>
+                        <p>@supportPhone<br />Hỗ trợ nhanh qua cuộc gọi và Zalo.</p>
                     </div>
                     <div class="contact-info-card">
                         <span class="contact-info-icon"><i class="bi bi-envelope"></i></span>
-                        <strong>Email</strong>
-                        <p>hello@northstarenglish.vn</p>
+                        <strong>Email nhận yêu cầu</strong>
+                        <p>@supportEmail<br />Nhận thông tin đăng ký và yêu cầu tư vấn chi tiết.</p>
                     </div>
                     <div class="contact-info-card">
                         <span class="contact-info-icon"><i class="bi bi-geo-alt"></i></span>
-                        <strong>Địa chỉ</strong>
-                        <p>120 Nguyễn Văn Linh, Đà Nẵng</p>
+                        <strong>Khu vực hỗ trợ</strong>
+                        <p>Tư vấn học trực tiếp, trực tuyến và lớp doanh nghiệp theo nhu cầu.</p>
                     </div>
                     <div class="contact-info-card">
                         <span class="contact-info-icon"><i class="bi bi-clock"></i></span>
-                        <strong>Khung giờ hỗ trợ</strong>
-                        <p>08:00 - 20:30 mỗi ngày</p>
+                        <strong>Khung giờ phản hồi</strong>
+                        <p>@supportHours.<br />Ưu tiên liên hệ trong vòng 24 giờ.</p>
                     </div>
                 </div>
             </div>
             <div class="col-lg-8">
                 <div class="form-display-card">
-                    <div class="landing-section-header">
+                    <div class="landing-section-header contact-header">
                         <div>
-                            <h2>Đăng ký tư vấn</h2>
-                            <p>Giữ nguyên form và luồng xử lý hiện có, chỉ trình bày lại gần hơn với phong cách mẫu.</p>
+                            <h2>@formTitle</h2>
+                            <p>@formSubtitle</p>
                         </div>
                     </div>
-                    <form asp-action="Index" method="post" class="row g-4">
-                        <div class="col-md-6">
-                            <label asp-for="FullName" class="form-label"></label>
-                            <input asp-for="FullName" class="form-control" />
-                            <span asp-validation-for="FullName" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" />
-                            <span asp-validation-for="Email" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="Phone" class="form-label"></label>
-                            <input asp-for="Phone" class="form-control" />
-                            <span asp-validation-for="Phone" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="Topic" class="form-label"></label>
-                            <select asp-for="Topic" class="form-select">
-                                <option value="">Chọn nhu cầu</option>
-                                <option>TOEIC</option>
-                                <option>IELTS</option>
-                                <option>Giao tiếp</option>
-                                <option>Tư vấn xếp lớp</option>
-                            </select>
-                            <span asp-validation-for="Topic" class="text-danger small"></span>
-                        </div>
-                        <div class="col-12">
-                            <label asp-for="Message" class="form-label"></label>
-                            <textarea asp-for="Message" rows="5" class="form-control"></textarea>
-                            <span asp-validation-for="Message" class="text-danger small"></span>
-                        </div>
-                        <div class="col-12">
-                            <button class="btn btn-primary" type="submit">Gửi yêu cầu tư vấn</button>
-                        </div>
-                    </form>
+                    @await Html.PartialAsync("~/Views/Shared/Partials/_ContactInquiryForm.cshtml", Model, new ViewDataDictionary(ViewData)
+                    {
+                        ["ReturnUrl"] = "/Contact",
+                        ["SubmitLabel"] = "Gửi yêu cầu tư vấn",
+                        ["SupportEmail"] = supportEmail
+                    })
                 </div>
             </div>
         </div>

@@ -2291,3 +2291,397 @@ textarea.form-control:focus {
     padding: 1.4rem;
   }
 }
+
+html {
+  scroll-padding-top: 110px;
+}
+
+[id] {
+  scroll-margin-top: 118px;
+}
+
+.site-main {
+  padding-top: 1.6rem;
+}
+
+.app-page {
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: 1.35rem clamp(1rem, 2.4vw, 2rem) 0;
+}
+
+.app-page .app-breadcrumb {
+  padding-inline: 0.35rem;
+}
+
+.dashboard-stage,
+.page-banner,
+.landing-hero-shell,
+.catalog-hero-card {
+  padding: 2.6rem;
+}
+
+.site-header {
+  box-shadow: 0 18px 44px rgba(16, 33, 60, 0.06);
+}
+
+.public-navbar {
+  padding: 1.15rem 0;
+}
+
+.public-nav-list .nav-link {
+  border-radius: 14px;
+  padding: 0.72rem 1rem !important;
+}
+
+.public-nav-list .nav-link::after {
+  left: 1rem;
+  right: 1rem;
+  bottom: 0.22rem;
+}
+
+.public-nav-list .nav-link:hover,
+.public-nav-list .nav-link.active {
+  background: rgba(68, 106, 159, 0.08) !important;
+}
+
+.btn {
+  border-width: 1.5px;
+}
+
+.btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, #365d94, #173763);
+  box-shadow: 0 14px 30px rgba(23, 55, 99, 0.22);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  color: #fff;
+  background: linear-gradient(135deg, #254c80, #102b4f);
+  box-shadow: 0 18px 34px rgba(16, 43, 79, 0.24);
+}
+
+.btn-outline-primary {
+  border-color: rgba(23, 55, 99, 0.2);
+  color: #204879;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  border-color: #274f82;
+  background: #eef4fb;
+  color: #173763;
+}
+
+.btn-outline-dark {
+  border-color: rgba(16, 33, 60, 0.2);
+  color: var(--ink-950);
+  background: #fff;
+}
+
+.btn-outline-dark:hover,
+.btn-outline-dark:focus {
+  border-color: transparent;
+  background: rgba(16, 33, 60, 0.08);
+  color: var(--ink-950);
+}
+
+.btn-ghost {
+  border-color: rgba(68, 106, 159, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.btn-logout {
+  min-width: 126px;
+}
+
+.dashboard-tabs .nav-pills .nav-link {
+  color: var(--ink-950);
+  background: #eef3f9;
+  box-shadow: inset 0 0 0 1px rgba(217, 226, 238, 0.9);
+}
+
+.dashboard-tabs .nav-pills .nav-link:not(.active):hover {
+  background: #e3edf9;
+  color: #173763;
+}
+
+.home-highlight-card {
+  min-height: 190px;
+}
+
+.landing-section-header.align-start {
+  align-items: flex-start;
+}
+
+.contact-home-card,
+.form-display-card {
+  padding: 1.8rem;
+}
+
+.contact-header {
+  margin-bottom: 1.35rem;
+}
+
+.contact-form-note {
+  color: var(--ink-500);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.footer-newsletter-form {
+  align-items: stretch;
+}
+
+.footer-newsletter-form .btn {
+  min-width: 96px;
+}
+
+@media (max-width: 991px) {
+  .site-main {
+    padding-top: 1.1rem;
+  }
+
+  .dashboard-stage,
+  .page-banner,
+  .landing-hero-shell,
+  .catalog-hero-card {
+    padding: 1.65rem;
+  }
+}
+
+body.dashboard-shell {
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 20%),
+    linear-gradient(180deg, #0f2746 0%, #173763 52%, #204879 100%);
+}
+
+.dashboard-shell {
+  --dashboard-panel-bg: linear-gradient(180deg, #28548c 0%, #173763 100%);
+  --dashboard-panel-border: rgba(255, 255, 255, 0.14);
+  --dashboard-text-soft: rgba(248, 251, 255, 0.82);
+  --dashboard-text-muted: rgba(248, 251, 255, 0.66);
+  background: transparent;
+}
+
+.dashboard-shell .dashboard-main {
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.05), transparent 18%),
+    linear-gradient(180deg, rgba(8, 22, 41, 0.08), rgba(8, 22, 41, 0.02));
+}
+
+.dashboard-shell .dashboard-header {
+  background: linear-gradient(90deg, rgba(23, 55, 99, 0.96), rgba(40, 84, 140, 0.96));
+  border-bottom-color: var(--dashboard-panel-border);
+  color: #fff;
+}
+
+.dashboard-shell .dashboard-role-badge {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.dashboard-shell .dashboard-role,
+.dashboard-shell .page-subtitle,
+.dashboard-shell .panel-card-header p,
+.dashboard-shell .text-muted,
+.dashboard-shell .text-secondary,
+.dashboard-shell .form-text,
+.dashboard-shell .pagination-row span,
+.dashboard-shell .empty-state p,
+.dashboard-shell .detail-item span,
+.dashboard-shell .sidebar-summary-label {
+  color: var(--dashboard-text-soft) !important;
+}
+
+.dashboard-shell .app-breadcrumb,
+.dashboard-shell .app-breadcrumb a,
+.dashboard-shell .app-breadcrumb span,
+.dashboard-shell .app-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  color: var(--dashboard-text-soft) !important;
+}
+
+.dashboard-shell .dashboard-stage,
+.dashboard-shell .panel-card,
+.dashboard-shell .stat-card,
+.dashboard-shell .stage-mini-card,
+.dashboard-shell .dashboard-shortcut-card,
+.dashboard-shell .detail-item,
+.dashboard-shell .schedule-table-card {
+  background: var(--dashboard-panel-bg);
+  border: 1px solid var(--dashboard-panel-border);
+  color: #fff;
+  box-shadow: 0 18px 40px rgba(7, 20, 36, 0.22);
+}
+
+.dashboard-shell .dashboard-stage::before,
+.dashboard-shell .panel-card::before,
+.dashboard-shell .stat-card::after {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.14), transparent 72%);
+}
+
+.dashboard-shell .page-header h1,
+.dashboard-shell .panel-card h3,
+.dashboard-shell .panel-card strong,
+.dashboard-shell .stat-card .stat-content strong,
+.dashboard-shell .stage-mini-card strong,
+.dashboard-shell .dashboard-shortcut-card h5,
+.dashboard-shell .detail-item strong,
+.dashboard-shell .empty-state h3,
+.dashboard-shell .timeline-item strong,
+.dashboard-shell .list-group-item strong {
+  color: #fff;
+}
+
+.dashboard-shell .eyebrow {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.dashboard-shell .dashboard-tabs .nav-pills .nav-link {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.dashboard-shell .dashboard-tabs .nav-pills .nav-link.active {
+  background: #fff;
+  color: #173763;
+}
+
+.dashboard-shell .dashboard-tabs .nav-pills .nav-link:not(.active):hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.dashboard-shell .panel-list .list-group-item,
+.dashboard-shell .timeline-item,
+.dashboard-shell .app-table td,
+.dashboard-shell .app-table th {
+  background: transparent;
+  color: #fff;
+  border-color: var(--dashboard-panel-border);
+}
+
+.dashboard-shell .app-table thead th {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.dashboard-shell .toolbar-row {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--dashboard-panel-border);
+  border-radius: 22px;
+  padding: 1rem;
+}
+
+.dashboard-shell .toolbar-search,
+.dashboard-shell .toolbar-filters .form-select {
+  background: transparent;
+}
+
+.dashboard-shell .toolbar-search i {
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.dashboard-shell .form-control,
+.dashboard-shell .form-select,
+.dashboard-shell textarea.form-control {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #173763;
+}
+
+.dashboard-shell .form-control::placeholder,
+.dashboard-shell textarea.form-control::placeholder {
+  color: rgba(23, 55, 99, 0.58);
+}
+
+.dashboard-shell .form-label,
+.dashboard-shell .form-section-title,
+.dashboard-shell .pagination-row,
+.dashboard-shell .empty-state i {
+  color: #fff;
+}
+
+.dashboard-shell .alert-info-soft {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.dashboard-shell .alert-warning-soft {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fff7df;
+}
+
+.dashboard-shell .alert-danger {
+  background: rgba(220, 38, 38, 0.18);
+  border-color: rgba(248, 113, 113, 0.28);
+  color: #fff;
+}
+
+.dashboard-shell .btn-outline-primary,
+.dashboard-shell .btn-outline-secondary,
+.dashboard-shell .btn-outline-dark {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.dashboard-shell .btn-outline-primary:hover,
+.dashboard-shell .btn-outline-secondary:hover,
+.dashboard-shell .btn-outline-dark:hover,
+.dashboard-shell .btn-outline-primary:focus,
+.dashboard-shell .btn-outline-secondary:focus,
+.dashboard-shell .btn-outline-dark:focus {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+.dashboard-shell .btn-light {
+  background: #fff;
+  border-color: #fff;
+  color: #173763;
+}
+
+.dashboard-shell .btn-dark {
+  background: #0d213b;
+  border-color: #0d213b;
+  color: #fff;
+}
+
+.dashboard-shell .page-link {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.dashboard-shell .page-item.active .page-link {
+  background: #fff;
+  border-color: #fff;
+  color: #173763;
+}
+
+.dashboard-shell .dashboard-shortcut-card:hover,
+.dashboard-shell .sidebar-nav a:hover,
+.dashboard-shell .sidebar-nav a.active {
+  box-shadow: 0 14px 30px rgba(8, 22, 41, 0.18);
+}
+
+.dashboard-shell .article-content::after {
+  display: none;
+  content: none;
+}
+
+@media (max-width: 991px) {
+  .dashboard-shell .dashboard-header {
+    padding: 1.1rem 1.15rem;
+  }
+
+  .dashboard-shell .dashboard-content {
+    padding: 1.15rem;
+  }
+}

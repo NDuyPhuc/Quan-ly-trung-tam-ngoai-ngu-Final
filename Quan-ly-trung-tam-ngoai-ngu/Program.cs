@@ -1,5 +1,8 @@
 using Quan_ly_trung_tam_ngoai_ngu.Services.Interfaces;
 using Quan_ly_trung_tam_ngoai_ngu.Services.Mocks;
+using Quan_ly_trung_tam_ngoai_ngu.Services;
+using Quan_ly_trung_tam_ngoai_ngu.Services.Sql;
+using Quan_ly_trung_tam_ngoai_ngu.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +15,13 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSingleton<IMockDataService, MockDataService>();
-builder.Services.AddSingleton<IDemoAuthService, DemoAuthService>();
+builder.Services.Configure<SmtpMailOptions>(builder.Configuration.GetSection("Smtp"));
+builder.Services.AddSingleton<MockDataService>();
+builder.Services.AddScoped<IMockDataService, SqlServerDataService>();
+builder.Services.AddScoped<IDemoAuthService, SqlAuthService>();
+builder.Services.AddScoped<ILanguageCenterManagementService, SqlLanguageCenterManagementService>();
+builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
+builder.Services.AddSingleton<IPublicSiteContentService, PublicSiteContentService>();
 
 var app = builder.Build();
 

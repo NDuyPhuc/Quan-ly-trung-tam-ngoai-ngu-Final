@@ -2,6 +2,8 @@
     var pageModel = ViewData.Model as AppPageViewModel;
     var pageTitle = ViewData["Title"]?.ToString() ?? pageModel?.Title ?? "Bảng điều khiển";
     var rawRole = Context.Session.GetString("DemoUserRole");
+    var displayName = Context.Session.GetString("DemoUserDisplayName") ?? "người dùng";
+    var currentArea = (ViewContext.RouteData.Values["area"]?.ToString() ?? string.Empty).ToLowerInvariant();
     var roleLabel = rawRole switch
     {
         "Admin" => "Quản trị viên",
@@ -32,12 +34,18 @@
         <header class="dashboard-header">
             <div>
                 <span class="dashboard-role-badge">@roleLabel</span>
-                <div class="dashboard-greeting">Xin chào, @Context.Session.GetString("DemoUserDisplayName")</div>
-                <div class="dashboard-role">Theo dõi số liệu, thao tác nhanh và các màn nghiệp vụ trên giao diện mới.</div>
+                <div class="dashboard-greeting">Xin chào, @displayName</div>
+                <div class="dashboard-role">Theo dõi dữ liệu, thao tác nhanh và cập nhật luôn nội dung hiển thị ngoài trang chủ trong cùng một khu quản trị.</div>
             </div>
             <div class="d-flex flex-wrap gap-2">
+                @if (currentArea == "admin")
+                {
+                    <a class="btn btn-outline-primary btn-sm" href="/Admin/News">
+                        <i class="bi bi-newspaper me-2"></i>Tin tức trang chủ
+                    </a>
+                }
                 <a class="btn btn-outline-primary btn-sm" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-house-door me-2"></i>Trang công khai
+                    <i class="bi bi-house-door me-2"></i>Trang chủ công khai
                 </a>
                 <a class="btn btn-light btn-sm" asp-area="" asp-controller="Profile" asp-action="Index">
                     <i class="bi bi-person me-2"></i>Hồ sơ

@@ -45,10 +45,22 @@ public class HomePageViewModel : AppPageViewModel
 {
     public string HeroTitle { get; set; } = string.Empty;
     public string HeroSubtitle { get; set; } = string.Empty;
+    public string AboutTitle { get; set; } = string.Empty;
+    public string AboutSubtitle { get; set; } = string.Empty;
+    public string AboutHighlightTitle { get; set; } = string.Empty;
+    public string AboutHighlightBody { get; set; } = string.Empty;
+    public string ContactSectionTitle { get; set; } = string.Empty;
+    public string ContactSectionSubtitle { get; set; } = string.Empty;
+    public string ContactFormTitle { get; set; } = string.Empty;
+    public string ContactFormSubtitle { get; set; } = string.Empty;
+    public string SupportEmail { get; set; } = string.Empty;
+    public string SupportPhone { get; set; } = string.Empty;
+    public string SupportHours { get; set; } = string.Empty;
     public List<SummaryCardViewModel> HighlightStats { get; set; } = [];
     public List<CourseCardViewModel> FeaturedCourses { get; set; } = [];
     public List<ClassCardViewModel> OpenClasses { get; set; } = [];
     public List<NewsCardViewModel> LatestNews { get; set; } = [];
+    public ContactViewModel ContactForm { get; set; } = new();
 }
 
 public class AboutPageViewModel : AppPageViewModel
@@ -94,41 +106,53 @@ public class NewsDetailPageViewModel : AppPageViewModel
 
 public class ContactViewModel : AppPageViewModel
 {
-    [Required(ErrorMessage = "Vui lòng nhập họ tên.")]
-    [Display(Name = "Họ và tên")]
+    [Required(ErrorMessage = "Vui long nhap ho ten.")]
+    [Display(Name = "Ho va ten")]
     public string FullName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng nhập email.")]
-    [EmailAddress(ErrorMessage = "Email không hợp lệ.")]
+    [Required(ErrorMessage = "Vui long nhap email.")]
+    [EmailAddress(ErrorMessage = "Email khong hop le.")]
     [Display(Name = "Email")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng nhập số điện thoại.")]
-    [Display(Name = "Số điện thoại")]
+    [Required(ErrorMessage = "Vui long nhap so dien thoai.")]
+    [Display(Name = "So dien thoai")]
     public string Phone { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng chọn nhu cầu.")]
-    [Display(Name = "Nhu cầu")]
+    [Required(ErrorMessage = "Vui long chon nhu cau.")]
+    [Display(Name = "Nhu cau")]
     public string Topic { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng nhập nội dung.")]
-    [Display(Name = "Nội dung")]
+    [Display(Name = "Khoa hoc quan tam")]
+    public string PreferredProgram { get; set; } = string.Empty;
+
+    [Display(Name = "Trinh do hien tai")]
+    public string CurrentLevel { get; set; } = string.Empty;
+
+    [Display(Name = "Khung gio mong muon")]
+    public string PreferredSchedule { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui long chon cach lien he mong muon.")]
+    [Display(Name = "Cach lien he mong muon")]
+    public string PreferredContactMethod { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui long nhap noi dung.")]
+    [Display(Name = "Noi dung")]
     public string Message { get; set; } = string.Empty;
 }
 
 public class LoginViewModel : AppPageViewModel
 {
-    [Required(ErrorMessage = "Vui lòng nhập email.")]
-    [EmailAddress(ErrorMessage = "Email không hợp lệ.")]
-    [Display(Name = "Email")]
+    [Required(ErrorMessage = "Vui long nhap email hoac ten dang nhap.")]
+    [Display(Name = "Email hoac ten dang nhap")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng nhập mật khẩu.")]
+    [Required(ErrorMessage = "Vui long nhap mat khau.")]
     [DataType(DataType.Password)]
-    [Display(Name = "Mật khẩu")]
+    [Display(Name = "Mat khau")]
     public string Password { get; set; } = string.Empty;
 
-    [Display(Name = "Ghi nhớ đăng nhập")]
+    [Display(Name = "Ghi nho dang nhap")]
     public bool RememberMe { get; set; }
 
     public string? ErrorMessage { get; set; }
@@ -136,35 +160,35 @@ public class LoginViewModel : AppPageViewModel
 
 public class RegisterViewModel : AppPageViewModel
 {
-    [Required(ErrorMessage = "Vui lòng nhập họ tên.")]
-    [Display(Name = "Họ và tên")]
+    [Required(ErrorMessage = "Vui long nhap ho ten.")]
+    [Display(Name = "Ho va ten")]
     public string FullName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng nhập email.")]
-    [EmailAddress(ErrorMessage = "Email không hợp lệ.")]
+    [Required(ErrorMessage = "Vui long nhap email.")]
+    [EmailAddress(ErrorMessage = "Email khong hop le.")]
     [Display(Name = "Email")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng nhập số điện thoại.")]
-    [Display(Name = "Số điện thoại")]
+    [Required(ErrorMessage = "Vui long nhap so dien thoai.")]
+    [Display(Name = "So dien thoai")]
     public string Phone { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng nhập mật khẩu.")]
+    [Required(ErrorMessage = "Vui long nhap mat khau.")]
     [DataType(DataType.Password)]
-    [Display(Name = "Mật khẩu")]
+    [Display(Name = "Mat khau")]
     public string Password { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu.")]
+    [Required(ErrorMessage = "Vui long xac nhan mat khau.")]
     [DataType(DataType.Password)]
-    [Compare(nameof(Password), ErrorMessage = "Mật khẩu xác nhận chưa khớp.")]
-    [Display(Name = "Xác nhận mật khẩu")]
+    [Compare(nameof(Password), ErrorMessage = "Mat khau xac nhan chua khop.")]
+    [Display(Name = "Xac nhan mat khau")]
     public string ConfirmPassword { get; set; } = string.Empty;
 }
 
 public class ForgotPasswordViewModel : AppPageViewModel
 {
-    [Required(ErrorMessage = "Vui lòng nhập email.")]
-    [EmailAddress(ErrorMessage = "Email không hợp lệ.")]
+    [Required(ErrorMessage = "Vui long nhap email.")]
+    [EmailAddress(ErrorMessage = "Email khong hop le.")]
     [Display(Name = "Email")]
     public string Email { get; set; } = string.Empty;
 }

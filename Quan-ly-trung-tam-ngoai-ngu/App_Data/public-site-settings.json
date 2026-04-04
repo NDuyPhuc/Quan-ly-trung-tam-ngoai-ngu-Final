@@ -1,0 +1,21 @@
+﻿{
+  "HomePage": {
+    "HeroTitle": "N\u1EC1n t\u1EA3ng qu\u1EA3n l\u00FD trung t\u00E2m ngo\u1EA1i ng\u1EEF hi\u1EC7n \u0111\u1EA1i v\u00E0 tr\u1EF1c quan.",
+    "HeroSubtitle": "H\u1EC7 th\u1ED1ng h\u1ED7 tr\u1EE3 tuy\u1EC3n sinh, qu\u1EA3n l\u00FD l\u1EDBp h\u1ECDc, theo d\u00F5i gi\u1EA3ng d\u1EA1y, c\u1EADp nh\u1EADt h\u1ECDc ph\u00ED v\u00E0 t\u01B0 v\u1EA5n h\u1ECDc vi\u00EAn trong c\u00F9ng m\u1ED9t kh\u00F4ng gian r\u00F5 r\u00E0ng, s\u00E1ng v\u00E0 d\u1EC5 d\u00F9ng."
+  },
+  "AboutSection": {
+    "SectionTitle": "Gi\u00E1 tr\u1ECB c\u1ED1t l\u00F5i v\u00E0 c\u00E1ch v\u1EADn h\u00E0nh",
+    "SectionSubtitle": "NorthStar English t\u1EADp trung v\u00E0o s\u1EF1 r\u00F5 r\u00E0ng trong l\u1ED9 tr\u00ECnh h\u1ECDc, giao di\u1EC7n d\u1EC5 d\u00F9ng v\u00E0 kh\u1EA3 n\u0103ng theo d\u00F5i ti\u1EBFn \u0111\u1ED9 xuy\u00EAn su\u1ED1t cho h\u1ECDc vi\u00EAn.",
+    "HighlightTitle": "L\u1EE3i th\u1EBF khi h\u1ECDc t\u1EA1i NorthStar",
+    "HighlightBody": "Thi\u1EBFt k\u1EBF m\u1EDBi gi\u1EEF nguy\u00EAn nghi\u1EC7p v\u1EE5 nh\u01B0ng tr\u00ECnh b\u00E0y hi\u1EC7n \u0111\u1EA1i h\u01A1n \u0111\u1EC3 ng\u01B0\u1EDDi d\u00F9ng nh\u00ECn l\u00E0 hi\u1EC3u ngay c\u00E1c khu v\u1EF1c c\u1EA7n thao t\u00E1c."
+  },
+  "ContactSection": {
+    "SectionTitle": "Li\u00EAn h\u1EC7 v\u00E0 \u0111\u0103ng k\u00FD t\u01B0 v\u1EA5n",
+    "SectionSubtitle": "\u0110\u00E2y l\u00E0 khu v\u1EF1c li\u00EAn h\u1EC7 th\u1EADt s\u1EF1 d\u00F9ng \u0111\u01B0\u1EE3c: ng\u01B0\u1EDDi d\u00F9ng c\u00F3 th\u1EC3 \u0111\u1EC3 l\u1EA1i nhu c\u1EA7u, khung gi\u1EDD h\u1ECDc v\u00E0 c\u00E1ch li\u00EAn h\u1EC7 mong mu\u1ED1n \u0111\u1EC3 trung t\u00E2m ph\u1EA3n h\u1ED3i.",
+    "FormTitle": "G\u1EEDi th\u00F4ng tin ngay t\u1EA1i trang ch\u1EE7",
+    "FormSubtitle": "\u0110i\u1EC1n form b\u00EAn d\u01B0\u1EDBi \u0111\u1EC3 trung t\u00E2m nh\u1EADn nhu c\u1EA7u c\u1EE5 th\u1EC3 v\u00E0 ph\u1EA3n h\u1ED3i \u0111\u00FAng kh\u00F3a h\u1ECDc b\u1EA1n \u0111ang quan t\u00E2m.",
+    "SupportEmail": "nguyenthanhdanhctk42@gmail.com",
+    "SupportPhone": "0901 001 001",
+    "SupportHours": "08:00 - 20:30 m\u1ED7i ng\u00E0y"
+  }
+}

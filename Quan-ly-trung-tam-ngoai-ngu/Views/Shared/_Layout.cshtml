@@ -4,16 +4,22 @@
     var pageTitle = ViewData["Title"]?.ToString() ?? pageModel?.Title ?? "NorthStar English";
     var demoRole = Context.Session.GetString("DemoUserRole");
     var demoName = Context.Session.GetString("DemoUserDisplayName");
+    var homeUrl = Url.Action("Index", "Home") ?? "/";
+    var currentReturnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+    var isAdminShortcutMode = string.Equals(demoRole, "Admin", StringComparison.OrdinalIgnoreCase);
     var dashboardUrl = demoRole switch
     {
         "Admin" => Url.Action("Index", "Dashboard", new { area = "Admin" }) ?? "/Admin",
         "Staff" => Url.Action("Index", "Dashboard", new { area = "Staff" }) ?? "/Staff",
         "Teacher" => Url.Action("Index", "Dashboard", new { area = "Teacher" }) ?? "/Teacher",
-        _ => Url.Action("Index", "Home") ?? "/"
+        _ => homeUrl
     };
 
-    string NavClass(string controller)
-        => currentController.Equals(controller, StringComparison.OrdinalIgnoreCase) ? "nav-link active" : "nav-link";
+    string HomeSectionUrl(string fragment) => $"{homeUrl}#{fragment}";
+    string PublicNavUrl(string fragment, string adminUrl) => isAdminShortcutMode ? adminUrl : HomeSectionUrl(fragment);
+    string HomeNavClass(bool isDefaultActive = false) => isDefaultActive && currentController.Equals("Home", StringComparison.OrdinalIgnoreCase)
+        ? "nav-link active home-scroll-link"
+        : "nav-link home-scroll-link";
 }
 <!DOCTYPE html>
 <html lang="vi">
@@ -27,13 +33,12 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Quan_ly_trung_tam_ngoai_ngu.styles.css" asp-append-version="true" />
 </head>
-<body class="app-body public-body">
+<body class="app-body public-body" data-controller="@currentController">
     <header class="site-header sticky-top">
         <div class="container">
             <nav class="navbar navbar-expand-lg site-navbar public-navbar">
-                <a class="navbar-brand brand-wordmark" asp-controller="Home" asp-action="Index">NorthStar English</a>
+                <a class="navbar-brand brand-wordmark" href="@HomeSectionUrl("trang-chu")">NorthStar English</a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Mở điều hướng">
                     <span class="navbar-toggler-icon"></span>
@@ -41,12 +46,12 @@
 
                 <div class="collapse navbar-collapse" id="mainNav">
                     <ul class="navbar-nav mx-auto public-nav-list">
-                        <li class="nav-item"><a class="@NavClass("Home")" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
-                        <li class="nav-item"><a class="@NavClass("About")" asp-controller="About" asp-action="Index">Giới thiệu</a></li>
-                        <li class="nav-item"><a class="@NavClass("Courses")" asp-controller="Courses" asp-action="Index">Khóa học</a></li>
-                        <li class="nav-item"><a class="@NavClass("Classes")" asp-controller="Classes" asp-action="Index">Lớp học</a></li>
-                        <li class="nav-item"><a class="@NavClass("News")" asp-controller="News" asp-action="Index">Tin tức</a></li>
-                        <li class="nav-item"><a class="@NavClass("Contact")" asp-controller="Contact" asp-action="Index">Liên hệ</a></li>
+                        <li class="nav-item"><a class="@HomeNavClass(isDefaultActive: true)" href="@PublicNavUrl("trang-chu", "/Admin/PublicPages/HomePage")" data-scroll-nav="trang-chu">Trang chủ</a></li>
+                        <li class="nav-item"><a class="@HomeNavClass()" href="@PublicNavUrl("gioi-thieu", "/Admin/PublicPages/AboutPage")" data-scroll-nav="gioi-thieu">Giới thiệu</a></li>
+                        <li class="nav-item"><a class="@HomeNavClass()" href="@PublicNavUrl("khoa-hoc", "/Admin/Courses")" data-scroll-nav="khoa-hoc">Khóa học</a></li>
+                        <li class="nav-item"><a class="@HomeNavClass()" href="@PublicNavUrl("lop-hoc", "/Admin/Classes")" data-scroll-nav="lop-hoc">Lớp học</a></li>
+                        <li class="nav-item"><a class="@HomeNavClass()" href="@PublicNavUrl("tin-tuc", "/Admin/News")" data-scroll-nav="tin-tuc">Tin tức</a></li>
+                        <li class="nav-item"><a class="@HomeNavClass()" href="@PublicNavUrl("lien-he", "/Admin/PublicPages/ContactPage")" data-scroll-nav="lien-he">Liên hệ</a></li>
                     </ul>
 
                     <div class="site-action-stack">
@@ -57,7 +62,7 @@
                                 @demoName
                             </span>
                             <a class="btn btn-outline-primary btn-sm" href="@dashboardUrl">Bảng điều khiển</a>
-                            <a class="btn btn-primary btn-sm" asp-controller="Account" asp-action="Logout">Đăng xuất</a>
+                            <a class="btn btn-primary btn-sm btn-logout" asp-controller="Account" asp-action="Logout">Đăng xuất</a>
                         }
                         else
                         {
@@ -80,43 +85,45 @@
                 <div class="row g-4">
                     <div class="col-lg-4">
                         <div class="public-footer-brand">
-                            <a class="brand-wordmark" asp-controller="Home" asp-action="Index">NorthStar English</a>
-                            <p>Giải pháp giao diện cho trung tâm ngoại ngữ theo hướng sáng, học thuật và rõ nghiệp vụ, giữ nguyên toàn bộ luồng chức năng hiện có.</p>
+                            <a class="brand-wordmark" href="@HomeSectionUrl("trang-chu")">NorthStar English</a>
+                            <p>Giải pháp giao diện cho trung tâm ngoại ngữ theo hướng sáng, học thuật và rõ nghiệp vụ, giữ nguyên luồng chức năng nhưng dễ dùng hơn cho người học và đội ngũ vận hành.</p>
                             <div class="footer-socials">
-                                <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                                <a href="#" aria-label="Youtube"><i class="bi bi-youtube"></i></a>
-                                <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                                <a href="@HomeSectionUrl("trang-chu")" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                                <a href="@HomeSectionUrl("tin-tuc")" aria-label="Youtube"><i class="bi bi-youtube"></i></a>
+                                <a href="@HomeSectionUrl("lien-he")" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6 col-lg-2">
                         <h6 class="footer-title">Khóa học</h6>
                         <div class="footer-links">
-                            <a asp-controller="Courses" asp-action="Index">TOEIC 650+</a>
-                            <a asp-controller="Courses" asp-action="Index">IELTS nền tảng</a>
-                            <a asp-controller="Courses" asp-action="Index">Tiếng Anh giao tiếp</a>
+                            <a href="@HomeSectionUrl("khoa-hoc")">TOEIC 650+</a>
+                            <a href="@HomeSectionUrl("khoa-hoc")">IELTS nền tảng</a>
+                            <a href="@HomeSectionUrl("khoa-hoc")">Tiếng Anh giao tiếp</a>
                         </div>
                     </div>
                     <div class="col-sm-6 col-lg-2">
                         <h6 class="footer-title">Hỗ trợ</h6>
                         <div class="footer-links">
                             <a asp-controller="Home" asp-action="Privacy">Chính sách riêng tư</a>
-                            <a asp-controller="Contact" asp-action="Index">Liên hệ tư vấn</a>
+                            <a href="@HomeSectionUrl("lien-he")">Liên hệ tư vấn</a>
                             <a asp-controller="Account" asp-action="Login">Đăng nhập hệ thống</a>
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <h6 class="footer-title">Nhận thông tin</h6>
                         <p class="footer-subtitle">Đăng ký nhận các bản tin về lịch khai giảng, workshop và thông báo mới nhất từ trung tâm.</p>
-                        <div class="footer-newsletter-form">
-                            <input type="email" class="form-control" placeholder="Email của bạn" aria-label="Email của bạn" />
-                            <button type="button" class="btn btn-primary btn-sm">Gửi</button>
-                        </div>
+                        <form asp-controller="Contact" asp-action="Subscribe" method="post" class="footer-newsletter-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="returnUrl" value="@(currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) ? "/#lien-he" : currentReturnUrl)" />
+                            <input type="email" name="email" class="form-control" placeholder="Email của bạn" aria-label="Email của bạn" required />
+                            <button type="submit" class="btn btn-primary btn-sm">Gửi</button>
+                        </form>
                     </div>
                 </div>
                 <div class="footer-bottom">
                     <span>&copy; 2026 NorthStar English.</span>
-                    <span>Giao diện được làm mới theo mẫu tham chiếu nhưng không thay đổi chức năng.</span>
+                    <span>Giao diện và các luồng thao tác đã được làm lại để bám sát nghiệp vụ và thuận tiện hơn cho người dùng.</span>
                 </div>
             </div>
         </div>

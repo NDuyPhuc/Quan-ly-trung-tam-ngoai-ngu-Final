@@ -160,10 +160,13 @@ public class ManagementFormPageViewModel : AppPageViewModel
 {
     public string FormTitle { get; set; } = string.Empty;
     public string FormDescription { get; set; } = string.Empty;
+    public string FormActionUrl { get; set; } = string.Empty;
+    public string FormMethod { get; set; } = "post";
     public string SubmitLabel { get; set; } = "Lưu tạm";
     public string CancelLabel { get; set; } = "Quay lại";
     public string CancelUrl { get; set; } = string.Empty;
     public string? Notice { get; set; }
+    public string? ErrorMessage { get; set; }
     public List<FormSectionViewModel> Sections { get; set; } = [];
 }
 

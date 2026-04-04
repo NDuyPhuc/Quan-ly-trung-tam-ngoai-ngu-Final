@@ -35,11 +35,11 @@
         </div>
     }
 
-    <div class="panel-card">
+    <div class="panel-card" data-management-list>
         <div class="toolbar-row">
             <div class="toolbar-search">
                 <i class="bi bi-search"></i>
-                <input type="text" class="form-control" placeholder="@Model.SearchPlaceholder" />
+                <input type="text" class="form-control" placeholder="@Model.SearchPlaceholder" data-management-search aria-label="@Model.SearchPlaceholder" />
             </div>
             <div class="toolbar-filters">
                 @foreach (var filter in Model.Filters)
@@ -73,7 +73,7 @@
                     {
                         @foreach (var row in Model.Table.Rows)
                         {
-                            <tr>
+                            <tr data-management-row>
                                 @for (var i = 0; i < row.Cells.Count; i++)
                                 {
                                     <td>@Html.Raw(row.Cells[i].Html)</td>
@@ -84,7 +84,7 @@
                                         {
                                             if (action.RequiresConfirm)
                                             {
-                                                <a href="#" class="@action.CssClass confirm-action" data-confirm-message="@action.ConfirmMessage"><i class="@action.Icon me-1"></i>@action.Label</a>
+                                                <a href="@action.Url" class="@action.CssClass confirm-action" data-confirm-message="@action.ConfirmMessage"><i class="@action.Icon me-1"></i>@action.Label</a>
                                             }
                                             else
                                             {
@@ -95,6 +95,16 @@
                                 </td>
                             </tr>
                         }
+
+                        <tr class="d-none" data-management-search-empty>
+                            <td colspan="@Model.Table.Columns.Count">
+                                <div class="empty-state">
+                                    <i class="bi bi-search"></i>
+                                    <h3>Không tìm thấy dữ liệu phù hợp</h3>
+                                    <p>Thử đổi từ khóa tìm kiếm để xem thêm bản ghi.</p>
+                                </div>
+                            </td>
+                        </tr>
                     }
                     else
                     {
@@ -112,14 +122,19 @@
             </table>
         </div>
         <div class="pagination-row">
-            <span class="text-muted">Đang hiển thị toàn bộ dữ liệu hiện có trên một trang.</span>
-            <nav>
+            <span class="text-muted" data-management-count>
+                @if (Model.Table.Rows.Any())
+                {
+                    @:Đang hiển thị @Model.Table.Rows.Count bản ghi trên một trang.
+                }
+                else
+                {
+                    @:Chưa có bản ghi nào để hiển thị.
+                }
+            </span>
+            <nav aria-label="Điều hướng danh sách">
                 <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Sau</a></li>
+                    <li class="page-item active"><span class="page-link">1</span></li>
                 </ul>
             </nav>
         </div>

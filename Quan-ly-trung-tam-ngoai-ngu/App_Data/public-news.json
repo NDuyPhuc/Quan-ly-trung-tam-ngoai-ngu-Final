@@ -1,0 +1,35 @@
+﻿[
+  {
+    "Id": 1,
+    "Slug": "lich-khai-giang-thang-4",
+    "Title": "L\u1ECBch khai gi\u1EA3ng c\u00E1c kh\u00F3a th\u00E1ng 4/2026",
+    "Category": "Th\u00F4ng b\u00E1o",
+    "Summary": "C\u1EADp nh\u1EADt c\u00E1c l\u1EDBp TOEIC, IELTS v\u00E0 Giao ti\u1EBFp b\u1EAFt \u0111\u1EA7u trong th\u00E1ng 4 c\u00F9ng \u01B0u \u0111\u00E3i gi\u1EEF ch\u1ED7 s\u1EDBm.",
+    "Content": "Trung t\u00E2m NorthStar English ch\u00EDnh th\u1EE9c m\u1EDF \u0111\u0103ng k\u00FD cho c\u00E1c l\u1EDBp khai gi\u1EA3ng th\u00E1ng 4. H\u1ECDc vi\u00EAn c\u00F3 th\u1EC3 l\u1EF1a ch\u1ECDn c\u00E1c khung gi\u1EDD t\u1ED1i 2-4-6, 3-5-7 ho\u1EB7c cu\u1ED1i tu\u1EA7n t\u00F9y theo l\u1ECBch h\u1ECDc v\u00E0 l\u00E0m vi\u1EC7c. Ch\u01B0\u01A1ng tr\u00ECnh \u01B0u \u0111\u00E3i \u00E1p d\u1EE5ng cho h\u1ECDc vi\u00EAn \u0111\u0103ng k\u00FD tr\u01B0\u1EDBc ng\u00E0y khai gi\u1EA3ng 7 ng\u00E0y.",
+    "Author": "Ph\u00F2ng gi\u00E1o v\u1EE5",
+    "PublishedOn": "2026-04-01T00:00:00",
+    "IsFeatured": true
+  },
+  {
+    "Id": 2,
+    "Slug": "workshop-chien-luoc-toeic",
+    "Title": "Bu\u1ED5i chia s\u1EBB mi\u1EC5n ph\u00ED: Chi\u1EBFn l\u01B0\u1EE3c \u0111\u1EA1t TOEIC 700\u002B",
+    "Category": "S\u1EF1 ki\u1EC7n",
+    "Summary": "Bu\u1ED5i chia s\u1EBB c\u00E1ch h\u1ECDc v\u00E0 qu\u1EA3n l\u00FD th\u1EDDi gian khi l\u00E0m b\u00E0i TOEIC d\u00E0nh cho sinh vi\u00EAn n\u0103m cu\u1ED1i.",
+    "Content": "Bu\u1ED5i chia s\u1EBB t\u1EADp trung v\u00E0o c\u00E1c chi\u1EBFn l\u01B0\u1EE3c c\u1EA3i thi\u1EC7n nhanh \u0111i\u1EC3m \u0110\u1ECDc hi\u1EC3u v\u00E0 Nghe hi\u1EC3u, k\u1EBFt h\u1EE3p ph\u1EA7n gi\u1EA3i \u0111\u00E1p tr\u1EF1c ti\u1EBFp v\u1EDBi gi\u00E1o vi\u00EAn TOEIC t\u1EA1i trung t\u00E2m. Ng\u01B0\u1EDDi tham d\u1EF1 s\u1EBD \u0111\u01B0\u1EE3c t\u1EB7ng b\u1ED9 t\u00E0i li\u1EC7u \u00F4n t\u1EADp nhanh v\u00E0 phi\u1EBFu h\u1ECDc th\u1EED.",
+    "Author": "Ban h\u1ECDc thu\u1EADt",
+    "PublishedOn": "2026-03-28T00:00:00",
+    "IsFeatured": true
+  },
+  {
+    "Id": 3,
+    "Slug": "kinh-nghiem-hoc-ielts-cho-nguoi-moi",
+    "Title": "Kinh nghi\u1EC7m h\u1ECDc IELTS cho ng\u01B0\u1EDDi m\u1EDBi b\u1EAFt \u0111\u1EA7u",
+    "Category": "Chia s\u1EBB h\u1ECDc t\u1EADp",
+    "Summary": "5 l\u01B0u \u00FD quan tr\u1ECDng khi b\u1EAFt \u0111\u1EA7u l\u1ED9 tr\u00ECnh IELTS t\u1EEB n\u1EC1n t\u1EA3ng c\u01A1 b\u1EA3n.",
+    "Content": "V\u1EDBi ng\u01B0\u1EDDi m\u1EDBi b\u1EAFt \u0111\u1EA7u IELTS, \u0111i\u1EC1u quan tr\u1ECDng l\u00E0 x\u00E1c \u0111\u1ECBnh m\u1EE5c ti\u00EAu \u0111\u1EA7u ra, \u0111\u00E1nh gi\u00E1 \u0111\u00FAng tr\u00ECnh \u0111\u1ED9 v\u00E0 ch\u1ECDn l\u1ED9 tr\u00ECnh ph\u00F9 h\u1EE3p. B\u00EAn c\u1EA1nh \u0111\u00F3, c\u1EA7n d\u00E0nh th\u1EDDi gian x\u00E2y d\u1EF1ng ph\u00E1t \u00E2m, t\u1EEB v\u1EF1ng n\u1EC1n v\u00E0 th\u00F3i quen ti\u1EBFp x\u00FAc v\u1EDBi ti\u1EBFng Anh m\u1ED7i ng\u00E0y.",
+    "Author": "Nguy\u1EC5n Mai Anh",
+    "PublishedOn": "2026-03-25T00:00:00",
+    "IsFeatured": false
+  }
+]

@@ -26,7 +26,7 @@ public class AccountController : Controller
     public IActionResult Login(LoginViewModel model)
     {
         model.Title = "Đăng nhập";
-        model.Subtitle = "Đăng nhập bằng tài khoản mẫu để truy cập đúng khu vực quản trị tương ứng.";
+        model.Subtitle = "Đăng nhập bằng tài khoản đang lưu trong cơ sở dữ liệu để truy cập đúng khu vực quản trị.";
         model.Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Đăng nhập", IsActive = true }];
 
         if (!ModelState.IsValid)
@@ -37,7 +37,7 @@ public class AccountController : Controller
         var account = _authService.ValidateLogin(model.Email, model.Password);
         if (account is null)
         {
-            model.ErrorMessage = "Tài khoản mẫu không hợp lệ. Hãy dùng một trong ba tài khoản được gợi ý trên màn hình.";
+            model.ErrorMessage = "Thông tin đăng nhập không hợp lệ hoặc tài khoản đã bị khóa.";
             return View(model);
         }
 
@@ -81,7 +81,14 @@ public class AccountController : Controller
             return View(model);
         }
 
-        TempData[AppConstants.ToastMessageKey] = "Đăng ký đã được ghi nhận trên biểu mẫu hiện tại.";
+        var result = _authService.RegisterStudent(model.FullName, model.Email, model.Phone, model.Password);
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+            return View(model);
+        }
+
+        TempData[AppConstants.ToastMessageKey] = result.Message;
         TempData[AppConstants.ToastTypeKey] = "success";
         return RedirectToAction(nameof(Login));
     }
@@ -110,7 +117,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        TempData[AppConstants.ToastMessageKey] = "Yêu cầu khôi phục đã được ghi nhận. Thông báo sẽ được cập nhật qua email khi hệ thống mở rộng.";
+        TempData[AppConstants.ToastMessageKey] = "Yêu cầu khôi phục đã được ghi nhận. Trung tâm sẽ liên hệ lại qua email đã đăng ký.";
         TempData[AppConstants.ToastTypeKey] = "success";
         return RedirectToAction(nameof(Login));
     }
@@ -128,7 +135,7 @@ public class AccountController : Controller
         return new LoginViewModel
         {
             Title = "Đăng nhập",
-            Subtitle = "Đăng nhập bằng tài khoản mẫu để truy cập đúng khu vực quản trị tương ứng.",
+            Subtitle = "Đăng nhập bằng tài khoản đang lưu trong cơ sở dữ liệu để truy cập đúng khu vực quản trị.",
             Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Đăng nhập", IsActive = true }]
         };
     }

@@ -6,4 +6,5 @@ public interface IDemoAuthService
 {
     IReadOnlyList<DemoAccount> GetDemoAccounts();
     DemoAccount? ValidateLogin(string email, string password);
+    StudentRegistrationResult RegisterStudent(string fullName, string email, string phone, string password);
 }
