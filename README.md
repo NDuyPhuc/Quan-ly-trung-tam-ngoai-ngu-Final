@@ -1,89 +1,45 @@
 # Quan-ly-trung-tam-ngoai-ngu
 
-Frontend skeleton cho do an "Xay dung he thong website quan ly trung tam ngoai ngu" bang ASP.NET Core MVC (.NET 8).
+Website quản lý trung tâm ngoại ngữ bằng ASP.NET Core MVC (.NET 8).
 
-## Da hoan thanh
+## Trạng thái hiện tại
 
-- Public pages:
-  - Trang chu
-  - Gioi thieu trung tam
-  - Danh sach khoa hoc
-  - Chi tiet khoa hoc
-  - Danh sach lop hoc dang mo
-  - Tin tuc / bai viet
-  - Chi tiet bai viet
-  - Lien he
-  - Dang nhap
-  - Dang ky
-  - Quen mat khau
-  - Ho so ca nhan
-- Dashboard theo vai tro:
-  - Admin
-  - Staff / Giao vu
-  - Teacher
-- Khu vuc quan tri da co skeleton module:
-  - Tai khoan
-  - Hoc vien
-  - Giao vien
-  - Khoa hoc
-  - Lop hoc
-  - Ghi danh
-  - Hoc phi / Bien nhan
-  - Buoi hoc
-  - Diem danh
-  - Diem so
-  - Bao cao / thong ke
-- Shared UI:
-  - Sidebar dashboard
-  - Breadcrumb
-  - Table + pagination mock
-  - Form mock
-  - Detail page mock
-  - Toast / modal xac nhan
-  - Chart.js mock
+- Public pages đã có đầy đủ.
+- Dashboard theo vai trò `Admin`, `Staff`, `Teacher` đã có.
+- Backend đọc dữ liệu thật từ SQL Server dựa trên schema trong [`db.txt`](C:\DoAn\db.txt).
+- Login quản trị đọc bảng `Accounts`.
+- Đăng ký học viên mới ghi vào bảng `Students`.
+- Tin tức vẫn dùng dữ liệu seed nội bộ vì `db.txt` chưa có bảng riêng cho bài viết.
+- Nhiều form CRUD quản trị hiện vẫn là form demo giao diện; dữ liệu danh sách đã lên DB nhưng thao tác `POST/PUT/DELETE` chưa nối hết.
 
-## Cau truc chinh
+## Kết nối database
 
-- `Quan-ly-trung-tam-ngoai-ngu/Controllers`
-  - Public controllers
-- `Quan-ly-trung-tam-ngoai-ngu/Areas/Admin`
-  - Dashboard va cac module admin
-- `Quan-ly-trung-tam-ngoai-ngu/Areas/Staff`
-  - Dashboard va module giao vu
-- `Quan-ly-trung-tam-ngoai-ngu/Areas/Teacher`
-  - Dashboard va module giao vien
-- `Quan-ly-trung-tam-ngoai-ngu/Services/Mocks`
-  - `MockDataService`
-  - `DemoAuthService`
-- `Quan-ly-trung-tam-ngoai-ngu/ViewModels`
-  - ViewModels cho public, dashboard, modules
-- `Quan-ly-trung-tam-ngoai-ngu/Views/Shared`
-  - Layout, partials, module views dung chung
+Connection string hiện được cấu hình trong:
 
-## Tai khoan demo
+- `Quan-ly-trung-tam-ngoai-ngu/appsettings.json`
+- `Quan-ly-trung-tam-ngoai-ngu/appsettings.Development.json`
 
-- `admin@demo.com` / `123456`
-- `staff@demo.com` / `123456`
-- `teacher@demo.com` / `123456`
+Thông tin đang dùng theo `db.txt`:
 
-## Trang thai hien tai
+- Server: `100.89.159.46,1433`
+- Database: `LanguageCenterDB`
+- User: `sa`
 
-- Du lieu dang dung `MockDataService`, chua ket noi SQL Server.
-- Dang nhap dang dung session mock, chua dung Identity.
-- Cac form CRUD hien tai phuc vu demo giao dien, chua luu du lieu that.
-- Nhieu cho da duoc danh dau theo tinh than:
-  - `// TODO: connect database later`
+## Cách dựng DB
 
-## Huong noi database sau
+1. Mở file [`db.txt`](C:\DoAn\db.txt).
+2. Chạy script đó trên SQL Server để tạo `LanguageCenterDB` và seed dữ liệu cơ bản.
+3. Chạy project ASP.NET Core.
 
-1. Thay `MockDataService` bang service/repository that.
-2. Noi `Account`, `Student`, `Teacher`, `Course`, `Class`, `Enrollment`, `Receipt`, `Attendance`, `ExamResult` vao EF Core.
-3. Thay mock login bang auth/authorization that.
-4. Bien cac form CRUD thanh POST/PUT/DELETE xu ly du lieu that.
-
-## Chay project
+## Cách chạy project
 
 ```bash
 dotnet build .\Quan-ly-trung-tam-ngoai-ngu\Quan-ly-trung-tam-ngoai-ngu.csproj
 dotnet run --project .\Quan-ly-trung-tam-ngoai-ngu\Quan-ly-trung-tam-ngoai-ngu.csproj
 ```
+
+## Ghi chú kỹ thuật
+
+- Lớp dữ liệu đang dùng `SqlServerDataService`.
+- Nếu SQL Server không truy cập được, service sẽ fallback về `MockDataService` để giao diện không bị trắng trang.
+- Do sandbox offline của môi trường hiện tại, `dotnet build` không chạy được theo luồng restore chuẩn; cú pháp C# đã được kiểm tra lại bằng Roslyn compiler với reference pack `net8.0`.

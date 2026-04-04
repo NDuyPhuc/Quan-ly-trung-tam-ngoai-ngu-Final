@@ -20,7 +20,15 @@
         {
             <div class="alert alert-warning-soft mb-4">@Model.Notice</div>
         }
-        <form class="row g-4 mock-submit-form">
+        @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger mb-4">@Model.ErrorMessage</div>
+        }
+        <form class="row g-4" method="@Model.FormMethod" action="@Model.FormActionUrl">
+            @if (string.Equals(Model.FormMethod, "post", StringComparison.OrdinalIgnoreCase))
+            {
+                @Html.AntiForgeryToken()
+            }
             @foreach (var formSection in Model.Sections)
             {
                 <div class="col-12">
@@ -32,6 +40,11 @@
                 </div>
                 @foreach (var field in formSection.Fields)
                 {
+                    @if (field.Type == "hidden")
+                    {
+                        <input type="hidden" name="@field.Name" value="@field.Value" />
+                        continue;
+                    }
                     <div class="@field.ColClass">
                         <label class="form-label">@field.Label</label>
                         @if (field.Type == "select")

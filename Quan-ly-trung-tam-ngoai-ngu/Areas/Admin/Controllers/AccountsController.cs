@@ -8,8 +8,13 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Areas.Admin.Controllers;
 
 public class AccountsController : AdminControllerBase
 {
-    public AccountsController(IMockDataService dataService) : base(dataService)
+    private readonly ILanguageCenterManagementService _managementService;
+
+    public AccountsController(
+        IMockDataService dataService,
+        ILanguageCenterManagementService managementService) : base(dataService)
     {
+        _managementService = managementService;
     }
 
     public IActionResult Index()
@@ -22,37 +27,35 @@ public class AccountsController : AdminControllerBase
             Breadcrumbs = Breadcrumbs("Tài khoản"),
             PrimaryActionText = "Tạo tài khoản",
             PrimaryActionUrl = "/Admin/Accounts/Create",
-            ToolbarNote = "Dữ liệu đang lấy từ dịch vụ mô phỏng và chưa ghi xuống cơ sở dữ liệu thật.",
             SearchPlaceholder = "Tìm theo email, vai trò, phòng ban...",
             SummaryCards =
             [
-                new SummaryCardViewModel { Title = "Tài khoản kích hoạt", Value = accounts.Count(x => x.Status == "Đang hoạt động").ToString(), Description = "Có thể đăng nhập ở chế độ mô phỏng", Icon = "bi-person-check", AccentClass = "success" },
-                new SummaryCardViewModel { Title = "Tài khoản tạm khóa", Value = accounts.Count(x => x.Status != "Đang hoạt động").ToString(), Description = "Hiển thị badge và thao tác phù hợp", Icon = "bi-person-lock", AccentClass = "warning" }
+                new SummaryCardViewModel { Title = "Tài khoản kích hoạt", Value = accounts.Count(x => x.Status == "Đang hoạt động").ToString(), Description = "Có thể đăng nhập vào hệ thống", Icon = "bi-person-check", AccentClass = "success" },
+                new SummaryCardViewModel { Title = "Tài khoản tạm khóa", Value = accounts.Count(x => x.Status != "Đang hoạt động").ToString(), Description = "Đang bị vô hiệu hóa", Icon = "bi-person-lock", AccentClass = "warning" }
             ],
             Filters =
             [
-                new FilterGroupViewModel { Label = "Vai trò", InputId = "role", Options = [new() { Label = "Tất cả", Value = "" }, new() { Label = "Quản trị viên", Value = "Admin" }, new() { Label = "Giáo vụ", Value = "Staff" }, new() { Label = "Giáo viên", Value = "Teacher" }] },
-                new FilterGroupViewModel { Label = "Trạng thái", InputId = "status", Options = [new() { Label = "Tất cả", Value = "" }, new() { Label = "Đang hoạt động", Value = "active" }, new() { Label = "Tạm khóa", Value = "locked" }] }
+                new FilterGroupViewModel { Label = "Vai trò", InputId = "role", Options = [new() { Label = "Tất cả", Value = "" }, new() { Label = "Quản trị viên", Value = "Admin" }, new() { Label = "Giáo vụ", Value = "Staff" }, new() { Label = "Giáo viên", Value = "Teacher" }] }
             ],
             Table = new TableViewModel
             {
-                Columns = [new() { Header = "Tài khoản" }, new() { Header = "Vai trò" }, new() { Header = "Phòng ban" }, new() { Header = "Trạng thái" }, new() { Header = "Thao tác", Width = "220px" }],
-                Rows = accounts.Select(x => new TableRowViewModel
+                Columns = [new() { Header = "Tài khoản" }, new() { Header = "Vai trò" }, new() { Header = "Phòng ban" }, new() { Header = "Trạng thái" }, new() { Header = "Thao tác", Width = "260px" }],
+                Rows = accounts.Select(account => new TableRowViewModel
                 {
-                    Id = x.Id.ToString(),
+                    Id = account.Id.ToString(),
                     Cells =
                     [
-                        new TableCellViewModel { Html = $"<strong>{x.FullName}</strong><div class='text-muted small'>{x.Email}</div>" },
-                        new TableCellViewModel { Html = AppUi.RoleLabel(x.Role) },
-                        new TableCellViewModel { Html = x.Department },
-                        new TableCellViewModel { Html = AppUi.StatusBadge(x.Status) },
-                        new TableCellViewModel { Html = "" }
+                        new() { Html = $"<strong>{account.FullName}</strong><div class='text-muted small'>{account.Username} • {account.Email}</div>" },
+                        new() { Html = AppUi.RoleLabel(account.Role) },
+                        new() { Html = account.Department },
+                        new() { Html = AppUi.StatusBadge(account.Status) },
+                        new() { Html = string.Empty }
                     ],
                     Actions =
                     [
-                        new TableRowActionViewModel { Label = "Chi tiết", Url = $"/Admin/Accounts/Details/{x.Id}", Icon = "bi-eye" },
-                        new TableRowActionViewModel { Label = "Sửa", Url = $"/Admin/Accounts/Edit/{x.Id}", Icon = "bi-pencil-square", CssClass = "btn btn-sm btn-outline-secondary" },
-                        new TableRowActionViewModel { Label = "Khóa", Url = "#", Icon = "bi-trash", CssClass = "btn btn-sm btn-outline-danger", RequiresConfirm = true, ConfirmMessage = "Bạn muốn khóa tài khoản mô phỏng này?" }
+                        new() { Label = "Chi tiết", Url = $"/Admin/Accounts/Details/{account.Id}", Icon = "bi-eye" },
+                        new() { Label = "Sửa", Url = $"/Admin/Accounts/Edit/{account.Id}", Icon = "bi-pencil-square", CssClass = "btn btn-sm btn-outline-secondary" },
+                        new() { Label = "Xóa", Url = $"/Admin/Accounts/Delete/{account.Id}", Icon = "bi-trash", CssClass = "btn btn-sm btn-outline-danger confirm-action", RequiresConfirm = true, ConfirmMessage = "Bạn muốn xóa tài khoản này?" }
                     ]
                 }).ToList()
             }
@@ -61,62 +64,129 @@ public class AccountsController : AdminControllerBase
         return ManagementListView(model);
     }
 
+    [HttpGet]
     public IActionResult Create()
     {
-        return ManagementFormView(BuildForm("Tạo tài khoản", "/Admin/Accounts"));
+        return ManagementFormView(BuildForm("Tạo tài khoản", "/Admin/Accounts/Create", new AccountInput()));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Create(AccountInput input)
+    {
+        var result = _managementService.SaveAccount(null, input);
+        if (!result.Succeeded)
+        {
+            return ManagementFormView(BuildForm("Tạo tài khoản", "/Admin/Accounts/Create", input, result.Message));
+        }
+
+        SetToast(result.Message);
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
     public IActionResult Edit(int id)
     {
-        return ManagementFormView(BuildForm("Cập nhật tài khoản", "/Admin/Accounts", DataService.GetAccounts().First(x => x.Id == id)));
+        var input = _managementService.GetAccount(id);
+        if (input is null)
+        {
+            SetToast("Không tìm thấy tài khoản cần chỉnh sửa.", "danger");
+            return RedirectToAction(nameof(Index));
+        }
+
+        input.Password = string.Empty;
+        return ManagementFormView(BuildForm("Cập nhật tài khoản", $"/Admin/Accounts/Edit/{id}", input));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit(int id, AccountInput input)
+    {
+        var result = _managementService.SaveAccount(id, input);
+        if (!result.Succeeded)
+        {
+            input.Password = string.Empty;
+            return ManagementFormView(BuildForm("Cập nhật tài khoản", $"/Admin/Accounts/Edit/{id}", input, result.Message));
+        }
+
+        SetToast(result.Message);
+        return RedirectToAction(nameof(Index));
+    }
+
+    public IActionResult Delete(int id)
+    {
+        var result = _managementService.DeleteAccount(id);
+        SetToast(result.Message, result.Succeeded ? "success" : "danger");
+        return RedirectToAction(nameof(Index));
     }
 
     public IActionResult Details(int id)
     {
-        var item = DataService.GetAccounts().First(x => x.Id == id);
+        var item = DataService.GetAccounts().FirstOrDefault(x => x.Id == id);
+        if (item is null)
+        {
+            SetToast("Không tìm thấy tài khoản.", "danger");
+            return RedirectToAction(nameof(Index));
+        }
+
         var roleLabel = AppUi.RoleLabel(item.Role);
 
-        var model = new ManagementDetailsPageViewModel
+        return ManagementDetailsView(new ManagementDetailsPageViewModel
         {
             Title = $"Chi tiết tài khoản {item.FullName}",
-            Subtitle = "Thông tin phân quyền và cấu hình đăng nhập hiển thị trên giao diện mô phỏng.",
+            Subtitle = "Thông tin đăng nhập, phân quyền và trạng thái tài khoản.",
             Breadcrumbs = Breadcrumbs("Chi tiết tài khoản", "Tài khoản", "/Admin/Accounts"),
             SummaryCards =
             [
-                new SummaryCardViewModel { Title = "Vai trò", Value = roleLabel, Description = "Điều hướng bảng điều khiển theo phiên đăng nhập", Icon = "bi-person-badge", AccentClass = "primary" },
-                new SummaryCardViewModel { Title = "Trạng thái", Value = item.Status, Description = "Hiển thị nhãn trạng thái tài khoản", Icon = "bi-shield-check", AccentClass = "success" }
+                new SummaryCardViewModel { Title = "Vai trò", Value = roleLabel, Description = "Quyền truy cập của tài khoản", Icon = "bi-person-badge", AccentClass = "primary" },
+                new SummaryCardViewModel { Title = "Trạng thái", Value = item.Status, Description = "Khả năng đăng nhập hiện tại", Icon = "bi-shield-check", AccentClass = "success" }
             ],
             Sections =
             [
-                new DetailSectionViewModel { Title = "Thông tin đăng nhập", Items = [new() { Label = "Email", Value = item.Email }, new() { Label = "Mật khẩu mẫu", Value = item.Password }, new() { Label = "Vai trò", Value = roleLabel, IsBadge = true, BadgeClass = AppUi.StatusBadgeClass("Đang hoạt động") }] },
-                new DetailSectionViewModel { Title = "Thông tin nội bộ", Items = [new() { Label = "Họ tên", Value = item.FullName }, new() { Label = "Số điện thoại", Value = item.Phone }, new() { Label = "Phòng ban", Value = item.Department }, new() { Label = "Trạng thái", Value = item.Status, IsBadge = true, BadgeClass = AppUi.StatusBadgeClass(item.Status) }] }
+                new DetailSectionViewModel
+                {
+                    Title = "Thông tin đăng nhập",
+                    Items =
+                    [
+                        new() { Label = "Username", Value = item.Username },
+                        new() { Label = "Email", Value = item.Email },
+                        new() { Label = "Vai trò", Value = roleLabel, IsBadge = true, BadgeClass = AppUi.StatusBadgeClass("Đang hoạt động") }
+                    ]
+                },
+                new DetailSectionViewModel
+                {
+                    Title = "Thông tin liên hệ",
+                    Items =
+                    [
+                        new() { Label = "Họ tên", Value = item.FullName },
+                        new() { Label = "Số điện thoại", Value = item.Phone },
+                        new() { Label = "Phòng ban", Value = item.Department },
+                        new() { Label = "Trạng thái", Value = item.Status, IsBadge = true, BadgeClass = AppUi.StatusBadgeClass(item.Status) }
+                    ]
+                }
             ],
             Actions =
             [
                 new QuickActionViewModel { Label = "Sửa tài khoản", Url = $"/Admin/Accounts/Edit/{id}", Icon = "bi-pencil-square", CssClass = "btn btn-primary" },
-                new QuickActionViewModel { Label = "Quay lại danh sách", Url = "/Admin/Accounts", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
-            ],
-            Timeline =
-            [
-                new TimelineItemViewModel { Title = "Đăng nhập mô phỏng", Meta = "Dữ liệu mẫu", Description = "Tài khoản có thể được dùng để chuyển hướng đến đúng bảng điều khiển theo vai trò.", AccentClass = "primary" },
-                new TimelineItemViewModel { Title = "Kết nối cơ sở dữ liệu", Meta = "Bước sau", Description = "Khi có backend hoàn chỉnh, dữ liệu tài khoản sẽ được lưu và phân quyền thật.", AccentClass = "warning" }
+                new QuickActionViewModel { Label = "Quay lại", Url = "/Admin/Accounts", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
             ]
-        };
-
-        return ManagementDetailsView(model);
+        });
     }
 
-    private static ManagementFormPageViewModel BuildForm(string title, string cancelUrl, DemoAccount? account = null)
+    private static ManagementFormPageViewModel BuildForm(string title, string actionUrl, AccountInput input, string? errorMessage = null)
     {
         return new ManagementFormPageViewModel
         {
             Title = title,
-            Subtitle = "Biểu mẫu tài khoản dùng để trình bày cấu trúc và validation giao diện.",
+            Subtitle = "Tạo hoặc cập nhật tài khoản đăng nhập cho các vai trò trong hệ thống.",
             Breadcrumbs = Breadcrumbs(title, "Tài khoản", "/Admin/Accounts"),
             FormTitle = title,
-            FormDescription = "Dùng để minh họa bố cục biểu mẫu, kiểm tra nhập liệu và cấu trúc dữ liệu tài khoản.",
-            CancelUrl = cancelUrl,
-            Notice = "Biểu mẫu đang ở chế độ mô phỏng và sẽ kết nối cơ sở dữ liệu ở bước sau.",
+            FormDescription = "Thông tin ở đây sẽ được lưu trực tiếp xuống bảng Accounts trong SQL Server.",
+            FormActionUrl = actionUrl,
+            CancelUrl = "/Admin/Accounts",
+            SubmitLabel = "Lưu tài khoản",
+            Notice = "Nếu để trống mật khẩu ở màn hình cập nhật, hệ thống sẽ giữ nguyên mật khẩu cũ.",
+            ErrorMessage = errorMessage,
             Sections =
             [
                 new FormSectionViewModel
@@ -124,12 +194,36 @@ public class AccountsController : AdminControllerBase
                     Title = "Thông tin tài khoản",
                     Fields =
                     [
-                        new FormFieldViewModel { Label = "Họ và tên", Name = "FullName", Value = account?.FullName ?? "", Required = true },
-                        new FormFieldViewModel { Label = "Email", Name = "Email", Value = account?.Email ?? "", Required = true, Type = "email" },
-                        new FormFieldViewModel { Label = "Số điện thoại", Name = "Phone", Value = account?.Phone ?? "", Required = true },
-                        new FormFieldViewModel { Label = "Mật khẩu", Name = "Password", Value = account?.Password ?? "123456", Required = true, Type = "password" },
-                        new FormFieldViewModel { Label = "Vai trò", Name = "Role", Type = "select", Required = true, Options = [new() { Label = "Quản trị viên", Value = "Admin", Selected = account?.Role == "Admin" }, new() { Label = "Giáo vụ", Value = "Staff", Selected = account?.Role == "Staff" }, new() { Label = "Giáo viên", Value = "Teacher", Selected = account?.Role == "Teacher" }] },
-                        new FormFieldViewModel { Label = "Trạng thái", Name = "Status", Type = "select", Required = true, Options = [new() { Label = "Đang hoạt động", Value = "Đang hoạt động", Selected = account?.Status != "Tạm khóa" }, new() { Label = "Tạm khóa", Value = "Tạm khóa", Selected = account?.Status == "Tạm khóa" }] }
+                        new FormFieldViewModel { Label = "Username", Name = "Username", Value = input.Username, Required = true },
+                        new FormFieldViewModel { Label = "Họ và tên", Name = "FullName", Value = input.FullName, Required = true },
+                        new FormFieldViewModel { Label = "Email", Name = "Email", Value = input.Email, Type = "email" },
+                        new FormFieldViewModel { Label = "Số điện thoại", Name = "Phone", Value = input.Phone },
+                        new FormFieldViewModel { Label = "Mật khẩu", Name = "Password", Value = input.Password, Type = "password", Hint = "Bắt buộc khi tạo mới, có thể để trống khi cập nhật." },
+                        new FormFieldViewModel
+                        {
+                            Label = "Vai trò",
+                            Name = "Role",
+                            Type = "select",
+                            Required = true,
+                            Options =
+                            [
+                                new SelectOptionViewModel { Label = "Quản trị viên", Value = AppConstants.Roles.Admin, Selected = input.Role == AppConstants.Roles.Admin },
+                                new SelectOptionViewModel { Label = "Giáo vụ", Value = AppConstants.Roles.Staff, Selected = input.Role == AppConstants.Roles.Staff },
+                                new SelectOptionViewModel { Label = "Giáo viên", Value = AppConstants.Roles.Teacher, Selected = input.Role == AppConstants.Roles.Teacher }
+                            ]
+                        },
+                        new FormFieldViewModel
+                        {
+                            Label = "Trạng thái",
+                            Name = "IsActive",
+                            Type = "select",
+                            Required = true,
+                            Options =
+                            [
+                                new SelectOptionViewModel { Label = "Đang hoạt động", Value = "true", Selected = input.IsActive },
+                                new SelectOptionViewModel { Label = "Tạm khóa", Value = "false", Selected = !input.IsActive }
+                            ]
+                        }
                     ]
                 }
             ]

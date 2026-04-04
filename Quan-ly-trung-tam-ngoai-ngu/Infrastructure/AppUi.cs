@@ -34,11 +34,11 @@ public static class AppUi
     {
         return value switch
         {
-            "Đang hoạt động" or "Đang học" or "Đã thanh toán" or "Đạt" or "Có mặt" or "Hoàn tất" or "Đã ghi nhận" or "Đã xếp lớp" or "Đang giảng dạy"
+            "Đang hoạt động" or "Đang học" or "Đã thanh toán" or "Đạt" or "Có mặt" or "Hoàn tất" or "Đã ghi nhận" or "Đã xếp lớp" or "Đang giảng dạy" or "Hoàn thành"
                 => "bg-success-subtle text-success-emphasis",
             "Sắp khai giảng" or "Sắp mở lớp" or "Sắp đến hạn" or "Đóng một phần" or "Đóng cọc" or "Muộn" or "Khai giảng sớm"
                 => "bg-warning-subtle text-warning-emphasis",
-            "Quá hạn" or "Còn nợ" or "Chờ xác nhận" or "Bảo lưu" or "Cần cải thiện"
+            "Quá hạn" or "Còn nợ" or "Chờ xác nhận" or "Bảo lưu" or "Cần cải thiện" or "Vắng" or "Đã hủy" or "Tạm khóa" or "Tạm dừng"
                 => "bg-danger-subtle text-danger-emphasis",
             "Đang tuyển sinh" or "Mở đăng ký" or "Hôm nay" or "Sắp diễn ra"
                 => "bg-info-subtle text-info-emphasis",

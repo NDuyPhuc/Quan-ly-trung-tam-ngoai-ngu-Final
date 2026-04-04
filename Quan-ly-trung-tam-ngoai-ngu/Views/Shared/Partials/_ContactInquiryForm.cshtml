@@ -1,0 +1,94 @@
+@model ContactViewModel
+@{
+    var returnUrl = ViewData["ReturnUrl"]?.ToString() ?? "/Contact";
+    var submitLabel = ViewData["SubmitLabel"]?.ToString() ?? "Gửi yêu cầu tư vấn";
+    var supportEmail = ViewData["SupportEmail"]?.ToString() ?? "nguyenthanhdanhctk42@gmail.com";
+}
+
+<form asp-controller="Contact" asp-action="Index" method="post" class="row g-4">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+    <div class="col-md-6">
+        <label class="form-label" for="contact-fullname">Họ và tên</label>
+        <input asp-for="FullName" id="contact-fullname" class="form-control" placeholder="Nguyễn Văn A" required />
+        <span asp-validation-for="FullName" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label" for="contact-email">Email</label>
+        <input asp-for="Email" id="contact-email" class="form-control" placeholder="name@example.com" required />
+        <span asp-validation-for="Email" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label" for="contact-phone">Số điện thoại</label>
+        <input asp-for="Phone" id="contact-phone" class="form-control" placeholder="0901 234 567" required />
+        <span asp-validation-for="Phone" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label" for="contact-topic">Nhu cầu</label>
+        <select asp-for="Topic" id="contact-topic" class="form-select" required>
+            <option value="">Chọn nhu cầu</option>
+            <option value="Tư vấn lộ trình">Tư vấn lộ trình</option>
+            <option value="Đăng ký khóa học">Đăng ký khóa học</option>
+            <option value="Tư vấn xếp lớp">Tư vấn xếp lớp</option>
+            <option value="Học phí">Học phí và ưu đãi</option>
+            <option value="Hợp tác">Hợp tác / doanh nghiệp</option>
+        </select>
+        <span asp-validation-for="Topic" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label" for="contact-program">Khóa học quan tâm</label>
+        <select asp-for="PreferredProgram" id="contact-program" class="form-select">
+            <option value="">Chọn khóa học</option>
+            <option value="Tiếng Anh cơ bản">Tiếng Anh cơ bản</option>
+            <option value="IELTS Foundation">IELTS Foundation</option>
+            <option value="IELTS Intensive">IELTS Intensive</option>
+            <option value="TOEIC 650+">TOEIC 650+</option>
+            <option value="TOEIC 900+">TOEIC 900+</option>
+            <option value="Business English">Business English</option>
+            <option value="Kids Starter">Kids Starter</option>
+            <option value="Speaking Foundation">Speaking Foundation</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label" for="contact-level">Trình độ hiện tại</label>
+        <select asp-for="CurrentLevel" id="contact-level" class="form-select">
+            <option value="">Chọn trình độ</option>
+            <option value="Mất gốc">Mất gốc</option>
+            <option value="Cơ bản">Cơ bản</option>
+            <option value="Trung bình">Trung bình</option>
+            <option value="Cần luyện đề">Cần luyện đề</option>
+            <option value="Đã có nền tảng">Đã có nền tảng</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label" for="contact-schedule">Khung giờ mong muốn</label>
+        <select asp-for="PreferredSchedule" id="contact-schedule" class="form-select">
+            <option value="">Chọn khung giờ</option>
+            <option value="Sáng">Sáng</option>
+            <option value="Chiều">Chiều</option>
+            <option value="Tối">Tối</option>
+            <option value="Cuối tuần">Cuối tuần</option>
+            <option value="Linh hoạt">Linh hoạt theo tư vấn</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label" for="contact-method">Cách liên hệ mong muốn</label>
+        <select asp-for="PreferredContactMethod" id="contact-method" class="form-select" required>
+            <option value="">Chọn cách liên hệ</option>
+            <option value="Phone">Gọi điện</option>
+            <option value="Email">Email</option>
+            <option value="Zalo">Zalo</option>
+        </select>
+        <span asp-validation-for="PreferredContactMethod" class="text-danger small"></span>
+    </div>
+    <div class="col-12">
+        <label class="form-label" for="contact-message">Nội dung cần tư vấn</label>
+        <textarea asp-for="Message" id="contact-message" rows="5" class="form-control" placeholder="Mô tả mục tiêu học, điểm số mục tiêu, thời gian mong muốn bắt đầu..." required></textarea>
+        <span asp-validation-for="Message" class="text-danger small"></span>
+    </div>
+    <div class="col-12 d-flex flex-wrap gap-3 align-items-center">
+        <button class="btn btn-primary" type="submit">@submitLabel</button>
+        <span class="contact-form-note">Thông tin sẽ được gửi đến hộp thư tư vấn `@supportEmail` sau khi SMTP được cấu hình đầy đủ.</span>
+    </div>
+</form>

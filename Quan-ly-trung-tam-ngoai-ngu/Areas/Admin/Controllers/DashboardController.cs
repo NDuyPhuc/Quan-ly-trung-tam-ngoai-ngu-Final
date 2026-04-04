@@ -8,31 +8,37 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Areas.Admin.Controllers;
 
 public class DashboardController : AdminControllerBase
 {
-    public DashboardController(IMockDataService dataService) : base(dataService)
+    private readonly IPublicSiteContentService _publicSiteContentService;
+
+    public DashboardController(IMockDataService dataService, IPublicSiteContentService publicSiteContentService)
+        : base(dataService)
     {
+        _publicSiteContentService = publicSiteContentService;
     }
 
     public IActionResult Index()
     {
+        var publicArticles = _publicSiteContentService.GetNewsArticles();
+
         var model = new DashboardPageViewModel
         {
             Title = "Bảng điều khiển quản trị",
-            Subtitle = "Tổng quan vận hành trung tâm ngoại ngữ trên giao diện mới, không thay đổi nghiệp vụ hiện có.",
+            Subtitle = "Theo dõi vận hành trung tâm và quản trị luôn cả nội dung công khai xuất hiện ở trang chủ trước khi người dùng đăng nhập.",
             Breadcrumbs = Breadcrumbs("Tổng quan"),
             RoleName = "Quản trị viên",
             SummaryCards =
             [
                 new SummaryCardViewModel { Title = "Tổng học viên", Value = DataService.GetStudents().Count.ToString(), Description = "Đang theo học và bảo lưu", Icon = "bi-people", AccentClass = "primary", Trend = "+18 tháng này" },
-                new SummaryCardViewModel { Title = "Tổng giáo viên", Value = DataService.GetTeachers().Count.ToString(), Description = "Bao gồm IELTS, TOEIC và giao tiếp", Icon = "bi-person-video3", AccentClass = "info", Trend = "1 giáo viên nghỉ phép" },
-                new SummaryCardViewModel { Title = "Lớp đang hoạt động", Value = DataService.GetClasses().Count(x => x.Status == "Đang hoạt động").ToString(), Description = "Có lịch học hoặc điểm danh", Icon = "bi-easel2", AccentClass = "success", Trend = "2 lớp sắp khai giảng" },
-                new SummaryCardViewModel { Title = "Doanh thu tháng", Value = AppUi.Currency(DataService.GetReceipts().Sum(x => x.Amount)), Description = "Tổng thu theo biên nhận hiện có", Icon = "bi-cash-coin", AccentClass = "warning", Trend = "76% kế hoạch" },
-                new SummaryCardViewModel { Title = "Học viên còn nợ", Value = DataService.GetDebts().Count.ToString(), Description = "Cần theo dõi công nợ", Icon = "bi-wallet2", AccentClass = "danger", Trend = "1 khoản quá hạn" }
+                new SummaryCardViewModel { Title = "Lớp hoạt động", Value = DataService.GetClasses().Count(x => x.Status == "Đang hoạt động").ToString(), Description = "Lớp đang vận hành trong hệ thống", Icon = "bi-easel2", AccentClass = "success", Trend = "2 lớp sắp khai giảng" },
+                new SummaryCardViewModel { Title = "Tin công khai", Value = publicArticles.Count.ToString(), Description = "Bài viết đang hiển thị ngoài trang public", Icon = "bi-newspaper", AccentClass = "info", Trend = $"{publicArticles.Count(item => item.IsFeatured)} bài nổi bật" },
+                new SummaryCardViewModel { Title = "Doanh thu tháng", Value = AppUi.Currency(DataService.GetReceipts().Sum(x => x.Amount)), Description = "Tổng thu theo biên nhận hiện có", Icon = "bi-cash-coin", AccentClass = "warning", Trend = "76% kế hoạch" }
             ],
             QuickActions =
             [
-                new QuickActionViewModel { Label = "Thêm học viên", Url = "/Admin/Students/Create", Icon = "bi-person-plus", CssClass = "btn btn-primary" },
-                new QuickActionViewModel { Label = "Mở lớp mới", Url = "/Admin/Classes/Create", Icon = "bi-plus-square", CssClass = "btn btn-outline-primary" },
-                new QuickActionViewModel { Label = "Thu học phí", Url = "/Admin/Receipts/Create", Icon = "bi-receipt", CssClass = "btn btn-outline-dark" }
+                new QuickActionViewModel { Label = "Thêm tin tức", Url = "/Admin/News/Create", Icon = "bi-plus-square", CssClass = "btn btn-primary" },
+                new QuickActionViewModel { Label = "Quản lý tin tức", Url = "/Admin/News", Icon = "bi-newspaper", CssClass = "btn btn-outline-primary" },
+                new QuickActionViewModel { Label = "Xem trang chủ", Url = "/", Icon = "bi-house-door", CssClass = "btn btn-outline-dark" },
+                new QuickActionViewModel { Label = "Thêm học viên", Url = "/Admin/Students/Create", Icon = "bi-person-plus", CssClass = "btn btn-outline-secondary" }
             ],
             Charts =
             [
@@ -44,7 +50,7 @@ public class DashboardController : AdminControllerBase
                     ChartType = "line",
                     Labels = ["11", "12", "01", "02", "03", "04"],
                     Values = [28, 35, 41, 46, 52, 61],
-                    Colors = ["#1d4ed8"]
+                    Colors = ["#dbeafe"]
                 },
                 new ChartCardViewModel
                 {
@@ -54,11 +60,26 @@ public class DashboardController : AdminControllerBase
                     ChartType = "bar",
                     Labels = ["11", "12", "01", "02", "03", "04"],
                     Values = [48, 55, 63, 71, 68, 82],
-                    Colors = ["#0f172a", "#1d4ed8", "#38bdf8", "#f59e0b", "#10b981", "#f97316"]
+                    Colors = ["#dbeafe", "#bfdbfe", "#93c5fd", "#60a5fa", "#3b82f6", "#2563eb"]
                 }
             ],
             Panels =
             [
+                new DashboardPanelViewModel
+                {
+                    Title = "Tin công khai mới nhất",
+                    Subtitle = "Những nội dung người dùng sẽ nhìn thấy ở trang chủ và trang tin tức",
+                    ActionLabel = "Mở quản lý tin tức",
+                    ActionUrl = "/Admin/News",
+                    Items = publicArticles.Take(4).Select(article => new PanelItemViewModel
+                    {
+                        Title = article.Title,
+                        Meta = $"{article.Category} • {article.Author}",
+                        Value = article.PublishedOn.ToString("dd/MM/yyyy"),
+                        BadgeText = article.IsFeatured ? "Nổi bật" : "Thường",
+                        BadgeClass = article.IsFeatured ? "bg-info-subtle text-info-emphasis" : "bg-secondary-subtle text-secondary-emphasis"
+                    }).ToList()
+                },
                 new DashboardPanelViewModel
                 {
                     Title = "Lớp đang hoạt động",
@@ -73,28 +94,13 @@ public class DashboardController : AdminControllerBase
                         BadgeText = x.Status,
                         BadgeClass = AppUi.StatusBadgeClass(x.Status)
                     }).ToList()
-                },
-                new DashboardPanelViewModel
-                {
-                    Title = "Ghi danh gần đây",
-                    Subtitle = "Danh sách ghi danh mới cần kiểm tra",
-                    ActionLabel = "Mở ghi danh",
-                    ActionUrl = "/Admin/Enrollments",
-                    Items = DataService.GetEnrollments().OrderByDescending(x => x.EnrolledOn).Take(4).Select(x => new PanelItemViewModel
-                    {
-                        Title = x.StudentName,
-                        Meta = $"{x.CourseName} • {x.ClassCode}",
-                        Value = AppUi.Currency(x.PaidAmount),
-                        BadgeText = x.PaymentStatus,
-                        BadgeClass = AppUi.StatusBadgeClass(x.PaymentStatus)
-                    }).ToList()
                 }
             ],
             Timeline =
             [
-                new TimelineItemViewModel { Title = "Khóa IELTS Nền Tảng sắp khai giảng", Meta = "20/04/2026", Description = "Cần chốt danh sách, kiểm tra học phí và in thẻ lớp.", AccentClass = "warning" },
-                new TimelineItemViewModel { Title = "Có 1 khoản công nợ quá hạn", Meta = "Học viên Đỗ Khánh Linh", Description = "Nên chuyển sang khu giáo vụ để xử lý nhắc phí và cập nhật biên nhận.", AccentClass = "danger" },
-                new TimelineItemViewModel { Title = "Báo cáo tháng đã sẵn sàng", Meta = "Dữ liệu tổng hợp", Description = "Khu vực báo cáo đang có biểu đồ doanh thu, ghi danh và top khóa học.", AccentClass = "success" }
+                new TimelineItemViewModel { Title = "Tin tức công khai đã có khu quản trị riêng", Meta = "Admin / Tin tức công khai", Description = "Bạn có thể thêm, sửa, xóa bài viết và cập nhật ra trang chủ ngay từ khu quản trị.", AccentClass = "success" },
+                new TimelineItemViewModel { Title = "Khóa IELTS Nền tảng sắp khai giảng", Meta = "20/04/2026", Description = "Cần chốt danh sách, kiểm tra học phí và in thẻ lớp.", AccentClass = "warning" },
+                new TimelineItemViewModel { Title = "Có 1 khoản công nợ quá hạn", Meta = "Học viên Đỗ Khánh Linh", Description = "Nên chuyển sang khu giáo vụ để xử lý nhắc phí và cập nhật biên nhận.", AccentClass = "danger" }
             ]
         };
 

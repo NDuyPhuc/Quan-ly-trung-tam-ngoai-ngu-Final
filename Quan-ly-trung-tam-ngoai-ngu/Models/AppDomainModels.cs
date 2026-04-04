@@ -3,9 +3,11 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Models;
 public class DemoAccount
 {
     public int Id { get; set; }
+    public string Username { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
     public string Department { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
@@ -45,6 +47,7 @@ public class Teacher
 public class Course
 {
     public int Id { get; set; }
+    public string Code { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Level { get; set; } = string.Empty;

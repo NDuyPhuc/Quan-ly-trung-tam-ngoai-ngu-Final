@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const isDashboardShell = document.body.classList.contains("dashboard-shell");
   const confirmModalElement = document.getElementById("confirmActionModal");
   const confirmMessageElement = document.getElementById("confirmActionMessage");
   const confirmButtonElement = document.getElementById("confirmActionButton");
@@ -9,27 +10,36 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
       if (!confirmModal || !confirmMessageElement || !confirmButtonElement) return;
 
-      confirmMessageElement.textContent = trigger.getAttribute("data-confirm-message") || "Bạn có chắc chắn muốn tiếp tục?";
+      confirmMessageElement.textContent =
+        trigger.getAttribute("data-confirm-message") || "Bạn có chắc chắn muốn tiếp tục?";
+
       confirmButtonElement.onclick = () => {
         confirmModal.hide();
-        showInlineToast("Đã xác nhận thao tác mô phỏng thành công.", "success");
+        const targetUrl = trigger.getAttribute("data-target-url") || trigger.getAttribute("href");
+        if (targetUrl && targetUrl !== "#") {
+          window.location.href = targetUrl;
+          return;
+        }
+
+        showInlineToast("Đã xác nhận thao tác thành công.", "success");
       };
+
       confirmModal.show();
     });
   });
 
-  document.querySelectorAll(".mock-submit-form").forEach((form) => {
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      showInlineToast("Đã lưu tạm dữ liệu giao diện mô phỏng. Chức năng xử lý thật sẽ được nối ở bước sau.", "success");
-    });
-  });
+  initializeManagementSearch();
+  initializeHomeScrollNav();
 
   document.querySelectorAll(".app-chart").forEach((canvas) => {
     const raw = canvas.getAttribute("data-chart-config");
     if (!raw) return;
+
     const config = JSON.parse(raw);
     const colors = config.Colors?.length ? config.Colors : ["#446a9f"];
+    const labelColor = isDashboardShell ? "#f8fbff" : "#314667";
+    const mutedColor = isDashboardShell ? "rgba(248, 251, 255, 0.78)" : "#7b8aa2";
+    const gridColor = isDashboardShell ? "rgba(255, 255, 255, 0.12)" : "rgba(217, 226, 238, 0.9)";
 
     new Chart(canvas, {
       type: config.ChartType || "bar",
@@ -39,7 +49,9 @@ document.addEventListener("DOMContentLoaded", () => {
           label: config.Title,
           data: config.Values,
           borderColor: colors[0],
-          backgroundColor: config.ChartType === "line" ? "rgba(68,106,159,0.14)" : colors,
+          backgroundColor: config.ChartType === "line"
+            ? (isDashboardShell ? "rgba(248, 251, 255, 0.12)" : "rgba(68, 106, 159, 0.14)")
+            : colors,
           fill: config.ChartType === "line",
           borderWidth: 2,
           borderRadius: 12,
@@ -50,17 +62,139 @@ document.addEventListener("DOMContentLoaded", () => {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: config.ChartType === "doughnut" },
+          legend: {
+            display: config.ChartType === "doughnut",
+            labels: {
+              color: labelColor
+            }
+          },
           tooltip: { mode: "index", intersect: false }
         },
         scales: config.ChartType === "doughnut" ? {} : {
-          x: { grid: { display: false } },
-          y: { beginAtZero: true, ticks: { precision: 0 } }
+          x: {
+            grid: { display: false, color: gridColor },
+            ticks: { color: mutedColor }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0, color: mutedColor },
+            grid: { color: gridColor }
+          }
         }
       }
     });
   });
 });
+
+function initializeManagementSearch() {
+  const normalizeText = (value) => value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+  document.querySelectorAll("[data-management-list]").forEach((container) => {
+    const searchInput = container.querySelector("[data-management-search]");
+    const rows = Array.from(container.querySelectorAll("[data-management-row]"));
+    const emptyRow = container.querySelector("[data-management-search-empty]");
+    const counter = container.querySelector("[data-management-count]");
+
+    if (!counter) {
+      return;
+    }
+
+    const updateCounter = (visibleCount, totalCount, hasSearch) => {
+      if (!totalCount) {
+        counter.textContent = "Chưa có bản ghi nào để hiển thị.";
+        return;
+      }
+
+      counter.textContent = hasSearch
+        ? `Đang hiển thị ${visibleCount}/${totalCount} bản ghi khớp từ khóa.`
+        : `Đang hiển thị ${totalCount} bản ghi trên một trang.`;
+    };
+
+    if (!searchInput || !rows.length) {
+      updateCounter(rows.length, rows.length, false);
+      return;
+    }
+
+    const applySearch = () => {
+      const keyword = normalizeText(searchInput.value.trim());
+      let visibleCount = 0;
+
+      rows.forEach((row) => {
+        const matches = !keyword || normalizeText(row.textContent || "").includes(keyword);
+        row.classList.toggle("d-none", !matches);
+        if (matches) {
+          visibleCount += 1;
+        }
+      });
+
+      if (emptyRow) {
+        emptyRow.classList.toggle("d-none", visibleCount !== 0);
+      }
+
+      updateCounter(visibleCount, rows.length, keyword.length > 0);
+    };
+
+    searchInput.addEventListener("input", applySearch);
+    applySearch();
+  });
+}
+
+function initializeHomeScrollNav() {
+  const body = document.body;
+  if (!body || body.getAttribute("data-controller") !== "Home") {
+    return;
+  }
+
+  const links = Array.from(document.querySelectorAll("[data-scroll-nav]"));
+  const sections = links
+    .map((link) => document.getElementById(link.getAttribute("data-scroll-nav") || ""))
+    .filter(Boolean);
+
+  const collapseElement = document.getElementById("mainNav");
+  const navCollapse = collapseElement ? bootstrap.Collapse.getOrCreateInstance(collapseElement, { toggle: false }) : null;
+
+  links.forEach((link) => {
+    link.addEventListener("click", () => {
+      if (window.innerWidth < 992 && navCollapse) {
+        navCollapse.hide();
+      }
+    });
+  });
+
+  if (!sections.length) {
+    return;
+  }
+
+  const setActive = (id) => {
+    links.forEach((link) => {
+      link.classList.toggle("active", link.getAttribute("data-scroll-nav") === id);
+    });
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    const visibleSection = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+    if (visibleSection?.target?.id) {
+      setActive(visibleSection.target.id);
+    }
+  }, {
+    rootMargin: "-25% 0px -55% 0px",
+    threshold: [0.2, 0.35, 0.55]
+  });
+
+  sections.forEach((section) => observer.observe(section));
+
+  if (window.location.hash) {
+    setActive(window.location.hash.replace("#", ""));
+  } else {
+    setActive("trang-chu");
+  }
+}
 
 function showInlineToast(message, type) {
   const toastContainer = document.createElement("div");

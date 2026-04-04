@@ -7,7 +7,7 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Services.Mocks;
 public class MockDataService : IMockDataService
 {
     private readonly IReadOnlyList<DemoAccount> _accounts;
-    private readonly IReadOnlyList<Student> _students;
+    private readonly List<Student> _students;
     private readonly IReadOnlyList<Teacher> _teachers;
     private readonly IReadOnlyList<Course> _courses;
     private readonly IReadOnlyList<CourseClass> _classes;
@@ -18,6 +18,7 @@ public class MockDataService : IMockDataService
     private readonly IReadOnlyList<AttendanceRecord> _attendance;
     private readonly IReadOnlyList<ExamResult> _examResults;
     private readonly IReadOnlyList<NewsArticle> _articles;
+    private readonly object _syncRoot = new();
 
     public MockDataService()
     {
@@ -34,6 +35,7 @@ public class MockDataService : IMockDataService
             new Course
             {
                 Id = 1,
+                Code = "TOEIC-650",
                 Slug = "toeic-650-plus",
                 Name = "TOEIC 650+",
                 Level = "Trung cấp",
@@ -52,6 +54,7 @@ public class MockDataService : IMockDataService
             new Course
             {
                 Id = 2,
+                Code = "IELTS-FOUNDATION",
                 Slug = "ielts-foundation",
                 Name = "IELTS Nền Tảng",
                 Level = "Sơ cấp",
@@ -70,6 +73,7 @@ public class MockDataService : IMockDataService
             new Course
             {
                 Id = 3,
+                Code = "COMM-APPLY",
                 Slug = "giao-tiep-ung-dung",
                 Name = "Tiếng Anh Giao Tiếp Ứng Dụng",
                 Level = "Cơ bản",
@@ -88,6 +92,7 @@ public class MockDataService : IMockDataService
             new Course
             {
                 Id = 4,
+                Code = "IELTS-INTENSIVE",
                 Slug = "ielts-intensive-65",
                 Name = "IELTS Chuyên Sâu 6.5+",
                 Level = "Nâng cao",
@@ -228,4 +233,59 @@ public class MockDataService : IMockDataService
     public IReadOnlyList<AttendanceRecord> GetAttendanceRecords() => _attendance;
     public IReadOnlyList<ExamResult> GetExamResults() => _examResults;
     public IReadOnlyList<NewsArticle> GetNewsArticles() => _articles;
+
+    public StudentRegistrationResult RegisterStudent(string fullName, string email, string phone)
+    {
+        var normalizedEmail = email.Trim();
+
+        lock (_syncRoot)
+        {
+            var exists = _students.Any(x => x.Email.Equals(normalizedEmail, StringComparison.OrdinalIgnoreCase)) ||
+                         _accounts.Any(x => x.Email.Equals(normalizedEmail, StringComparison.OrdinalIgnoreCase));
+
+            if (exists)
+            {
+                return StudentRegistrationResult.Fail("Email nay da ton tai trong du lieu demo.");
+            }
+
+            var nextId = _students.Count == 0 ? 1 : _students.Max(x => x.Id) + 1;
+            var nextCodeNumber = _students
+                .Select(x => ExtractStudentNumber(x.Code))
+                .DefaultIfEmpty(0)
+                .Max() + 1;
+            var studentCode = $"HV{nextCodeNumber:000}";
+
+            _students.Add(new Student
+            {
+                Id = nextId,
+                Code = studentCode,
+                FullName = fullName.Trim(),
+                Email = normalizedEmail,
+                Phone = phone.Trim(),
+                Level = "Cho tu van",
+                Status = "Moi dang ky",
+                CourseName = "Chua chon khoa",
+                ClassCode = "Chua xep lop",
+                JoinedOn = DateTime.Now,
+                TuitionFee = 0,
+                PaidAmount = 0,
+                DebtAmount = 0
+            });
+
+            return StudentRegistrationResult.Success(
+                $"SQL Server dang khong kha dung nen he thong da ghi nhan dang ky o che do demo voi ma {studentCode}.",
+                studentCode);
+        }
+    }
+
+    private static int ExtractStudentNumber(string code)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return 0;
+        }
+
+        var digits = new string(code.Where(char.IsDigit).ToArray());
+        return int.TryParse(digits, out var value) ? value : 0;
+    }
 }

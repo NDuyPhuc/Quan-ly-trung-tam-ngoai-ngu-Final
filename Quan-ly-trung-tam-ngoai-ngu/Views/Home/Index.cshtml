@@ -4,28 +4,29 @@
     {
         new { Title = "Chất lượng thực học", Description = "Cam kết kết quả dựa trên lộ trình học rõ ràng và có đo lường." },
         new { Title = "Tận tâm", Description = "Đồng hành với học viên ở mọi chặng của quá trình học tập." },
-        new { Title = "Sáng tạo", Description = "Liên tục cập nhật phương pháp giảng dạy và giao diện vận hành." },
+        new { Title = "Sáng tạo", Description = "Liên tục cập nhật phương pháp giảng dạy và cách vận hành hiện đại." },
         new { Title = "Kết nối", Description = "Xây dựng cộng đồng học tập văn minh, hỗ trợ lẫn nhau." }
     };
     var advantages = new[]
     {
         "Theo dõi tiến độ học tập 24/7 qua hệ thống.",
-        "Kho tài liệu số không bị phân mảnh theo từng bộ phận.",
-        "Tương tác trực tiếp với giáo viên và giáo vụ nhanh hơn."
+        "Kho tài liệu số tập trung, không bị phân mảnh theo từng bộ phận.",
+        "Tương tác trực tiếp với giáo viên và giáo vụ nhanh hơn.",
+        "Thông tin lớp, học phí và lịch học được đồng bộ rõ ràng."
     };
 }
 
-<section class="landing-hero-section">
+<section id="trang-chu" class="landing-hero-section">
     <div class="container">
         <div class="landing-hero-shell">
             <div class="row g-5 align-items-center">
                 <div class="col-lg-6">
-                    <span class="landing-label">Tiếng Anh cho mọi người</span>
+                    <span class="landing-label">NorthStar English</span>
                     <h1 class="landing-hero-title">@Model.HeroTitle</h1>
                     <p class="landing-hero-copy">@Model.HeroSubtitle</p>
                     <div class="landing-hero-actions">
-                        <a class="btn btn-primary btn-lg" asp-controller="Courses" asp-action="Index">Xem khóa học</a>
-                        <a class="btn btn-outline-primary btn-lg" asp-controller="Contact" asp-action="Index">Đăng ký tư vấn</a>
+                        <a class="btn btn-primary btn-lg" href="#khoa-hoc">Xem khóa học</a>
+                        <a class="btn btn-outline-primary btn-lg" href="#lien-he">Đăng ký tư vấn</a>
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -34,22 +35,42 @@
                         <div class="landing-hero-overlay">
                             <span class="overlay-icon"><i class="bi bi-stars"></i></span>
                             <div>
-                                <strong>Giảng viên bản ngữ</strong>
-                                <span>100+ buổi chuyên đề kỹ năng được tổ chức định kỳ mỗi quý.</span>
+                                <strong>Giảng viên đồng hành sát tiến độ</strong>
+                                <span>Lộ trình học, xếp lớp, học phí và tư vấn được gom về một trải nghiệm rõ ràng hơn.</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="row g-4 mt-4">
+                @foreach (var item in Model.HighlightStats)
+                {
+                    <div class="col-md-6 col-xl-3">
+                        <div class="stat-card stat-@item.AccentClass home-highlight-card">
+                            <div class="stat-icon"><i class="@item.Icon"></i></div>
+                            <div class="stat-content">
+                                <span>@item.Title</span>
+                                <strong>@item.Value</strong>
+                                <p>@item.Description</p>
+                                @if (!string.IsNullOrWhiteSpace(item.Trend))
+                                {
+                                    <small>@item.Trend</small>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </section>
 
-<section class="landing-section">
+<section id="gioi-thieu" class="landing-section">
     <div class="container">
         <div class="landing-section-header centered">
-            <h2>Giá Trị Cốt Lõi &amp; Lợi Thế</h2>
-            <p>Những nguyên tắc vận hành và các điểm mạnh giúp giao diện mới bám sát tinh thần học thuật hiện đại của mẫu tham chiếu.</p>
+            <h2>@Model.AboutTitle</h2>
+            <p>@Model.AboutSubtitle</p>
         </div>
         <div class="row g-4">
             <div class="col-lg-6">
@@ -71,8 +92,8 @@
             </div>
             <div class="col-lg-6">
                 <div class="landing-panel accent">
-                    <h3>Lợi thế hệ thống hiện đại</h3>
-                    <p>Thiết kế mới giữ nguyên nghiệp vụ nhưng trình bày sáng hơn, có điểm nhấn hình ảnh giống bố cục bạn gửi.</p>
+                    <h3>@Model.AboutHighlightTitle</h3>
+                    <p>@Model.AboutHighlightBody</p>
                     <ul class="accent-list">
                         @foreach (var item in advantages)
                         {
@@ -85,12 +106,12 @@
     </div>
 </section>
 
-<section class="landing-section muted">
+<section id="khoa-hoc" class="landing-section muted">
     <div class="container">
         <div class="landing-section-header between">
             <div>
                 <h2>Khóa Học Nổi Bật</h2>
-                <p>Lộ trình học được tách rõ trên trang riêng, nhưng vẫn có bản xem nhanh ngay tại trang chủ.</p>
+                <p>Xem nhanh các lộ trình đang được quan tâm nhiều nhất trước khi vào trang danh mục chi tiết.</p>
             </div>
             <a class="section-link" asp-controller="Courses" asp-action="Index">Xem tất cả khóa học <i class="bi bi-arrow-right"></i></a>
         </div>
@@ -124,11 +145,11 @@
     </div>
 </section>
 
-<section class="landing-section">
+<section id="lop-hoc" class="landing-section">
     <div class="container">
         <div class="landing-section-header centered">
-            <h2>Lịch Khai Giảng Dự Kiến</h2>
-            <p>Lịch học linh hoạt, nhịp học rõ ràng và có giáo viên phụ trách hiển thị ngay trên giao diện.</p>
+            <h2>Lớp Học Và Lịch Khai Giảng</h2>
+            <p>Lịch học linh hoạt, giáo viên phụ trách rõ ràng và trạng thái lớp được hiển thị ngay trên trang chủ.</p>
         </div>
 
         <div class="schedule-table-card">
@@ -167,7 +188,7 @@
                         <span class="badge @AppUi.StatusBadgeClass(item.Status)">@item.Status</span>
                     </div>
                     <div class="schedule-cell action">
-                        <a class="btn btn-primary btn-sm" asp-controller="Contact" asp-action="Index">Đăng ký</a>
+                        <a class="btn btn-primary btn-sm" href="#lien-he">Đăng ký</a>
                     </div>
                 </div>
             }
@@ -175,12 +196,12 @@
     </div>
 </section>
 
-<section class="landing-section muted">
+<section id="tin-tuc" class="landing-section muted">
     <div class="container">
         <div class="landing-section-header between">
             <div>
-                <h2>Tin Tức &amp; Sự Kiện</h2>
-                <p>Bản tin được trình bày theo kiểu thẻ ảnh để gần hơn với giao diện mẫu bạn gửi.</p>
+                <h2>Tin Tức Và Sự Kiện</h2>
+                <p>Các thông báo khai giảng, workshop và bài viết mới được trình bày theo kiểu thẻ ảnh gọn và dễ đọc.</p>
             </div>
             <a class="section-link" asp-controller="News" asp-action="Index">Xem tất cả <i class="bi bi-arrow-right"></i></a>
         </div>
@@ -205,6 +226,56 @@
                     </article>
                 </div>
             }
+        </div>
+    </div>
+</section>
+
+<section id="lien-he" class="landing-section">
+    <div class="container">
+        <div class="landing-section-header between align-start">
+            <div>
+                <h2>@Model.ContactSectionTitle</h2>
+                <p>@Model.ContactSectionSubtitle</p>
+            </div>
+            <a class="section-link" asp-controller="Contact" asp-action="Index">Mở trang liên hệ đầy đủ <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="contact-info-stack">
+                    <div class="contact-info-card">
+                        <span class="contact-info-icon"><i class="bi bi-envelope-paper"></i></span>
+                        <strong>Email nhận yêu cầu</strong>
+                        <p>@Model.SupportEmail<br />Mọi form liên hệ sẽ được gửi về đúng hộp thư này khi SMTP được cấu hình.</p>
+                    </div>
+                    <div class="contact-info-card">
+                        <span class="contact-info-icon"><i class="bi bi-telephone-forward"></i></span>
+                        <strong>Hotline tư vấn</strong>
+                        <p>@Model.SupportPhone<br />Ưu tiên gọi lại trong ngày cho các yêu cầu xếp lớp và tư vấn đầu vào.</p>
+                    </div>
+                    <div class="contact-info-card">
+                        <span class="contact-info-icon"><i class="bi bi-calendar-check"></i></span>
+                        <strong>Khung giờ hỗ trợ</strong>
+                        <p>@Model.SupportHours<br />Có thể tư vấn học trực tiếp hoặc online.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="form-display-card contact-home-card">
+                    <div class="landing-section-header contact-header">
+                        <div>
+                            <h2>@Model.ContactFormTitle</h2>
+                            <p>@Model.ContactFormSubtitle</p>
+                        </div>
+                    </div>
+                    @await Html.PartialAsync("~/Views/Shared/Partials/_ContactInquiryForm.cshtml", Model.ContactForm, new ViewDataDictionary(ViewData)
+                    {
+                        ["ReturnUrl"] = "/#lien-he",
+                        ["SubmitLabel"] = "Gửi thông tin liên hệ",
+                        ["SupportEmail"] = Model.SupportEmail
+                    })
+                </div>
+            </div>
         </div>
     </div>
 </section>
