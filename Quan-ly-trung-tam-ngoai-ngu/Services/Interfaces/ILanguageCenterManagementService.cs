@@ -40,6 +40,10 @@ public interface ILanguageCenterManagementService
     ManagementResult SaveAttendance(int? id, AttendanceInput input);
     ManagementResult DeleteAttendance(int id);
 
+    ExamInput? GetExam(int id);
+    ManagementResult SaveExam(int? id, ExamInput input);
+    ManagementResult DeleteExam(int id);
+
     ExamResultInput? GetExamResult(int id);
     ManagementResult SaveExamResult(int? id, ExamResultInput input);
     ManagementResult DeleteExamResult(int id);

@@ -17,13 +17,16 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     private static readonly HashSet<string> ValidResultStatuses = new(StringComparer.OrdinalIgnoreCase) { "Pass", "Fail" };
 
     private readonly ApplicationDbContext _dbContext;
+    private readonly IAccountPasswordService _passwordService;
     private readonly ILogger<EfLanguageCenterManagementService> _logger;
 
     public EfLanguageCenterManagementService(
         ApplicationDbContext dbContext,
+        IAccountPasswordService passwordService,
         ILogger<EfLanguageCenterManagementService> logger)
     {
         _dbContext = dbContext;
+        _passwordService = passwordService;
         _logger = logger;
     }
 
@@ -90,17 +93,16 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
 
                 if (!string.IsNullOrWhiteSpace(password))
                 {
-                    account.PasswordHash = password;
+                    account.PasswordHash = _passwordService.HashPassword(account, password);
                 }
 
                 _dbContext.SaveChanges();
                 return ManagementResult.Success("Cập nhật tài khoản thành công.");
             }
 
-            _dbContext.Accounts.Add(new AccountEntity
+            var newAccount = new AccountEntity
             {
                 Username = username,
-                PasswordHash = password,
                 FullName = fullName,
                 Email = email,
                 Phone = phone,
@@ -109,7 +111,10 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                 Status = input.IsActive ? (byte)1 : (byte)0,
                 IsDeleted = false,
                 CreatedAt = DateTime.Now
-            });
+            };
+
+            newAccount.PasswordHash = _passwordService.HashPassword(newAccount, password);
+            _dbContext.Accounts.Add(newAccount);
 
             _dbContext.SaveChanges();
             return ManagementResult.Success("Tạo tài khoản thành công.");
@@ -911,6 +916,130 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
         catch (DbUpdateException ex)
         {
             return HandleUpdateException(ex, "delete attendance");
+        }
+    }
+
+    public ExamInput? GetExam(int id)
+    {
+        var exam = _dbContext.Exams
+            .AsNoTracking()
+            .Include(x => x.Class)
+            .FirstOrDefault(x => x.Id == id);
+
+        return exam is null
+            ? null
+            : new ExamInput
+            {
+                ClassCode = exam.Class.ClassCode,
+                ExamName = exam.ExamName,
+                ExamType = exam.ExamType,
+                ExamDate = exam.ExamDate,
+                MaxScore = exam.MaxScore
+            };
+    }
+
+    public ManagementResult SaveExam(int? id, ExamInput input)
+    {
+        try
+        {
+            var classCode = Required(input.ClassCode, "Lớp học là bắt buộc.");
+            var examName = Required(input.ExamName, "Tên bài kiểm tra là bắt buộc.");
+            var examType = Required(input.ExamType, "Loại bài kiểm tra là bắt buộc.");
+
+            if (!ValidExamTypes.Contains(examType))
+            {
+                return ManagementResult.Fail("Loại bài kiểm tra không hợp lệ.");
+            }
+
+            if (input.MaxScore <= 0)
+            {
+                return ManagementResult.Fail("Điểm tối đa phải lớn hơn 0.");
+            }
+
+            var classEntity = _dbContext.Classes.FirstOrDefault(x => !x.IsDeleted && x.ClassCode == classCode);
+            if (classEntity is null)
+            {
+                return ManagementResult.Fail("Không tìm thấy lớp học đã chọn.");
+            }
+
+            var duplicateExists = _dbContext.Exams.Any(x =>
+                x.ClassId == classEntity.Id &&
+                x.ExamName == examName &&
+                x.ExamType == examType &&
+                x.ExamDate == input.ExamDate.Date &&
+                (!id.HasValue || x.Id != id.Value));
+
+            if (duplicateExists)
+            {
+                return ManagementResult.Fail("Bài kiểm tra này đã tồn tại cho lớp học đã chọn.");
+            }
+
+            if (id.HasValue)
+            {
+                var exam = _dbContext.Exams.FirstOrDefault(x => x.Id == id.Value);
+                if (exam is null)
+                {
+                    return ManagementResult.Fail("Không tìm thấy bài kiểm tra cần cập nhật.");
+                }
+
+                exam.ClassId = classEntity.Id;
+                exam.ExamName = examName;
+                exam.ExamType = examType;
+                exam.ExamDate = input.ExamDate.Date;
+                exam.MaxScore = input.MaxScore;
+
+                _dbContext.SaveChanges();
+                return ManagementResult.Success("Cập nhật bài kiểm tra thành công.");
+            }
+
+            _dbContext.Exams.Add(new ExamEntity
+            {
+                ClassId = classEntity.Id,
+                ExamName = examName,
+                ExamType = examType,
+                ExamDate = input.ExamDate.Date,
+                MaxScore = input.MaxScore,
+                CreatedAt = DateTime.Now
+            });
+
+            _dbContext.SaveChanges();
+            return ManagementResult.Success("Tạo bài kiểm tra thành công.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return ManagementResult.Fail(ex.Message);
+        }
+        catch (DbUpdateException ex)
+        {
+            return HandleUpdateException(ex, "save exam");
+        }
+    }
+
+    public ManagementResult DeleteExam(int id)
+    {
+        try
+        {
+            var exam = _dbContext.Exams
+                .Include(x => x.Results)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (exam is null)
+            {
+                return ManagementResult.Fail("Không tìm thấy bài kiểm tra cần xóa.");
+            }
+
+            if (exam.Results.Count > 0)
+            {
+                return ManagementResult.Fail("Không thể xóa bài kiểm tra đã có kết quả. Hãy xóa các dòng điểm trước.");
+            }
+
+            _dbContext.Exams.Remove(exam);
+            _dbContext.SaveChanges();
+            return ManagementResult.Success("Xóa bài kiểm tra thành công.");
+        }
+        catch (DbUpdateException ex)
+        {
+            return HandleUpdateException(ex, "delete exam");
         }
     }
 

@@ -10,7 +10,7 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Areas.Admin.Controllers;
 [DemoAuthorize(AppConstants.Roles.Admin)]
 public abstract class AdminControllerBase : ModuleControllerBase
 {
-    protected AdminControllerBase(IMockDataService dataService)
+    protected AdminControllerBase(ILanguageCenterReadService dataService)
         : base(dataService)
     {
     }

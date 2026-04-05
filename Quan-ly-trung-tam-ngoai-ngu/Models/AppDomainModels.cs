@@ -139,6 +139,20 @@ public class AttendanceRecord
     public string Note { get; set; } = string.Empty;
 }
 
+public class Exam
+{
+    public int Id { get; set; }
+    public string ClassCode { get; set; } = string.Empty;
+    public string CourseName { get; set; } = string.Empty;
+    public string ExamName { get; set; } = string.Empty;
+    public string ExamType { get; set; } = string.Empty;
+    public DateTime ExamDate { get; set; }
+    public decimal MaxScore { get; set; }
+    public int ResultCount { get; set; }
+    public decimal AverageScore { get; set; }
+    public string Status { get; set; } = string.Empty;
+}
+
 public class ExamResult
 {
     public int Id { get; set; }

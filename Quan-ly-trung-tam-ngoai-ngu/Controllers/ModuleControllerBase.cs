@@ -8,9 +8,9 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Controllers;
 
 public abstract class ModuleControllerBase : Controller
 {
-    protected readonly IMockDataService DataService;
+    protected readonly ILanguageCenterReadService DataService;
 
-    protected ModuleControllerBase(IMockDataService dataService)
+    protected ModuleControllerBase(ILanguageCenterReadService dataService)
     {
         DataService = dataService;
     }

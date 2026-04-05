@@ -8,9 +8,9 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Controllers;
 
 public class ClassesController : Controller
 {
-    private readonly IMockDataService _dataService;
+    private readonly ILanguageCenterReadService _dataService;
 
-    public ClassesController(IMockDataService dataService)
+    public ClassesController(ILanguageCenterReadService dataService)
     {
         _dataService = dataService;
     }

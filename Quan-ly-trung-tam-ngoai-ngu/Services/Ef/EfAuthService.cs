@@ -1,29 +1,34 @@
+using Microsoft.EntityFrameworkCore;
 using Quan_ly_trung_tam_ngoai_ngu.Data;
 using Quan_ly_trung_tam_ngoai_ngu.Models;
 using Quan_ly_trung_tam_ngoai_ngu.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace Quan_ly_trung_tam_ngoai_ngu.Services.Ef;
 
-public sealed class EfAuthService : IDemoAuthService
+public sealed class EfAuthService : IAccountAuthService
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly IAccountPasswordService _passwordService;
     private readonly ILogger<EfAuthService> _logger;
 
-    public EfAuthService(ApplicationDbContext dbContext, ILogger<EfAuthService> logger)
+    public EfAuthService(
+        ApplicationDbContext dbContext,
+        IAccountPasswordService passwordService,
+        ILogger<EfAuthService> logger)
     {
         _dbContext = dbContext;
+        _passwordService = passwordService;
         _logger = logger;
     }
 
-    public IReadOnlyList<DemoAccount> GetDemoAccounts()
+    public async Task<IReadOnlyList<DemoAccount>> GetDemoAccountsAsync()
     {
-        var teacherSpecializations = _dbContext.Teachers
+        var teacherSpecializations = await _dbContext.Teachers
             .AsNoTracking()
             .Where(x => !x.IsDeleted && x.Email != null)
-            .ToDictionary(x => x.Email!, x => x.Specialization ?? string.Empty, StringComparer.OrdinalIgnoreCase);
+            .ToDictionaryAsync(x => x.Email!, x => x.Specialization ?? string.Empty, StringComparer.OrdinalIgnoreCase);
 
-        return _dbContext.Accounts
+        return await _dbContext.Accounts
             .AsNoTracking()
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Id)
@@ -40,17 +45,16 @@ public sealed class EfAuthService : IDemoAuthService
                 Password = string.IsNullOrWhiteSpace(x.PasswordHash) ? string.Empty : "********",
                 PasswordHash = x.PasswordHash
             })
-            .ToList();
+            .ToListAsync();
     }
 
-    public DemoAccount? ValidateLogin(string email, string password)
+    public async Task<DemoAccount?> ValidateLoginAsync(string email, string password)
     {
         var login = email.Trim();
-        var normalizedLogin = login.ToLower();
+        var normalizedLogin = login.ToLowerInvariant();
 
-        var account = _dbContext.Accounts
-            .AsNoTracking()
-            .FirstOrDefault(x =>
+        var account = await _dbContext.Accounts
+            .FirstOrDefaultAsync(x =>
                 !x.IsDeleted &&
                 ((x.Email != null && x.Email.ToLower() == normalizedLogin) ||
                  x.Username.ToLower() == normalizedLogin));
@@ -65,16 +69,30 @@ public sealed class EfAuthService : IDemoAuthService
             return null;
         }
 
-        if (!string.Equals(account.PasswordHash, password, StringComparison.Ordinal))
+        var verification = _passwordService.VerifyPassword(account, password);
+        if (!verification.Succeeded)
         {
+            _logger.LogWarning("Password verification failed for account {AccountId}.", account.Id);
             return null;
         }
 
-        var teacherSpecialization = _dbContext.Teachers
+        if (verification.NeedsUpgrade && !string.IsNullOrWhiteSpace(verification.UpgradedHash))
+        {
+            account.PasswordHash = verification.UpgradedHash;
+            account.UpdatedAt = DateTime.Now;
+            await _dbContext.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Upgraded password storage for account {AccountId}. LegacyPlainText={LegacyPlainText}.",
+                account.Id,
+                verification.UsedLegacyPlainText);
+        }
+
+        var teacherSpecialization = await _dbContext.Teachers
             .AsNoTracking()
             .Where(x => !x.IsDeleted && x.Email == account.Email)
             .Select(x => x.Specialization)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
 
         return new DemoAccount
         {
@@ -91,7 +109,7 @@ public sealed class EfAuthService : IDemoAuthService
         };
     }
 
-    public StudentRegistrationResult RegisterStudent(string fullName, string email, string phone, string password)
+    public async Task<StudentRegistrationResult> RegisterStudentAsync(string fullName, string email, string phone, string password)
     {
         var normalizedName = fullName.Trim();
         var normalizedEmail = email.Trim();
@@ -107,8 +125,8 @@ public sealed class EfAuthService : IDemoAuthService
             return StudentRegistrationResult.Fail("Email là bắt buộc.");
         }
 
-        var emailExists = _dbContext.Students.Any(x => !x.IsDeleted && x.Email == normalizedEmail) ||
-                          _dbContext.Accounts.Any(x => !x.IsDeleted && x.Email == normalizedEmail);
+        var emailExists = await _dbContext.Students.AnyAsync(x => !x.IsDeleted && x.Email == normalizedEmail) ||
+                          await _dbContext.Accounts.AnyAsync(x => !x.IsDeleted && x.Email == normalizedEmail);
 
         if (emailExists)
         {
@@ -117,16 +135,18 @@ public sealed class EfAuthService : IDemoAuthService
 
         try
         {
-            var maxStudentCode = _dbContext.Students
+            var studentCodes = await _dbContext.Students
                 .AsNoTracking()
                 .Where(x => x.StudentCode.StartsWith("S"))
                 .Select(x => x.StudentCode)
-                .ToList()
+                .ToListAsync();
+
+            var nextStudentNumber = studentCodes
                 .Select(code => int.TryParse(code[1..], out var value) ? value : 0)
                 .DefaultIfEmpty(0)
                 .Max();
 
-            var nextStudentCode = $"S{maxStudentCode + 1:000}";
+            var nextStudentCode = $"S{nextStudentNumber + 1:000}";
 
             _dbContext.Students.Add(new StudentEntity
             {
@@ -139,7 +159,7 @@ public sealed class EfAuthService : IDemoAuthService
                 CreatedAt = DateTime.Now
             });
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             return StudentRegistrationResult.Success($"Đăng ký thành công. Học viên {nextStudentCode} đã được tạo trong cơ sở dữ liệu.", nextStudentCode);
         }
         catch (DbUpdateException ex)
@@ -151,7 +171,9 @@ public sealed class EfAuthService : IDemoAuthService
 
     private static string ResolveDepartment(string role, string? email, IReadOnlyDictionary<string, string> teacherSpecializations)
     {
-        if (!string.IsNullOrWhiteSpace(email) && teacherSpecializations.TryGetValue(email, out var specialization) && !string.IsNullOrWhiteSpace(specialization))
+        if (!string.IsNullOrWhiteSpace(email) &&
+            teacherSpecializations.TryGetValue(email, out var specialization) &&
+            !string.IsNullOrWhiteSpace(specialization))
         {
             return specialization;
         }

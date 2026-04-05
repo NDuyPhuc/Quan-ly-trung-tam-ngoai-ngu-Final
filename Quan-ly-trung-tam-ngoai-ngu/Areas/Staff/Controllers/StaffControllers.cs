@@ -9,7 +9,7 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Areas.Staff.Controllers;
 
 public class DashboardController : StaffControllerBase
 {
-    public DashboardController(IMockDataService dataService) : base(dataService) { }
+    public DashboardController(ILanguageCenterReadService dataService) : base(dataService) { }
 
     public IActionResult Index()
     {
@@ -58,7 +58,7 @@ public class StudentsController : StaffControllerBase
 {
     private readonly ILanguageCenterManagementService _managementService;
 
-    public StudentsController(IMockDataService dataService, ILanguageCenterManagementService managementService) : base(dataService)
+    public StudentsController(ILanguageCenterReadService dataService, ILanguageCenterManagementService managementService) : base(dataService)
     {
         _managementService = managementService;
     }
@@ -291,7 +291,7 @@ public class EnrollmentsController : StaffControllerBase
 {
     private readonly ILanguageCenterManagementService _managementService;
 
-    public EnrollmentsController(IMockDataService dataService, ILanguageCenterManagementService managementService) : base(dataService)
+    public EnrollmentsController(ILanguageCenterReadService dataService, ILanguageCenterManagementService managementService) : base(dataService)
     {
         _managementService = managementService;
     }
@@ -528,7 +528,7 @@ public class EnrollmentsController : StaffControllerBase
 
 public class ClassesController : StaffControllerBase
 {
-    public ClassesController(IMockDataService dataService) : base(dataService) { }
+    public ClassesController(ILanguageCenterReadService dataService) : base(dataService) { }
 
     public IActionResult Index()
     {
@@ -654,7 +654,7 @@ public class ReceiptsController : StaffControllerBase
 {
     private readonly ILanguageCenterManagementService _managementService;
 
-    public ReceiptsController(IMockDataService dataService, ILanguageCenterManagementService managementService) : base(dataService)
+    public ReceiptsController(ILanguageCenterReadService dataService, ILanguageCenterManagementService managementService) : base(dataService)
     {
         _managementService = managementService;
     }

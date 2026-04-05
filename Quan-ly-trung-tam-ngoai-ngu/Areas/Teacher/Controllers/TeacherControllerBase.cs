@@ -12,7 +12,7 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Areas.Teacher.Controllers;
 [DemoAuthorize(AppConstants.Roles.Teacher)]
 public abstract class TeacherControllerBase : ModuleControllerBase
 {
-    protected TeacherControllerBase(IMockDataService dataService)
+    protected TeacherControllerBase(ILanguageCenterReadService dataService)
         : base(dataService)
     {
     }

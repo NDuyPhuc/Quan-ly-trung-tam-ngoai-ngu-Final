@@ -15,7 +15,7 @@ public class HomeController : ModuleControllerBase
 
     public HomeController(
         ILogger<HomeController> logger,
-        IMockDataService dataService,
+        ILanguageCenterReadService dataService,
         IPublicSiteContentService publicSiteContentService)
         : base(dataService)
     {

@@ -3,7 +3,7 @@ using Quan_ly_trung_tam_ngoai_ngu.Services.Interfaces;
 
 namespace Quan_ly_trung_tam_ngoai_ngu.Services.Mocks;
 
-public class DemoAuthService : IDemoAuthService
+public class DemoAuthService : IAccountAuthService
 {
     private readonly MockDataService _mockDataService;
 

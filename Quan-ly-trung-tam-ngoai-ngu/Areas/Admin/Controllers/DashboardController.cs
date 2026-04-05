@@ -10,7 +10,7 @@ public class DashboardController : AdminControllerBase
 {
     private readonly IPublicSiteContentService _publicSiteContentService;
 
-    public DashboardController(IMockDataService dataService, IPublicSiteContentService publicSiteContentService)
+    public DashboardController(ILanguageCenterReadService dataService, IPublicSiteContentService publicSiteContentService)
         : base(dataService)
     {
         _publicSiteContentService = publicSiteContentService;

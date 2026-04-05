@@ -2,9 +2,11 @@ using Quan_ly_trung_tam_ngoai_ngu.Models;
 using Quan_ly_trung_tam_ngoai_ngu.Services;
 using Quan_ly_trung_tam_ngoai_ngu.Services.Ef;
 using Quan_ly_trung_tam_ngoai_ngu.Services.Interfaces;
+using Quan_ly_trung_tam_ngoai_ngu.Services.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Quan_ly_trung_tam_ngoai_ngu.Data;
+using Quan_ly_trung_tam_ngoai_ngu.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,13 +39,16 @@ builder.Services.AddSession(options =>
 });
 builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<SmtpMailOptions>(builder.Configuration.GetSection("Smtp"));
-builder.Services.AddScoped<IMockDataService, EfLanguageCenterReadService>();
-builder.Services.AddScoped<IDemoAuthService, EfAuthService>();
+builder.Services.AddScoped<IAccountPasswordService, AccountPasswordService>();
+builder.Services.AddScoped<ILanguageCenterReadService, EfLanguageCenterReadService>();
+builder.Services.AddScoped<IAccountAuthService, EfAuthService>();
 builder.Services.AddScoped<ILanguageCenterManagementService, EfLanguageCenterManagementService>();
 builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
 builder.Services.AddSingleton<IPublicSiteContentService, PublicSiteContentService>();
 
 var app = builder.Build();
+
+await app.Services.ApplySecurityBackfillAsync();
 
 if (!app.Environment.IsDevelopment())
 {

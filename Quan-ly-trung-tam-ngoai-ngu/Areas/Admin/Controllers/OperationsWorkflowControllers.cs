@@ -11,7 +11,7 @@ public class EnrollmentsController : AdminControllerBase
     private readonly ILanguageCenterManagementService _managementService;
 
     public EnrollmentsController(
-        IMockDataService dataService,
+        ILanguageCenterReadService dataService,
         ILanguageCenterManagementService managementService) : base(dataService)
     {
         _managementService = managementService;
@@ -213,7 +213,7 @@ public class ReceiptsController : AdminControllerBase
     private readonly ILanguageCenterManagementService _managementService;
 
     public ReceiptsController(
-        IMockDataService dataService,
+        ILanguageCenterReadService dataService,
         ILanguageCenterManagementService managementService) : base(dataService)
     {
         _managementService = managementService;
@@ -411,7 +411,7 @@ public class SessionsController : AdminControllerBase
     private readonly ILanguageCenterManagementService _managementService;
 
     public SessionsController(
-        IMockDataService dataService,
+        ILanguageCenterReadService dataService,
         ILanguageCenterManagementService managementService) : base(dataService)
     {
         _managementService = managementService;

@@ -4,7 +4,7 @@ using Quan_ly_trung_tam_ngoai_ngu.Services.Interfaces;
 
 namespace Quan_ly_trung_tam_ngoai_ngu.Services.Mocks;
 
-public class MockDataService : IMockDataService
+public class MockDataService : ILanguageCenterReadService
 {
     private readonly IReadOnlyList<DemoAccount> _accounts;
     private readonly List<Student> _students;

@@ -11,7 +11,7 @@ public class CoursesController : AdminControllerBase
     private readonly ILanguageCenterManagementService _managementService;
 
     public CoursesController(
-        IMockDataService dataService,
+        ILanguageCenterReadService dataService,
         ILanguageCenterManagementService managementService) : base(dataService)
     {
         _managementService = managementService;
@@ -207,7 +207,7 @@ public class ClassesController : AdminControllerBase
     private readonly ILanguageCenterManagementService _managementService;
 
     public ClassesController(
-        IMockDataService dataService,
+        ILanguageCenterReadService dataService,
         ILanguageCenterManagementService managementService) : base(dataService)
     {
         _managementService = managementService;

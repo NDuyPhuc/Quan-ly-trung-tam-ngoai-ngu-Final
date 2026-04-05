@@ -10,7 +10,7 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Areas.Staff.Controllers;
 [DemoAuthorize(AppConstants.Roles.Staff)]
 public abstract class StaffControllerBase : ModuleControllerBase
 {
-    protected StaffControllerBase(IMockDataService dataService)
+    protected StaffControllerBase(ILanguageCenterReadService dataService)
         : base(dataService)
     {
     }

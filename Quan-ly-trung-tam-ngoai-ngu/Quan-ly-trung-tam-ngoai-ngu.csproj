@@ -17,4 +17,9 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Services\Mocks\**\*.cs" />
+    <Compile Remove="Services\Sql\**\*.cs" />
+  </ItemGroup>
+
 </Project>

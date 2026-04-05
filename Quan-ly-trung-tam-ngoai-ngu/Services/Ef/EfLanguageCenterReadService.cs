@@ -5,7 +5,7 @@ using Quan_ly_trung_tam_ngoai_ngu.Services.Interfaces;
 
 namespace Quan_ly_trung_tam_ngoai_ngu.Services.Ef;
 
-public sealed class EfLanguageCenterReadService : IMockDataService
+public sealed class EfLanguageCenterReadService : ILanguageCenterReadService
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly IPublicSiteContentService _publicSiteContentService;
@@ -439,6 +439,48 @@ public sealed class EfLanguageCenterReadService : IMockDataService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Could not load attendance records.");
+            return [];
+        }
+    }
+
+    public IReadOnlyList<Exam> GetExams()
+    {
+        try
+        {
+            return _dbContext.Exams
+                .AsNoTracking()
+                .Include(x => x.Class)
+                    .ThenInclude(x => x.Course)
+                .Include(x => x.Results)
+                .OrderByDescending(x => x.ExamDate)
+                .ThenByDescending(x => x.Id)
+                .ToList()
+                .Select(exam =>
+                {
+                    var resultCount = exam.Results.Count;
+                    var averageScore = resultCount == 0 ? 0m : exam.Results.Average(x => x.Score);
+
+                    return new Exam
+                    {
+                        Id = exam.Id,
+                        ClassCode = exam.Class.ClassCode,
+                        CourseName = exam.Class.Course.CourseName,
+                        ExamName = exam.ExamName,
+                        ExamType = EfServiceMapper.BuildExamLabel(exam.ExamType, string.Empty),
+                        ExamDate = exam.ExamDate,
+                        MaxScore = exam.MaxScore,
+                        ResultCount = resultCount,
+                        AverageScore = averageScore,
+                        Status = exam.ExamDate.Date > DateTime.Today
+                            ? "Sắp diễn ra"
+                            : resultCount > 0 ? "Đã có kết quả" : "Chưa nhập điểm"
+                    };
+                })
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Could not load exams.");
             return [];
         }
     }

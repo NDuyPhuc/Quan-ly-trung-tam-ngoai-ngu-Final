@@ -10,7 +10,7 @@ public class NewsController : AdminControllerBase
 {
     private readonly IPublicSiteContentService _publicSiteContentService;
 
-    public NewsController(IMockDataService dataService, IPublicSiteContentService publicSiteContentService)
+    public NewsController(ILanguageCenterReadService dataService, IPublicSiteContentService publicSiteContentService)
         : base(dataService)
     {
         _publicSiteContentService = publicSiteContentService;

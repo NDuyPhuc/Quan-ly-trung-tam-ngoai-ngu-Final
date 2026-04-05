@@ -5,7 +5,7 @@ using Quan_ly_trung_tam_ngoai_ngu.Services.Mocks;
 
 namespace Quan_ly_trung_tam_ngoai_ngu.Services.Sql;
 
-public class SqlAuthService : IDemoAuthService
+public class SqlAuthService : IAccountAuthService
 {
     private const string ActiveStatus = "Đang hoạt động";
     private const string LockedStatus = "Tạm khóa";

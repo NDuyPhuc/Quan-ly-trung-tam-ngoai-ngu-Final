@@ -116,6 +116,15 @@ public sealed class AttendanceInput
     public string Note { get; set; } = string.Empty;
 }
 
+public sealed class ExamInput
+{
+    public string ClassCode { get; set; } = string.Empty;
+    public string ExamName { get; set; } = string.Empty;
+    public string ExamType { get; set; } = string.Empty;
+    public DateTime ExamDate { get; set; } = DateTime.Today;
+    public decimal MaxScore { get; set; } = 10;
+}
+
 public sealed class ExamResultInput
 {
     public int EnrollmentId { get; set; }

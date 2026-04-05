@@ -9,9 +9,9 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Controllers;
 [DemoAuthorize]
 public class ProfileController : Controller
 {
-    private readonly IMockDataService _dataService;
+    private readonly ILanguageCenterReadService _dataService;
 
-    public ProfileController(IMockDataService dataService)
+    public ProfileController(ILanguageCenterReadService dataService)
     {
         _dataService = dataService;
     }

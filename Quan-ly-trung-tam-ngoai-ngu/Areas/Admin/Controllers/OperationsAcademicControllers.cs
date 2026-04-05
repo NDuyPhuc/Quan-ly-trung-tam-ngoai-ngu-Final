@@ -12,7 +12,7 @@ public class AttendanceController : AdminControllerBase
     private readonly ILanguageCenterManagementService _managementService;
 
     public AttendanceController(
-        IMockDataService dataService,
+        ILanguageCenterReadService dataService,
         ILanguageCenterManagementService managementService) : base(dataService)
     {
         _managementService = managementService;
@@ -200,12 +200,12 @@ public class AttendanceController : AdminControllerBase
     }
 }
 
-public class ExamsController : AdminControllerBase
+public class ExamResultsController : AdminControllerBase
 {
     private readonly ILanguageCenterManagementService _managementService;
 
-    public ExamsController(
-        IMockDataService dataService,
+    public ExamResultsController(
+        ILanguageCenterReadService dataService,
         ILanguageCenterManagementService managementService) : base(dataService)
     {
         _managementService = managementService;
@@ -219,7 +219,7 @@ public class ExamsController : AdminControllerBase
             Subtitle = "Quản lý đầu điểm và kết quả học tập.",
             Breadcrumbs = Breadcrumbs("Điểm số"),
             PrimaryActionText = "Nhập điểm",
-            PrimaryActionUrl = "/Admin/Exams/Create",
+            PrimaryActionUrl = "/Admin/ExamResults/Create",
             Table = new TableViewModel
             {
                 Columns = [new() { Header = "Học viên" }, new() { Header = "Bài kiểm tra" }, new() { Header = "Điểm" }, new() { Header = "Kết quả" }, new() { Header = "Thao tác", Width = "280px" }],
@@ -236,9 +236,9 @@ public class ExamsController : AdminControllerBase
                     ],
                     Actions =
                     [
-                        new() { Label = "Chi tiết", Url = $"/Admin/Exams/Details/{item.Id}", Icon = "bi-eye" },
-                        new() { Label = "Sửa", Url = $"/Admin/Exams/Edit/{item.Id}", Icon = "bi-pencil-square", CssClass = "btn btn-sm btn-outline-secondary" },
-                        new() { Label = "Xóa", Url = $"/Admin/Exams/Delete/{item.Id}", Icon = "bi-trash", CssClass = "btn btn-sm btn-outline-danger confirm-action", RequiresConfirm = true, ConfirmMessage = "Bạn muốn xóa đầu điểm này?" }
+                        new() { Label = "Chi tiết", Url = $"/Admin/ExamResults/Details/{item.Id}", Icon = "bi-eye" },
+                        new() { Label = "Sửa", Url = $"/Admin/ExamResults/Edit/{item.Id}", Icon = "bi-pencil-square", CssClass = "btn btn-sm btn-outline-secondary" },
+                        new() { Label = "Xóa", Url = $"/Admin/ExamResults/Delete/{item.Id}", Icon = "bi-trash", CssClass = "btn btn-sm btn-outline-danger confirm-action", RequiresConfirm = true, ConfirmMessage = "Bạn muốn xóa đầu điểm này?" }
                     ]
                 }).ToList()
             }
@@ -248,7 +248,7 @@ public class ExamsController : AdminControllerBase
     [HttpGet]
     public IActionResult Create()
     {
-        return ManagementFormView(BuildExamForm("Nhập điểm", "/Admin/Exams/Create", new ExamResultInput { ExamDate = DateTime.Today, MaxScore = 10 }));
+        return ManagementFormView(BuildExamForm("Nhập điểm", "/Admin/ExamResults/Create", new ExamResultInput { ExamDate = DateTime.Today, MaxScore = 10 }));
     }
 
     [HttpPost]
@@ -258,7 +258,7 @@ public class ExamsController : AdminControllerBase
         var result = _managementService.SaveExamResult(null, input);
         if (!result.Succeeded)
         {
-            return ManagementFormView(BuildExamForm("Nhập điểm", "/Admin/Exams/Create", input, result.Message));
+            return ManagementFormView(BuildExamForm("Nhập điểm", "/Admin/ExamResults/Create", input, result.Message));
         }
 
         SetToast(result.Message);
@@ -275,7 +275,7 @@ public class ExamsController : AdminControllerBase
             return RedirectToAction(nameof(Index));
         }
 
-        return ManagementFormView(BuildExamForm("Cập nhật điểm", $"/Admin/Exams/Edit/{id}", input));
+        return ManagementFormView(BuildExamForm("Cập nhật điểm", $"/Admin/ExamResults/Edit/{id}", input));
     }
 
     [HttpPost]
@@ -285,7 +285,7 @@ public class ExamsController : AdminControllerBase
         var result = _managementService.SaveExamResult(id, input);
         if (!result.Succeeded)
         {
-            return ManagementFormView(BuildExamForm("Cập nhật điểm", $"/Admin/Exams/Edit/{id}", input, result.Message));
+            return ManagementFormView(BuildExamForm("Cập nhật điểm", $"/Admin/ExamResults/Edit/{id}", input, result.Message));
         }
 
         SetToast(result.Message);
@@ -312,7 +312,7 @@ public class ExamsController : AdminControllerBase
         {
             Title = $"Điểm số {item.StudentName}",
             Subtitle = item.ExamType,
-            Breadcrumbs = Breadcrumbs("Chi tiết điểm số", "Điểm số", "/Admin/Exams"),
+            Breadcrumbs = Breadcrumbs("Chi tiết điểm số", "Điểm số", "/Admin/ExamResults"),
             SummaryCards =
             [
                 new SummaryCardViewModel { Title = "Điểm số", Value = item.Score.ToString("0.0"), Description = "Kết quả của học viên", Icon = "bi-award", AccentClass = item.Result == "Đạt" ? "success" : "warning" }
@@ -334,8 +334,8 @@ public class ExamsController : AdminControllerBase
             ],
             Actions =
             [
-                new QuickActionViewModel { Label = "Sửa điểm", Url = $"/Admin/Exams/Edit/{id}", Icon = "bi-pencil-square" },
-                new QuickActionViewModel { Label = "Quay lại", Url = "/Admin/Exams", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
+                new QuickActionViewModel { Label = "Sửa điểm", Url = $"/Admin/ExamResults/Edit/{id}", Icon = "bi-pencil-square" },
+                new QuickActionViewModel { Label = "Quay lại", Url = "/Admin/ExamResults", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
             ]
         });
     }
@@ -353,11 +353,11 @@ public class ExamsController : AdminControllerBase
         {
             Title = title,
             Subtitle = "Tạo hoặc cập nhật dữ liệu điểm số trong hệ thống.",
-            Breadcrumbs = Breadcrumbs(title, "Điểm số", "/Admin/Exams"),
+            Breadcrumbs = Breadcrumbs(title, "Điểm số", "/Admin/ExamResults"),
             FormTitle = title,
             FormDescription = "Thông tin sẽ được lưu vào bảng Exams và ExamResults trong SQL Server.",
             FormActionUrl = actionUrl,
-            CancelUrl = "/Admin/Exams",
+            CancelUrl = "/Admin/ExamResults",
             SubmitLabel = "Lưu điểm số",
             ErrorMessage = errorMessage,
             Sections =
@@ -408,7 +408,7 @@ public class ExamsController : AdminControllerBase
 
 public class ReportsController : AdminControllerBase
 {
-    public ReportsController(IMockDataService dataService) : base(dataService)
+    public ReportsController(ILanguageCenterReadService dataService) : base(dataService)
     {
     }
 

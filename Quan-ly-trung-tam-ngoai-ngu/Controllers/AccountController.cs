@@ -11,11 +11,13 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Controllers;
 
 public class AccountController : Controller
 {
-    private readonly IDemoAuthService _authService;
+    private readonly IAccountAuthService _authService;
+    private readonly ILogger<AccountController> _logger;
 
-    public AccountController(IDemoAuthService authService)
+    public AccountController(IAccountAuthService authService, ILogger<AccountController> logger)
     {
         _authService = authService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -37,9 +39,10 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var account = _authService.ValidateLogin(model.Email, model.Password);
+        var account = await _authService.ValidateLoginAsync(model.Email, model.Password);
         if (account is null)
         {
+            _logger.LogWarning("Login failed for {Login}.", model.Email);
             model.ErrorMessage = "Thông tin đăng nhập không hợp lệ hoặc tài khoản đã bị khóa.";
             return View(model);
         }
@@ -93,7 +96,7 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Register(RegisterViewModel model)
+    public async Task<IActionResult> Register(RegisterViewModel model)
     {
         model.Title = "Đăng ký";
         model.Subtitle = "Biểu mẫu đăng ký dành cho học viên mới.";
@@ -104,7 +107,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var result = _authService.RegisterStudent(model.FullName, model.Email, model.Phone, model.Password);
+        var result = await _authService.RegisterStudentAsync(model.FullName, model.Email, model.Phone, model.Password);
         if (!result.Succeeded)
         {
             ModelState.AddModelError(string.Empty, result.Message);

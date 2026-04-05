@@ -5,7 +5,7 @@ using Quan_ly_trung_tam_ngoai_ngu.Services.Mocks;
 
 namespace Quan_ly_trung_tam_ngoai_ngu.Services.Sql;
 
-public partial class SqlServerDataService : IMockDataService
+public partial class SqlServerDataService : ILanguageCenterReadService
 {
     private readonly string? _connectionString;
     private readonly MockDataService _fallback;

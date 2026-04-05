@@ -11,7 +11,7 @@ public class AccountsController : AdminControllerBase
     private readonly ILanguageCenterManagementService _managementService;
 
     public AccountsController(
-        IMockDataService dataService,
+        ILanguageCenterReadService dataService,
         ILanguageCenterManagementService managementService) : base(dataService)
     {
         _managementService = managementService;

@@ -9,7 +9,7 @@ public class PublicPagesController : AdminControllerBase
 {
     private readonly IPublicSiteContentService _publicSiteContentService;
 
-    public PublicPagesController(IMockDataService dataService, IPublicSiteContentService publicSiteContentService)
+    public PublicPagesController(ILanguageCenterReadService dataService, IPublicSiteContentService publicSiteContentService)
         : base(dataService)
     {
         _publicSiteContentService = publicSiteContentService;
