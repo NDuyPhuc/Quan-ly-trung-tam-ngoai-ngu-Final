@@ -1,0 +1,284 @@
+@model ReceiptPrintPageViewModel
+@using Quan_ly_trung_tam_ngoai_ngu.Infrastructure
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@Model.Title - @Model.ReceiptCode</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            padding: 32px;
+            color: #0f172a;
+            background: #f8fafc;
+        }
+
+        .receipt-shell {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #dbe4f0;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+        }
+
+        .receipt-head,
+        .receipt-grid,
+        .receipt-metrics,
+        .receipt-history,
+        .receipt-foot {
+            margin-bottom: 24px;
+        }
+
+        .receipt-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            align-items: flex-start;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 24px;
+        }
+
+        .brand-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 6px;
+            color: #1d4ed8;
+        }
+
+        .brand-subtitle,
+        .text-muted {
+            color: #64748b;
+        }
+
+        .receipt-code {
+            text-align: right;
+        }
+
+        .receipt-code strong {
+            display: block;
+            font-size: 22px;
+            margin-top: 8px;
+        }
+
+        .receipt-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .info-card,
+        .metric-card {
+            background: #f8fbff;
+            border: 1px solid #dbeafe;
+            border-radius: 18px;
+            padding: 18px 20px;
+        }
+
+        .info-card span,
+        .metric-card span {
+            display: block;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .info-card strong,
+        .metric-card strong {
+            font-size: 18px;
+            color: #0f172a;
+        }
+
+        .receipt-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .metric-card strong.amount {
+            font-size: 24px;
+        }
+
+        .receipt-history table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .receipt-history th,
+        .receipt-history td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .receipt-history th {
+            background: #eff6ff;
+            color: #1e3a8a;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .receipt-foot {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            align-items: end;
+            border-top: 2px dashed #cbd5e1;
+            padding-top: 20px;
+        }
+
+        .print-actions {
+            max-width: 900px;
+            margin: 0 auto 16px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .print-actions button,
+        .print-actions a {
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .print-actions button {
+            background: #1d4ed8;
+            color: #fff;
+        }
+
+        .print-actions a {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        @@media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+
+            .print-actions {
+                display: none;
+            }
+
+            .receipt-shell {
+                box-shadow: none;
+                border: 0;
+                border-radius: 0;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-actions">
+        <a href="javascript:history.back()">Quay lại</a>
+        <button type="button" onclick="window.print()">In biên nhận</button>
+    </div>
+
+    <main class="receipt-shell">
+        <section class="receipt-head">
+            <div>
+                <p class="brand-title">NorthStar English</p>
+                <div class="brand-subtitle">Biên nhận thu học phí trung tâm ngoại ngữ</div>
+                <div class="text-muted">Người in: @Model.PrintedBy</div>
+            </div>
+            <div class="receipt-code">
+                <div class="text-muted">@Model.Title</div>
+                <strong>@Model.ReceiptCode</strong>
+                <div class="text-muted">Ngày thu: @Model.PaidOn.ToString("dd/MM/yyyy HH:mm")</div>
+            </div>
+        </section>
+
+        <section class="receipt-grid">
+            <div class="info-card">
+                <span>Học viên</span>
+                <strong>@Model.StudentName</strong>
+            </div>
+            <div class="info-card">
+                <span>Lớp học</span>
+                <strong>@Model.ClassCode</strong>
+            </div>
+            <div class="info-card">
+                <span>Khóa học</span>
+                <strong>@Model.CourseName</strong>
+            </div>
+            <div class="info-card">
+                <span>Mã ghi danh</span>
+                <strong>@(string.IsNullOrWhiteSpace(Model.EnrollmentCode) ? "Chưa đối chiếu" : Model.EnrollmentCode)</strong>
+            </div>
+            <div class="info-card">
+                <span>Phương thức thanh toán</span>
+                <strong>@Model.PaymentMethod</strong>
+            </div>
+            <div class="info-card">
+                <span>Trạng thái</span>
+                <strong>@Model.Status</strong>
+            </div>
+        </section>
+
+        <section class="receipt-metrics">
+            <div class="metric-card">
+                <span>Số tiền biên nhận</span>
+                <strong class="amount">@AppUi.Currency(Model.Amount)</strong>
+            </div>
+            <div class="metric-card">
+                <span>Đã thu lũy kế</span>
+                <strong class="amount">@AppUi.Currency(Model.TotalPaid)</strong>
+            </div>
+            <div class="metric-card">
+                <span>Còn lại</span>
+                <strong class="amount">@AppUi.Currency(Model.RemainingAmount)</strong>
+            </div>
+        </section>
+
+        <section class="receipt-history">
+            <h3>Lịch sử biên nhận cùng ghi danh</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mốc thanh toán</th>
+                        <th>Thời gian</th>
+                        <th>Diễn giải</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.PaymentHistory)
+                    {
+                        <tr>
+                            <td><strong>@item.Title</strong></td>
+                            <td>@item.Meta</td>
+                            <td>@item.Description</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+
+        <section class="receipt-foot">
+            <div>
+                <div class="text-muted">Ghi chú</div>
+                <strong>@(string.IsNullOrWhiteSpace(Model.Note) ? "Không có ghi chú bổ sung." : Model.Note)</strong>
+            </div>
+            <div style="text-align:right">
+                <div class="text-muted">Tổng học phí</div>
+                <strong>@AppUi.Currency(Model.TotalFee)</strong>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

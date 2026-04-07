@@ -48,7 +48,8 @@ public class DashboardController : StaffControllerBase
             [
                 new QuickActionViewModel { Label = "Thêm học viên", Url = "/Staff/Students/Create", Icon = "bi-person-plus" },
                 new QuickActionViewModel { Label = "Ghi danh", Url = "/Staff/Enrollments/Create", Icon = "bi-journal-check", CssClass = "btn btn-outline-primary" },
-                new QuickActionViewModel { Label = "Thu học phí", Url = "/Staff/Receipts/Create", Icon = "bi-receipt", CssClass = "btn btn-outline-dark" }
+                new QuickActionViewModel { Label = "Thu học phí", Url = "/Staff/Receipts/Create", Icon = "bi-receipt", CssClass = "btn btn-outline-dark" },
+                new QuickActionViewModel { Label = "Xem công nợ", Url = "/Staff/Debts", Icon = "bi-wallet2", CssClass = "btn btn-outline-danger" }
             ]
         });
     }
@@ -701,6 +702,7 @@ public class ReceiptsController : StaffControllerBase
                     Actions =
                     [
                         new() { Label = "Chi tiết", Url = $"/Staff/Receipts/Details/{item.Id}", Icon = "bi-eye" },
+                        new() { Label = "In", Url = $"/Staff/Receipts/Print/{item.Id}", Icon = "bi-printer", CssClass = "btn btn-sm btn-outline-primary" },
                         new() { Label = "Sửa", Url = $"/Staff/Receipts/Edit/{item.Id}", Icon = "bi-pencil-square", CssClass = "btn btn-sm btn-outline-secondary" }
                     ]
                 }).ToList()
@@ -833,8 +835,60 @@ public class ReceiptsController : StaffControllerBase
             Actions =
             [
                 new QuickActionViewModel { Label = "Sửa biên nhận", Url = $"/Staff/Receipts/Edit/{id}", Icon = "bi-pencil-square" },
+                new QuickActionViewModel { Label = "In biên nhận", Url = $"/Staff/Receipts/Print/{id}", Icon = "bi-printer", CssClass = "btn btn-outline-primary" },
                 new QuickActionViewModel { Label = "Quay lại", Url = "/Staff/Receipts", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
             ]
+        });
+    }
+
+    public IActionResult Print(int id)
+    {
+        var receipt = DataService.GetReceipts().FirstOrDefault(x => x.Id == id);
+        if (receipt is null)
+        {
+            SetToast("Không tìm thấy biên nhận.", "danger");
+            return RedirectToAction(nameof(Index));
+        }
+
+        var relatedReceipts = DataService.GetReceipts()
+            .Where(x =>
+                string.Equals(x.StudentName, receipt.StudentName, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(x.ClassCode, receipt.ClassCode, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(x => x.PaidOn)
+            .ToList();
+
+        var enrollment = DataService.GetEnrollments()
+            .FirstOrDefault(x =>
+                string.Equals(x.StudentName, receipt.StudentName, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(x.ClassCode, receipt.ClassCode, StringComparison.OrdinalIgnoreCase));
+
+        var totalPaid = relatedReceipts.Sum(x => x.Amount);
+        var totalFee = enrollment?.TotalFee ?? totalPaid;
+        var remainingAmount = Math.Max(0, totalFee - totalPaid);
+
+        return View("~/Views/Shared/Modules/ReceiptPrint.cshtml", new ReceiptPrintPageViewModel
+        {
+            ReceiptCode = receipt.ReceiptCode,
+            StudentName = receipt.StudentName,
+            ClassCode = receipt.ClassCode,
+            CourseName = enrollment?.CourseName ?? "Đang cập nhật",
+            EnrollmentCode = enrollment?.EnrollmentCode ?? string.Empty,
+            PaymentMethod = receipt.PaymentMethod,
+            Status = receipt.Status,
+            Note = enrollment is null ? string.Empty : $"Đã đối chiếu với ghi danh {enrollment.EnrollmentCode}.",
+            PaidOn = receipt.PaidOn,
+            Amount = receipt.Amount,
+            TotalFee = totalFee,
+            TotalPaid = totalPaid,
+            RemainingAmount = remainingAmount,
+            PrintedBy = User.Identity?.Name ?? "Giáo vụ",
+            PaymentHistory = relatedReceipts.Select(item => new TimelineItemViewModel
+            {
+                Title = $"{item.ReceiptCode} - {AppUi.Currency(item.Amount)}",
+                Meta = item.PaidOn.ToString("dd/MM/yyyy HH:mm"),
+                Description = $"{item.PaymentMethod} • {item.Status}",
+                AccentClass = item.Id == receipt.Id ? "primary" : "success"
+            }).ToList()
         });
     }
 

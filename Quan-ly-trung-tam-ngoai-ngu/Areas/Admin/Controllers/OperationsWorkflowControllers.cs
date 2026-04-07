@@ -252,6 +252,7 @@ public class ReceiptsController : AdminControllerBase
                     Actions =
                     [
                         new() { Label = "Chi tiết", Url = $"/Admin/Receipts/Details/{item.Id}", Icon = "bi-eye" },
+                        new() { Label = "In", Url = $"/Admin/Receipts/Print/{item.Id}", Icon = "bi-printer", CssClass = "btn btn-sm btn-outline-primary" },
                         new() { Label = "Sửa", Url = $"/Admin/Receipts/Edit/{item.Id}", Icon = "bi-pencil-square", CssClass = "btn btn-sm btn-outline-secondary" },
                         new() { Label = "Xóa", Url = $"/Admin/Receipts/Delete/{item.Id}", Icon = "bi-trash", CssClass = "btn btn-sm btn-outline-danger confirm-action", RequiresConfirm = true, ConfirmMessage = "Bạn muốn xóa biên nhận này?" }
                     ]
@@ -350,8 +351,60 @@ public class ReceiptsController : AdminControllerBase
             Actions =
             [
                 new QuickActionViewModel { Label = "Sửa biên nhận", Url = $"/Admin/Receipts/Edit/{id}", Icon = "bi-pencil-square" },
+                new QuickActionViewModel { Label = "In biên nhận", Url = $"/Admin/Receipts/Print/{id}", Icon = "bi-printer", CssClass = "btn btn-outline-primary" },
                 new QuickActionViewModel { Label = "Quay lại", Url = "/Admin/Receipts", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
             ]
+        });
+    }
+
+    public IActionResult Print(int id)
+    {
+        var item = DataService.GetReceipts().FirstOrDefault(x => x.Id == id);
+        if (item is null)
+        {
+            SetToast("Không tìm thấy biên nhận.", "danger");
+            return RedirectToAction(nameof(Index));
+        }
+
+        var relatedReceipts = DataService.GetReceipts()
+            .Where(x =>
+                string.Equals(x.StudentName, item.StudentName, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(x.ClassCode, item.ClassCode, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(x => x.PaidOn)
+            .ToList();
+
+        var enrollment = DataService.GetEnrollments()
+            .FirstOrDefault(x =>
+                string.Equals(x.StudentName, item.StudentName, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(x.ClassCode, item.ClassCode, StringComparison.OrdinalIgnoreCase));
+
+        var totalPaid = relatedReceipts.Sum(x => x.Amount);
+        var totalFee = enrollment?.TotalFee ?? totalPaid;
+        var remainingAmount = Math.Max(0, totalFee - totalPaid);
+
+        return View("~/Views/Shared/Modules/ReceiptPrint.cshtml", new ReceiptPrintPageViewModel
+        {
+            ReceiptCode = item.ReceiptCode,
+            StudentName = item.StudentName,
+            ClassCode = item.ClassCode,
+            CourseName = enrollment?.CourseName ?? "Đang cập nhật",
+            EnrollmentCode = enrollment?.EnrollmentCode ?? string.Empty,
+            PaymentMethod = item.PaymentMethod,
+            Status = item.Status,
+            Note = enrollment is null ? string.Empty : $"Đã đối chiếu với ghi danh {enrollment.EnrollmentCode}.",
+            PaidOn = item.PaidOn,
+            Amount = item.Amount,
+            TotalFee = totalFee,
+            TotalPaid = totalPaid,
+            RemainingAmount = remainingAmount,
+            PrintedBy = User.Identity?.Name ?? "Quản trị viên",
+            PaymentHistory = relatedReceipts.Select(receipt => new TimelineItemViewModel
+            {
+                Title = $"{receipt.ReceiptCode} - {AppUi.Currency(receipt.Amount)}",
+                Meta = receipt.PaidOn.ToString("dd/MM/yyyy HH:mm"),
+                Description = $"{receipt.PaymentMethod} • {receipt.Status}",
+                AccentClass = receipt.Id == item.Id ? "primary" : "success"
+            }).ToList()
         });
     }
 

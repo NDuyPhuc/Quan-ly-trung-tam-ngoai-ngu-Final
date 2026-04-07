@@ -177,3 +177,23 @@ public class ManagementDetailsPageViewModel : AppPageViewModel
     public List<QuickActionViewModel> Actions { get; set; } = [];
     public List<TimelineItemViewModel> Timeline { get; set; } = [];
 }
+
+public class ReceiptPrintPageViewModel
+{
+    public string Title { get; set; } = "Biên nhận học phí";
+    public string ReceiptCode { get; set; } = string.Empty;
+    public string StudentName { get; set; } = string.Empty;
+    public string ClassCode { get; set; } = string.Empty;
+    public string CourseName { get; set; } = string.Empty;
+    public string EnrollmentCode { get; set; } = string.Empty;
+    public string PaymentMethod { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public string Note { get; set; } = string.Empty;
+    public DateTime PaidOn { get; set; }
+    public decimal Amount { get; set; }
+    public decimal TotalFee { get; set; }
+    public decimal TotalPaid { get; set; }
+    public decimal RemainingAmount { get; set; }
+    public string PrintedBy { get; set; } = string.Empty;
+    public List<TimelineItemViewModel> PaymentHistory { get; set; } = [];
+}

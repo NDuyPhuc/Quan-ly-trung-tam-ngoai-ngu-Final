@@ -82,6 +82,7 @@ public class DashboardController : TeacherControllerBase
             QuickActions =
             [
                 new QuickActionViewModel { Label = "Tạo buổi học", Url = "/Teacher/Schedule/Create", Icon = "bi-calendar-plus" },
+                new QuickActionViewModel { Label = "Tạo bài kiểm tra", Url = "/Teacher/Exams/Create", Icon = "bi-journal-plus", CssClass = "btn btn-outline-success" },
                 new QuickActionViewModel { Label = "Điểm danh", Url = "/Teacher/Attendance/Create", Icon = "bi-list-check", CssClass = "btn btn-outline-primary" },
                 new QuickActionViewModel { Label = "Nhập điểm", Url = "/Teacher/ExamResults/Create", Icon = "bi-pencil-square", CssClass = "btn btn-outline-dark" }
             ]
@@ -201,6 +202,7 @@ public class ClassesController : TeacherControllerBase
             Actions =
             [
                 new QuickActionViewModel { Label = "Tạo buổi học", Url = "/Teacher/Schedule/Create", Icon = "bi-calendar-plus" },
+                new QuickActionViewModel { Label = "Tạo bài kiểm tra", Url = "/Teacher/Exams/Create", Icon = "bi-journal-plus", CssClass = "btn btn-outline-success" },
                 new QuickActionViewModel { Label = "Điểm danh", Url = "/Teacher/Attendance", Icon = "bi-list-check", CssClass = "btn btn-outline-primary" },
                 new QuickActionViewModel { Label = "Quay lại", Url = "/Teacher/Classes", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
             ]

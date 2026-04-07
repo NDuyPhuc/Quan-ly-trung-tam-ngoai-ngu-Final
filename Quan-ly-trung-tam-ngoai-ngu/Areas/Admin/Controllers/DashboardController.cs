@@ -35,10 +35,12 @@ public class DashboardController : AdminControllerBase
             ],
             QuickActions =
             [
-                new QuickActionViewModel { Label = "Thêm tin tức", Url = "/Admin/News/Create", Icon = "bi-plus-square", CssClass = "btn btn-primary" },
-                new QuickActionViewModel { Label = "Quản lý tin tức", Url = "/Admin/News", Icon = "bi-newspaper", CssClass = "btn btn-outline-primary" },
-                new QuickActionViewModel { Label = "Xem trang chủ", Url = "/", Icon = "bi-house-door", CssClass = "btn btn-outline-dark" },
-                new QuickActionViewModel { Label = "Thêm học viên", Url = "/Admin/Students/Create", Icon = "bi-person-plus", CssClass = "btn btn-outline-secondary" }
+                new QuickActionViewModel { Label = "Tạo khóa học", Url = "/Admin/Courses/Create", Icon = "bi-journal-plus", CssClass = "btn btn-primary" },
+                new QuickActionViewModel { Label = "Mở lớp mới", Url = "/Admin/Classes/Create", Icon = "bi-easel2", CssClass = "btn btn-outline-primary" },
+                new QuickActionViewModel { Label = "Thêm giáo viên", Url = "/Admin/Teachers/Create", Icon = "bi-person-plus", CssClass = "btn btn-outline-secondary" },
+                new QuickActionViewModel { Label = "Tạo bài kiểm tra", Url = "/Admin/Exams/Create", Icon = "bi-clipboard-plus", CssClass = "btn btn-outline-success" },
+                new QuickActionViewModel { Label = "Quản lý tin tức", Url = "/Admin/News", Icon = "bi-newspaper", CssClass = "btn btn-outline-info" },
+                new QuickActionViewModel { Label = "Xem trang chủ", Url = "/", Icon = "bi-house-door", CssClass = "btn btn-outline-dark" }
             ],
             Charts =
             [
