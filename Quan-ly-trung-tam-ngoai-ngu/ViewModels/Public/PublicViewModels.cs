@@ -158,7 +158,7 @@ public class LoginViewModel : AppPageViewModel
     public string? ErrorMessage { get; set; }
 }
 
-public class RegisterViewModel : AppPageViewModel
+public class ConsultationRequestViewModel : AppPageViewModel
 {
     [Required(ErrorMessage = "Vui long nhap ho ten.")]
     [Display(Name = "Ho va ten")]
@@ -173,16 +173,19 @@ public class RegisterViewModel : AppPageViewModel
     [Display(Name = "So dien thoai")]
     public string Phone { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui long nhap mat khau.")]
-    [DataType(DataType.Password)]
-    [Display(Name = "Mat khau")]
-    public string Password { get; set; } = string.Empty;
+    [Display(Name = "Khoa hoc quan tam")]
+    public string PreferredProgram { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui long xac nhan mat khau.")]
-    [DataType(DataType.Password)]
-    [Compare(nameof(Password), ErrorMessage = "Mat khau xac nhan chua khop.")]
-    [Display(Name = "Xac nhan mat khau")]
-    public string ConfirmPassword { get; set; } = string.Empty;
+    [Display(Name = "Khung gio mong muon")]
+    public string PreferredSchedule { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui long chon cach lien he mong muon.")]
+    [Display(Name = "Cach lien he mong muon")]
+    public string PreferredContactMethod { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui long nhap noi dung can tu van.")]
+    [Display(Name = "Noi dung can tu van")]
+    public string Message { get; set; } = string.Empty;
 }
 
 public class ForgotPasswordViewModel : AppPageViewModel

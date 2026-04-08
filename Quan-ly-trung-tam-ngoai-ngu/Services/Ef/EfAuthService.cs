@@ -109,66 +109,6 @@ public sealed class EfAuthService : IAccountAuthService
         };
     }
 
-    public async Task<StudentRegistrationResult> RegisterStudentAsync(string fullName, string email, string phone, string password)
-    {
-        var normalizedName = fullName.Trim();
-        var normalizedEmail = email.Trim();
-        var normalizedPhone = phone.Trim();
-
-        if (string.IsNullOrWhiteSpace(normalizedName))
-        {
-            return StudentRegistrationResult.Fail("Họ và tên là bắt buộc.");
-        }
-
-        if (string.IsNullOrWhiteSpace(normalizedEmail))
-        {
-            return StudentRegistrationResult.Fail("Email là bắt buộc.");
-        }
-
-        var emailExists = await _dbContext.Students.AnyAsync(x => !x.IsDeleted && x.Email == normalizedEmail) ||
-                          await _dbContext.Accounts.AnyAsync(x => !x.IsDeleted && x.Email == normalizedEmail);
-
-        if (emailExists)
-        {
-            return StudentRegistrationResult.Fail("Email này đã tồn tại trong cơ sở dữ liệu.");
-        }
-
-        try
-        {
-            var studentCodes = await _dbContext.Students
-                .AsNoTracking()
-                .Where(x => x.StudentCode.StartsWith("S"))
-                .Select(x => x.StudentCode)
-                .ToListAsync();
-
-            var nextStudentNumber = studentCodes
-                .Select(code => int.TryParse(code[1..], out var value) ? value : 0)
-                .DefaultIfEmpty(0)
-                .Max();
-
-            var nextStudentCode = $"S{nextStudentNumber + 1:000}";
-
-            _dbContext.Students.Add(new StudentEntity
-            {
-                StudentCode = nextStudentCode,
-                FullName = normalizedName,
-                Email = normalizedEmail,
-                Phone = string.IsNullOrWhiteSpace(normalizedPhone) ? null : normalizedPhone,
-                Status = 1,
-                IsDeleted = false,
-                CreatedAt = DateTime.Now
-            });
-
-            await _dbContext.SaveChangesAsync();
-            return StudentRegistrationResult.Success($"Đăng ký thành công. Học viên {nextStudentCode} đã được tạo trong cơ sở dữ liệu.", nextStudentCode);
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "Could not register student with email {Email}.", normalizedEmail);
-            return StudentRegistrationResult.Fail("Không thể tạo học viên mới trong cơ sở dữ liệu.");
-        }
-    }
-
     private static string ResolveDepartment(string role, string? email, IReadOnlyDictionary<string, string> teacherSpecializations)
     {
         if (!string.IsNullOrWhiteSpace(email) &&

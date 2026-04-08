@@ -93,6 +93,14 @@ public sealed class EfLanguageCenterReadService : ILanguageCenterReadService
                 var totalFee = enrollment?.FinalFee ?? 0m;
                 var paidAmount = enrollment?.Receipts.Sum(x => x.Amount) ?? 0m;
                 var debtAmount = Math.Max(0m, totalFee - paidAmount);
+                var isConsultationLead = EfServiceMapper.IsConsultationLead(student.StudentCode);
+                var courseName = enrollment?.Class.Course.CourseName
+                    ?? (isConsultationLead ? "Chưa xác định" : string.Empty);
+                var classCode = enrollment?.Class.ClassCode
+                    ?? (isConsultationLead ? "Chưa xếp lớp" : string.Empty);
+                var level = enrollment is not null
+                    ? EfServiceMapper.InferCourseLevel(enrollment.Class.Course.CourseName)
+                    : isConsultationLead ? "Chờ tư vấn đầu vào" : "Tổng hợp";
 
                 return new Student
                 {
@@ -101,10 +109,11 @@ public sealed class EfLanguageCenterReadService : ILanguageCenterReadService
                     FullName = student.FullName,
                     Email = student.Email ?? string.Empty,
                     Phone = student.Phone ?? string.Empty,
-                    Level = EfServiceMapper.InferCourseLevel(enrollment?.Class.Course.CourseName ?? string.Empty),
-                    Status = EfServiceMapper.MapStudentStatus(enrollment?.Status, enrollment?.Class.StartDate, enrollment?.Class.EndDate, student.Status),
-                    CourseName = enrollment?.Class.Course.CourseName ?? string.Empty,
-                    ClassCode = enrollment?.Class.ClassCode ?? string.Empty,
+                    Address = student.Address ?? string.Empty,
+                    Level = level,
+                    Status = EfServiceMapper.MapStudentStatus(student.StudentCode, enrollment?.Status, enrollment?.Class.StartDate, enrollment?.Class.EndDate, student.Status),
+                    CourseName = courseName,
+                    ClassCode = classCode,
                     JoinedOn = enrollment?.EnrollDate ?? student.CreatedAt,
                     TuitionFee = totalFee,
                     PaidAmount = paidAmount,

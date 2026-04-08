@@ -6,5 +6,4 @@ public interface IAccountAuthService
 {
     Task<IReadOnlyList<DemoAccount>> GetDemoAccountsAsync();
     Task<DemoAccount?> ValidateLoginAsync(string email, string password);
-    Task<StudentRegistrationResult> RegisterStudentAsync(string fullName, string email, string phone, string password);
 }

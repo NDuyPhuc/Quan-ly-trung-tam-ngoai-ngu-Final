@@ -1,26 +1,31 @@
-@model RegisterViewModel
+@model ConsultationRequestViewModel
 
 <section class="auth-showcase-section">
     <div class="container">
         <div class="auth-showcase-layout">
             <div class="auth-showcase-visual register">
-                <img src="@AppUi.PublicImageUrl("register")" alt="Minh họa đăng ký NorthStar English" />
+                <img src="@AppUi.PublicImageUrl("register")" alt="Minh họa đăng ký tư vấn NorthStar English" />
                 <div class="auth-showcase-overlay">
-                    <span class="auth-spotlight-pill">Hành trình học tập mới</span>
-                    <h1>Tạo tài khoản để bắt đầu lộ trình cùng NorthStar English</h1>
-                    <p>Biểu mẫu đăng ký được làm lại theo bố cục hiện đại, nhiều khoảng thở và phần minh họa lớn giống tinh thần của giao diện mẫu.</p>
+                    <span class="auth-spotlight-pill">Tư vấn đầu vào</span>
+                    <h1>Để lại thông tin để trung tâm ghi nhận hồ sơ tư vấn</h1>
+                    <p>Biểu mẫu này dùng để tiếp nhận nhu cầu học, lịch học mong muốn và thông tin liên hệ. Đây không phải là nơi tạo tài khoản để đăng nhập vào web quản trị.</p>
                     <div class="auth-benefit-list">
-                        <div><i class="bi bi-check-circle-fill"></i>Giữ nguyên tất cả trường dữ liệu hiện có</div>
-                        <div><i class="bi bi-check-circle-fill"></i>Trình bày rõ ràng hơn cho học viên mới</div>
-                        <div><i class="bi bi-check-circle-fill"></i>Đồng bộ ngôn ngữ với toàn bộ trang công khai</div>
+                        <div><i class="bi bi-check-circle-fill"></i>Ghi nhận lead tư vấn vào hệ thống nội bộ</div>
+                        <div><i class="bi bi-check-circle-fill"></i>Phù hợp với website quản trị của trung tâm</div>
+                        <div><i class="bi bi-check-circle-fill"></i>Nhân viên có thể theo dõi và gọi lại để xếp lớp</div>
                     </div>
                 </div>
             </div>
 
             <div class="auth-showcase-card">
-                <span class="auth-card-kicker">Tạo tài khoản mới</span>
+                <span class="auth-card-kicker">Đăng ký tư vấn</span>
                 <h2>@Model.Title</h2>
                 <p class="page-subtitle">@Model.Subtitle</p>
+
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+                {
+                    <div class="alert alert-warning">@ViewData.ModelState[string.Empty]!.Errors.First().ErrorMessage</div>
+                }
 
                 <form asp-action="Register" method="post" class="row g-4">
                     <div class="col-md-6">
@@ -39,22 +44,52 @@
                         <span asp-validation-for="Email" class="text-danger small"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Password" class="form-label"></label>
-                        <input asp-for="Password" class="form-control" placeholder="********" />
-                        <span asp-validation-for="Password" class="text-danger small"></span>
+                        <label asp-for="PreferredProgram" class="form-label"></label>
+                        <select asp-for="PreferredProgram" class="form-select">
+                            <option value="">Chọn khóa học quan tâm</option>
+                            <option value="Tiếng Anh cơ bản">Tiếng Anh cơ bản</option>
+                            <option value="IELTS Foundation">IELTS Foundation</option>
+                            <option value="IELTS Intensive">IELTS Intensive</option>
+                            <option value="TOEIC 650+">TOEIC 650+</option>
+                            <option value="TOEIC 900+">TOEIC 900+</option>
+                            <option value="Business English">Business English</option>
+                            <option value="Kids Starter">Kids Starter</option>
+                            <option value="Speaking Foundation">Speaking Foundation</option>
+                        </select>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="ConfirmPassword" class="form-label"></label>
-                        <input asp-for="ConfirmPassword" class="form-control" placeholder="********" />
-                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        <label asp-for="PreferredSchedule" class="form-label"></label>
+                        <select asp-for="PreferredSchedule" class="form-select">
+                            <option value="">Chọn khung giờ mong muốn</option>
+                            <option value="Sáng">Sáng</option>
+                            <option value="Chiều">Chiều</option>
+                            <option value="Tối">Tối</option>
+                            <option value="Cuối tuần">Cuối tuần</option>
+                            <option value="Linh hoạt">Linh hoạt theo tư vấn</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="PreferredContactMethod" class="form-label"></label>
+                        <select asp-for="PreferredContactMethod" class="form-select">
+                            <option value="">Chọn cách liên hệ</option>
+                            <option value="Phone">Gọi điện</option>
+                            <option value="Email">Email</option>
+                            <option value="Zalo">Zalo</option>
+                        </select>
+                        <span asp-validation-for="PreferredContactMethod" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Message" class="form-label"></label>
+                        <textarea asp-for="Message" rows="5" class="form-control" placeholder="Mô tả mục tiêu học, thời gian mong muốn bắt đầu hoặc nhu cầu cần trung tâm tư vấn..."></textarea>
+                        <span asp-validation-for="Message" class="text-danger small"></span>
                     </div>
                     <div class="col-12 d-flex flex-wrap gap-2">
-                        <button class="btn btn-primary auth-submit-btn" type="submit">Tạo tài khoản <i class="bi bi-arrow-right"></i></button>
-                        <a class="btn btn-outline-primary" asp-action="Login">Quay lại đăng nhập</a>
+                        <button class="btn btn-primary auth-submit-btn" type="submit">Gửi hồ sơ tư vấn <i class="bi bi-arrow-right"></i></button>
+                        <a class="btn btn-outline-primary" asp-action="Login">Quay lại đăng nhập nội bộ</a>
                     </div>
                 </form>
 
-                <p class="auth-switch-copy">Đã có tài khoản? <a asp-action="Login">Đăng nhập ngay</a></p>
+                <p class="auth-switch-copy">Bạn là nhân sự trung tâm? <a asp-action="Login">Đăng nhập khu quản trị</a></p>
             </div>
         </div>
     </div>

@@ -29,7 +29,7 @@
         <select asp-for="Topic" id="contact-topic" class="form-select" required>
             <option value="">Chọn nhu cầu</option>
             <option value="Tư vấn lộ trình">Tư vấn lộ trình</option>
-            <option value="Đăng ký khóa học">Đăng ký khóa học</option>
+            <option value="Tư vấn nhập học">Tư vấn nhập học</option>
             <option value="Tư vấn xếp lớp">Tư vấn xếp lớp</option>
             <option value="Học phí">Học phí và ưu đãi</option>
             <option value="Hợp tác">Hợp tác / doanh nghiệp</option>
@@ -89,6 +89,6 @@
     </div>
     <div class="col-12 d-flex flex-wrap gap-3 align-items-center">
         <button class="btn btn-primary" type="submit">@submitLabel</button>
-        <span class="contact-form-note">Thông tin sẽ được gửi đến hộp thư tư vấn `@supportEmail` sau khi SMTP được cấu hình đầy đủ.</span>
+        <span class="contact-form-note">Hồ sơ sẽ được ghi nhận vào hệ thống tư vấn nội bộ và lưu trong danh sách học viên tiềm năng để bộ phận tuyển sinh theo dõi. Nếu SMTP được cấu hình đầy đủ, thông tin cũng sẽ được gửi thêm tới `@supportEmail`.</span>
     </div>
 </form>

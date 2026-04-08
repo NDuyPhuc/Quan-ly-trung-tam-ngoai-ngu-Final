@@ -113,7 +113,7 @@ public class ContactController : Controller
     private static void ApplyPageMeta(ContactViewModel model)
     {
         model.Title = "Liên hệ";
-        model.Subtitle = "Để lại thông tin để trung tâm tư vấn lộ trình phù hợp và liên hệ lại đúng nhu cầu.";
+        model.Subtitle = "Để lại thông tin để trung tâm ghi nhận hồ sơ tư vấn và liên hệ lại đúng nhu cầu.";
         model.Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Liên hệ", IsActive = true }];
     }
 

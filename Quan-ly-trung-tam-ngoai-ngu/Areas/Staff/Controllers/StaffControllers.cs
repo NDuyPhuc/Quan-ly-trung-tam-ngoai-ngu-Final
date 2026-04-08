@@ -13,21 +13,41 @@ public class DashboardController : StaffControllerBase
 
     public IActionResult Index()
     {
+        var students = DataService.GetStudents();
+        var consultationLeads = students
+            .Where(x => x.Status == "Chờ tư vấn" || x.Code.StartsWith("TV", StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(x => x.JoinedOn)
+            .ToList();
+
         return DashboardView(new DashboardPageViewModel
         {
             Title = "Bảng điều khiển giáo vụ",
-            Subtitle = "Theo dõi học viên, ghi danh, học phí và xếp lớp trên cùng một giao diện.",
+            Subtitle = "Theo dõi học viên, hồ sơ tư vấn từ website, ghi danh, học phí và xếp lớp trên cùng một giao diện.",
             Breadcrumbs = Breadcrumbs("Tổng quan"),
             RoleName = "Giáo vụ",
             SummaryCards =
             [
-                new SummaryCardViewModel { Title = "Học viên", Value = DataService.GetStudents().Count.ToString(), Description = "Tổng hồ sơ hiện có", Icon = "bi-people", AccentClass = "primary" },
+                new SummaryCardViewModel { Title = "Học viên", Value = students.Count.ToString(), Description = "Tổng hồ sơ hiện có", Icon = "bi-people", AccentClass = "primary" },
+                new SummaryCardViewModel { Title = "Hồ sơ tư vấn web", Value = consultationLeads.Count.ToString(), Description = "Khách đã để lại thông tin cần tiếp nhận", Icon = "bi-person-heart", AccentClass = "warning" },
                 new SummaryCardViewModel { Title = "Ghi danh", Value = DataService.GetEnrollments().Count.ToString(), Description = "Danh sách ghi danh đang theo dõi", Icon = "bi-journal-check", AccentClass = "info" },
                 new SummaryCardViewModel { Title = "Khoản thu", Value = AppUi.Currency(DataService.GetReceipts().Sum(x => x.Amount)), Description = "Tổng biên nhận hiện có", Icon = "bi-cash-stack", AccentClass = "success" },
                 new SummaryCardViewModel { Title = "Công nợ", Value = DataService.GetDebts().Count.ToString(), Description = "Học viên còn nợ học phí", Icon = "bi-wallet2", AccentClass = "danger" }
             ],
             Panels =
             [
+                new DashboardPanelViewModel
+                {
+                    Title = "Hồ sơ tư vấn mới từ website",
+                    Subtitle = consultationLeads.Any() ? "Giáo vụ có thể mở hồ sơ, cập nhật thông tin và ghi danh trực tiếp." : "Chưa có hồ sơ tư vấn mới cần xử lý.",
+                    Items = consultationLeads.Take(5).Select(x => new PanelItemViewModel
+                    {
+                        Title = x.FullName,
+                        Meta = $"{x.Code} • {x.Phone}",
+                        Value = string.IsNullOrWhiteSpace(x.Level) ? "Chờ xử lý" : x.Level,
+                        BadgeText = x.Status,
+                        BadgeClass = AppUi.StatusBadgeClass(x.Status)
+                    }).ToList()
+                },
                 new DashboardPanelViewModel
                 {
                     Title = "Lớp sắp khai giảng",
@@ -46,7 +66,8 @@ public class DashboardController : StaffControllerBase
             ],
             QuickActions =
             [
-                new QuickActionViewModel { Label = "Thêm học viên", Url = "/Staff/Students/Create", Icon = "bi-person-plus" },
+                new QuickActionViewModel { Label = "Hồ sơ tư vấn", Url = "/Staff/Students", Icon = "bi-person-heart" },
+                new QuickActionViewModel { Label = "Thêm học viên", Url = "/Staff/Students/Create", Icon = "bi-person-plus", CssClass = "btn btn-outline-primary" },
                 new QuickActionViewModel { Label = "Ghi danh", Url = "/Staff/Enrollments/Create", Icon = "bi-journal-check", CssClass = "btn btn-outline-primary" },
                 new QuickActionViewModel { Label = "Thu học phí", Url = "/Staff/Receipts/Create", Icon = "bi-receipt", CssClass = "btn btn-outline-dark" },
                 new QuickActionViewModel { Label = "Xem công nợ", Url = "/Staff/Debts", Icon = "bi-wallet2", CssClass = "btn btn-outline-danger" }
@@ -66,19 +87,27 @@ public class StudentsController : StaffControllerBase
 
     public IActionResult Index()
     {
-        var students = DataService.GetStudents();
+        var students = DataService.GetStudents()
+            .OrderByDescending(x => x.Status == "Chờ tư vấn" || x.Code.StartsWith("TV", StringComparison.OrdinalIgnoreCase))
+            .ThenByDescending(x => x.JoinedOn)
+            .ToList();
+        var consultationLeads = students
+            .Where(x => x.Status == "Chờ tư vấn" || x.Code.StartsWith("TV", StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
         return ManagementListView(new ManagementListPageViewModel
         {
-            Title = "Học viên",
-            Subtitle = "Quản lý hồ sơ cá nhân, tình trạng học tập và công nợ học phí cho học viên.",
+            Title = "Học viên và hồ sơ tư vấn",
+            Subtitle = "Giáo vụ theo dõi cả học viên chính thức và khách đã để lại thông tin tư vấn từ website trong cùng một danh sách.",
             Breadcrumbs = Breadcrumbs("Học viên"),
             PrimaryActionText = "Thêm học viên",
             PrimaryActionUrl = "/Staff/Students/Create",
             SearchPlaceholder = "Tìm theo mã, họ tên, email hoặc số điện thoại...",
+            ToolbarNote = "Khách nhập form công khai sẽ được lưu vào Students với mã TV... và trạng thái Chờ tư vấn. Khi giáo vụ tạo ghi danh đầu tiên cho hồ sơ này, hệ thống sẽ tự chuyển sang mã học viên chính thức S...",
             SummaryCards =
             [
-                new SummaryCardViewModel { Title = "Tổng học viên", Value = students.Count.ToString(), Description = "Số hồ sơ đang quản lý", Icon = "bi-people", AccentClass = "primary" },
+                new SummaryCardViewModel { Title = "Tổng hồ sơ", Value = students.Count.ToString(), Description = "Bao gồm cả lead tư vấn và học viên", Icon = "bi-people", AccentClass = "primary" },
+                new SummaryCardViewModel { Title = "Chờ tư vấn", Value = consultationLeads.Count.ToString(), Description = "Khách gửi từ form website", Icon = "bi-person-heart", AccentClass = "warning" },
                 new SummaryCardViewModel { Title = "Đang học", Value = students.Count(x => x.Status == "Đang học" || x.Status == "Đã xếp lớp").ToString(), Description = "Học viên đang có lộ trình học", Icon = "bi-person-check", AccentClass = "success" },
                 new SummaryCardViewModel { Title = "Còn công nợ", Value = students.Count(x => x.DebtAmount > 0).ToString(), Description = "Cần theo dõi thanh toán", Icon = "bi-wallet2", AccentClass = "danger" }
             ],
@@ -86,28 +115,44 @@ public class StudentsController : StaffControllerBase
             {
                 Columns =
                 [
-                    new() { Header = "Học viên" },
-                    new() { Header = "Lớp hiện tại" },
+                    new() { Header = "Học viên / lead" },
+                    new() { Header = "Học tập / tư vấn" },
                     new() { Header = "Liên hệ" },
                     new() { Header = "Trạng thái" },
-                    new() { Header = "Thao tác", Width = "220px" }
+                    new() { Header = "Thao tác", Width = "260px" }
                 ],
-                Rows = students.Select(student => new TableRowViewModel
+                Rows = students.Select(student =>
                 {
-                    Id = student.Id.ToString(),
-                    Cells =
-                    [
-                        new() { Html = $"<strong>{student.FullName}</strong><div class='text-muted small'>{student.Code} • {student.Email}</div>" },
-                        new() { Html = $"{student.CourseName}<div class='text-muted small'>{student.ClassCode}</div>" },
-                        new() { Html = $"{student.Phone}<div class='text-muted small'>{(student.DebtAmount > 0 ? AppUi.Currency(student.DebtAmount) : "Đã đủ học phí")}</div>" },
-                        new() { Html = AppUi.StatusBadge(student.Status) },
-                        new() { Html = string.Empty }
-                    ],
-                    Actions =
-                    [
+                    var isConsultationLead = student.Status == "Chờ tư vấn" || student.Code.StartsWith("TV", StringComparison.OrdinalIgnoreCase);
+                    var noteText = string.IsNullOrWhiteSpace(student.Address) ? string.Empty : System.Net.WebUtility.HtmlEncode(student.Address);
+                    var contactSubLine = student.DebtAmount > 0
+                        ? AppUi.Currency(student.DebtAmount)
+                        : isConsultationLead ? "Hồ sơ từ form website" : "Đã đủ học phí";
+
+                    var actions = new List<TableRowActionViewModel>
+                    {
                         new() { Label = "Chi tiết", Url = $"/Staff/Students/Details/{student.Id}", Icon = "bi-eye" },
-                        new() { Label = "Sửa", Url = $"/Staff/Students/Edit/{student.Id}", Icon = "bi-pencil-square", CssClass = "btn btn-sm btn-outline-secondary" }
-                    ]
+                        new() { Label = isConsultationLead ? "Tiếp nhận" : "Sửa", Url = $"/Staff/Students/Edit/{student.Id}", Icon = "bi-pencil-square", CssClass = "btn btn-sm btn-outline-secondary" }
+                    };
+
+                    if (isConsultationLead)
+                    {
+                        actions.Add(new TableRowActionViewModel { Label = "Ghi danh", Url = $"/Staff/Enrollments/Create?studentCode={Uri.EscapeDataString(student.Code)}", Icon = "bi-journal-check", CssClass = "btn btn-sm btn-outline-primary" });
+                    }
+
+                    return new TableRowViewModel
+                    {
+                        Id = student.Id.ToString(),
+                        Cells =
+                        [
+                            new() { Html = $"<strong>{student.FullName}</strong><div class='text-muted small'>{student.Code} • {student.Email}</div>" },
+                            new() { Html = isConsultationLead ? $"Hồ sơ tư vấn từ website<div class='text-muted small'>{noteText}</div>" : $"{student.CourseName}<div class='text-muted small'>{student.ClassCode}</div>" },
+                            new() { Html = $"{student.Phone}<div class='text-muted small'>{contactSubLine}</div>" },
+                            new() { Html = AppUi.StatusBadge(student.Status) },
+                            new() { Html = string.Empty }
+                        ],
+                        Actions = actions
+                    };
                 }).ToList()
             }
         });
@@ -116,7 +161,11 @@ public class StudentsController : StaffControllerBase
     [HttpGet]
     public IActionResult Create()
     {
-        return ManagementFormView(BuildStudentForm("Thêm học viên", "/Staff/Students/Create", new StudentInput()));
+        return ManagementFormView(BuildStudentForm(
+            title: "Thêm học viên",
+            actionUrl: "/Staff/Students/Create",
+            input: new StudentInput { StudentCode = GetNextOfficialStudentCodePreview() },
+            isCreate: true));
     }
 
     [HttpPost]
@@ -126,7 +175,8 @@ public class StudentsController : StaffControllerBase
         var result = _managementService.SaveStudent(null, input);
         if (!result.Succeeded)
         {
-            return ManagementFormView(BuildStudentForm("Thêm học viên", "/Staff/Students/Create", input, result.Message));
+            input.StudentCode = GetNextOfficialStudentCodePreview();
+            return ManagementFormView(BuildStudentForm("Thêm học viên", "/Staff/Students/Create", input, isCreate: true, errorMessage: result.Message));
         }
 
         SetToast(result.Message);
@@ -143,7 +193,7 @@ public class StudentsController : StaffControllerBase
             return RedirectToAction(nameof(Index));
         }
 
-        return ManagementFormView(BuildStudentForm("Cập nhật học viên", $"/Staff/Students/Edit/{id}", input));
+        return ManagementFormView(BuildStudentForm("Cập nhật học viên", $"/Staff/Students/Edit/{id}", input, isCreate: false));
     }
 
     [HttpPost]
@@ -153,7 +203,7 @@ public class StudentsController : StaffControllerBase
         var result = _managementService.SaveStudent(id, input);
         if (!result.Succeeded)
         {
-            return ManagementFormView(BuildStudentForm("Cập nhật học viên", $"/Staff/Students/Edit/{id}", input, result.Message));
+            return ManagementFormView(BuildStudentForm("Cập nhật học viên", $"/Staff/Students/Edit/{id}", input, isCreate: false, errorMessage: result.Message));
         }
 
         SetToast(result.Message);
@@ -169,6 +219,7 @@ public class StudentsController : StaffControllerBase
             return RedirectToAction(nameof(Index));
         }
 
+        var isConsultationLead = student.Status == "Chờ tư vấn" || student.Code.StartsWith("TV", StringComparison.OrdinalIgnoreCase);
         var histories = DataService.GetEnrollments()
             .Where(x => string.Equals(x.StudentName, student.FullName, StringComparison.OrdinalIgnoreCase))
             .OrderByDescending(x => x.EnrolledOn)
@@ -181,12 +232,14 @@ public class StudentsController : StaffControllerBase
 
         return ManagementDetailsView(new ManagementDetailsPageViewModel
         {
-            Title = $"Học viên {student.FullName}",
-            Subtitle = "Theo dõi hồ sơ cá nhân và lịch sử đăng ký học của học viên.",
-            Breadcrumbs = Breadcrumbs("Chi tiết học viên", "Học viên", "/Staff/Students"),
+            Title = isConsultationLead ? $"Hồ sơ tư vấn {student.FullName}" : $"Học viên {student.FullName}",
+            Subtitle = isConsultationLead
+                ? "Khách đã để lại thông tin từ website. Giáo vụ có thể cập nhật hồ sơ hoặc tạo ghi danh trực tiếp từ đây."
+                : "Theo dõi hồ sơ cá nhân và lịch sử đăng ký học của học viên.",
+            Breadcrumbs = Breadcrumbs(isConsultationLead ? "Chi tiết hồ sơ tư vấn" : "Chi tiết học viên", "Học viên", "/Staff/Students"),
             SummaryCards =
             [
-                new SummaryCardViewModel { Title = "Trạng thái", Value = student.Status, Description = "Tình trạng học tập hiện tại", Icon = "bi-person-check", AccentClass = "primary" },
+                new SummaryCardViewModel { Title = "Trạng thái", Value = student.Status, Description = isConsultationLead ? "Hồ sơ đang chờ giáo vụ tiếp nhận" : "Tình trạng học tập hiện tại", Icon = "bi-person-check", AccentClass = "primary" },
                 new SummaryCardViewModel { Title = "Đã đóng", Value = AppUi.Currency(student.PaidAmount), Description = "Tổng học phí đã ghi nhận", Icon = "bi-cash-stack", AccentClass = "success" },
                 new SummaryCardViewModel { Title = "Còn nợ", Value = AppUi.Currency(student.DebtAmount), Description = debt is null ? "Không còn công nợ cần theo dõi" : $"Hạn theo dõi {debt.DueDate:dd/MM/yyyy}", Icon = "bi-wallet2", AccentClass = "danger" }
             ],
@@ -197,20 +250,20 @@ public class StudentsController : StaffControllerBase
                     Title = "Thông tin cá nhân",
                     Items =
                     [
-                        new() { Label = "Mã học viên", Value = student.Code },
+                        new() { Label = isConsultationLead ? "Mã hồ sơ tư vấn" : "Mã học viên", Value = student.Code },
                         new() { Label = "Email", Value = student.Email },
                         new() { Label = "Số điện thoại", Value = student.Phone },
-                        new() { Label = "Trình độ", Value = student.Level }
+                        new() { Label = isConsultationLead ? "Ghi chú tư vấn" : "Địa chỉ / ghi chú", Value = string.IsNullOrWhiteSpace(student.Address) ? "Chưa cập nhật" : student.Address }
                     ]
                 },
                 new DetailSectionViewModel
                 {
-                    Title = "Thông tin học tập",
+                    Title = isConsultationLead ? "Tình trạng xử lý" : "Thông tin học tập",
                     Items =
                     [
-                        new() { Label = "Khóa học hiện tại", Value = student.CourseName },
-                        new() { Label = "Lớp hiện tại", Value = student.ClassCode },
-                        new() { Label = "Ngày vào học", Value = student.JoinedOn.ToString("dd/MM/yyyy") },
+                        new() { Label = isConsultationLead ? "Lộ trình" : "Khóa học hiện tại", Value = string.IsNullOrWhiteSpace(student.CourseName) ? "Chưa xác định" : student.CourseName },
+                        new() { Label = isConsultationLead ? "Xếp lớp" : "Lớp hiện tại", Value = string.IsNullOrWhiteSpace(student.ClassCode) ? "Chưa xếp lớp" : student.ClassCode },
+                        new() { Label = isConsultationLead ? "Ngày ghi nhận" : "Ngày vào học", Value = student.JoinedOn.ToString("dd/MM/yyyy") },
                         new() { Label = "Trạng thái", Value = student.Status, IsBadge = true, BadgeClass = AppUi.StatusBadgeClass(student.Status) }
                     ]
                 }
@@ -222,27 +275,44 @@ public class StudentsController : StaffControllerBase
                 Description = $"{item.Status} • {item.PaymentStatus} • Đã thu {AppUi.Currency(item.PaidAmount)}",
                 AccentClass = item.PaymentStatus == "Đã thanh toán" ? "success" : "warning"
             }).ToList(),
-            Actions =
-            [
-                new QuickActionViewModel { Label = "Sửa hồ sơ", Url = $"/Staff/Students/Edit/{id}", Icon = "bi-pencil-square" },
-                new QuickActionViewModel { Label = "Quay lại", Url = "/Staff/Students", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
-            ]
+            Actions = isConsultationLead
+                ?
+                [
+                    new QuickActionViewModel { Label = "Tiếp nhận hồ sơ", Url = $"/Staff/Students/Edit/{id}", Icon = "bi-pencil-square" },
+                    new QuickActionViewModel { Label = "Tạo ghi danh", Url = $"/Staff/Enrollments/Create?studentCode={Uri.EscapeDataString(student.Code)}", Icon = "bi-journal-check", CssClass = "btn btn-outline-primary" },
+                    new QuickActionViewModel { Label = "Quay lại", Url = "/Staff/Students", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
+                ]
+                :
+                [
+                    new QuickActionViewModel { Label = "Sửa hồ sơ", Url = $"/Staff/Students/Edit/{id}", Icon = "bi-pencil-square" },
+                    new QuickActionViewModel { Label = "Quay lại", Url = "/Staff/Students", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
+                ]
         });
     }
 
-    private static ManagementFormPageViewModel BuildStudentForm(string title, string actionUrl, StudentInput input, string? errorMessage = null)
+    private ManagementFormPageViewModel BuildStudentForm(string title, string actionUrl, StudentInput input, bool isCreate, string? errorMessage = null)
     {
+        var isConsultationLead = !isCreate && input.StudentCode.StartsWith("TV", StringComparison.OrdinalIgnoreCase);
+        var displayedCode = isCreate ? GetNextOfficialStudentCodePreview() : input.StudentCode;
+
         return new ManagementFormPageViewModel
         {
             Title = title,
             Subtitle = "Biểu mẫu nghiệp vụ dành cho giáo vụ.",
             Breadcrumbs = Breadcrumbs(title, "Học viên", "/Staff/Students"),
             FormTitle = title,
-            FormDescription = "Thông tin sẽ được lưu trực tiếp xuống bảng Students.",
+            FormDescription = isCreate
+                ? "Thông tin sẽ được lưu trực tiếp xuống bảng Students. Mã học viên S... sẽ được hệ thống tự sinh khi lưu."
+                : "Thông tin sẽ được cập nhật trực tiếp trong bảng Students.",
             FormActionUrl = actionUrl,
             CancelUrl = "/Staff/Students",
             SubmitLabel = "Lưu học viên",
             ErrorMessage = errorMessage,
+            Notice = isCreate
+                ? "Không cần nhập mã học viên thủ công. Hệ thống tự sinh mã chính thức theo dạng S... để tránh trùng lặp."
+                : isConsultationLead
+                    ? "Đây là hồ sơ tư vấn từ website với mã TV... Khi giáo vụ tạo ghi danh đầu tiên, hệ thống sẽ tự chuyển sang mã học viên chính thức S...."
+                    : "Mã học viên là mã hệ thống, chỉ hiển thị để đối chiếu và không cho chỉnh tay.",
             Sections =
             [
                 new FormSectionViewModel
@@ -250,7 +320,7 @@ public class StudentsController : StaffControllerBase
                     Title = "Thông tin học viên",
                     Fields =
                     [
-                        new() { Label = "Mã học viên", Name = "StudentCode", Value = input.StudentCode, Required = true },
+                        new() { Label = isConsultationLead ? "Mã hồ sơ tư vấn" : "Mã học viên", Name = "StudentCode", Value = displayedCode, ReadOnly = true, Hint = isCreate ? "Mã chính thức sẽ được hệ thống tự sinh khi bấm Lưu học viên." : "Mã này do hệ thống quản lý để tránh trùng lặp.", Required = false },
                         new() { Label = "Họ và tên", Name = "FullName", Value = input.FullName, Required = true },
                         new() { Label = "Ngày sinh", Name = "DateOfBirth", Value = input.DateOfBirth?.ToString("yyyy-MM-dd") ?? string.Empty, Type = "date" },
                         new()
@@ -268,7 +338,7 @@ public class StudentsController : StaffControllerBase
                         },
                         new() { Label = "Email", Name = "Email", Value = input.Email, Type = "email" },
                         new() { Label = "Số điện thoại", Name = "Phone", Value = input.Phone },
-                        new() { Label = "Địa chỉ", Name = "Address", Value = input.Address, Type = "textarea", ColClass = "col-12" },
+                        new() { Label = isConsultationLead ? "Ghi chú tư vấn / nhu cầu" : "Địa chỉ", Name = "Address", Value = input.Address, Type = "textarea", ColClass = "col-12" },
                         new()
                         {
                             Label = "Trạng thái",
@@ -277,7 +347,7 @@ public class StudentsController : StaffControllerBase
                             Required = true,
                             Options =
                             [
-                                new SelectOptionViewModel { Label = "Đang hoạt động", Value = "true", Selected = input.IsActive },
+                                new SelectOptionViewModel { Label = isConsultationLead ? "Chờ tiếp nhận" : "Đang hoạt động", Value = "true", Selected = input.IsActive },
                                 new SelectOptionViewModel { Label = "Tạm khóa", Value = "false", Selected = !input.IsActive }
                             ]
                         }
@@ -285,6 +355,18 @@ public class StudentsController : StaffControllerBase
                 }
             ]
         };
+    }
+
+    private string GetNextOfficialStudentCodePreview()
+    {
+        var nextNumber = DataService.GetStudents()
+            .Select(x => x.Code)
+            .Where(code => code.StartsWith("S", StringComparison.OrdinalIgnoreCase))
+            .Select(code => int.TryParse(code[1..], out var value) ? value : 0)
+            .DefaultIfEmpty(0)
+            .Max() + 1;
+
+        return $"S{nextNumber:000}";
     }
 }
 
@@ -347,9 +429,14 @@ public class EnrollmentsController : StaffControllerBase
     }
 
     [HttpGet]
-    public IActionResult Create()
+    public IActionResult Create(string? studentCode)
     {
-        return ManagementFormView(BuildEnrollmentForm("Ghi danh học viên", "/Staff/Enrollments/Create", new EnrollmentInput { EnrollDate = DateTime.Today, Status = "DangHoc" }));
+        return ManagementFormView(BuildEnrollmentForm("Ghi danh học viên", "/Staff/Enrollments/Create", new EnrollmentInput
+        {
+            EnrollDate = DateTime.Today,
+            Status = "DangHoc",
+            StudentCode = studentCode ?? string.Empty
+        }));
     }
 
     [HttpPost]
@@ -470,7 +557,9 @@ public class EnrollmentsController : StaffControllerBase
     {
         var studentOptions = DataService.GetStudents().Select(student => new SelectOptionViewModel
         {
-            Label = $"{student.Code} - {student.FullName}",
+            Label = student.Code.StartsWith("TV", StringComparison.OrdinalIgnoreCase)
+                ? $"{student.Code} - {student.FullName} (hồ sơ tư vấn web)"
+                : $"{student.Code} - {student.FullName}",
             Value = student.Code,
             Selected = student.Code == input.StudentCode
         }).ToList();
@@ -493,6 +582,9 @@ public class EnrollmentsController : StaffControllerBase
             CancelUrl = "/Staff/Enrollments",
             SubmitLabel = "Lưu ghi danh",
             ErrorMessage = errorMessage,
+            Notice = input.StudentCode.StartsWith("TV", StringComparison.OrdinalIgnoreCase)
+                ? "Bạn đang tạo ghi danh cho một hồ sơ tư vấn từ website. Khi lưu, hệ thống sẽ tự chuyển mã TV... sang mã học viên chính thức S...."
+                : null,
             Sections =
             [
                 new FormSectionViewModel
@@ -941,3 +1033,5 @@ public class ReceiptsController : StaffControllerBase
         };
     }
 }
+
+

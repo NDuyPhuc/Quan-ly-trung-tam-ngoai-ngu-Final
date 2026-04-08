@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Quan_ly_trung_tam_ngoai_ngu.Infrastructure;
+using Quan_ly_trung_tam_ngoai_ngu.Models;
 using Quan_ly_trung_tam_ngoai_ngu.Services.Interfaces;
 using Quan_ly_trung_tam_ngoai_ngu.ViewModels.Common;
 using Quan_ly_trung_tam_ngoai_ngu.ViewModels.Public;
@@ -12,11 +13,16 @@ namespace Quan_ly_trung_tam_ngoai_ngu.Controllers;
 public class AccountController : Controller
 {
     private readonly IAccountAuthService _authService;
+    private readonly IContactMessageService _contactMessageService;
     private readonly ILogger<AccountController> _logger;
 
-    public AccountController(IAccountAuthService authService, ILogger<AccountController> logger)
+    public AccountController(
+        IAccountAuthService authService,
+        IContactMessageService contactMessageService,
+        ILogger<AccountController> logger)
     {
         _authService = authService;
+        _contactMessageService = contactMessageService;
         _logger = logger;
     }
 
@@ -31,7 +37,7 @@ public class AccountController : Controller
     public async Task<IActionResult> Login(LoginViewModel model)
     {
         model.Title = "Đăng nhập";
-        model.Subtitle = "Đăng nhập bằng tài khoản đang lưu trong cơ sở dữ liệu để truy cập đúng khu vực quản trị.";
+        model.Subtitle = "Đăng nhập bằng tài khoản nội bộ đang lưu trong cơ sở dữ liệu để truy cập đúng khu vực quản trị.";
         model.Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Đăng nhập", IsActive = true }];
 
         if (!ModelState.IsValid)
@@ -86,37 +92,56 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Register()
     {
-        return View(new RegisterViewModel
-        {
-            Title = "Đăng ký",
-            Subtitle = "Biểu mẫu đăng ký dành cho học viên mới.",
-            Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Đăng ký", IsActive = true }]
-        });
+        return RedirectToAction(nameof(Consultation));
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel model)
+    public Task<IActionResult> Register(ConsultationRequestViewModel model, CancellationToken cancellationToken)
     {
-        model.Title = "Đăng ký";
-        model.Subtitle = "Biểu mẫu đăng ký dành cho học viên mới.";
-        model.Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Đăng ký", IsActive = true }];
+        return Consultation(model, cancellationToken);
+    }
+
+    [HttpGet]
+    public IActionResult Consultation()
+    {
+        return View("Register", CreateConsultationModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Consultation(ConsultationRequestViewModel model, CancellationToken cancellationToken)
+    {
+        ApplyConsultationMeta(model);
 
         if (!ModelState.IsValid)
         {
-            return View(model);
+            return View("Register", model);
         }
 
-        var result = await _authService.RegisterStudentAsync(model.FullName, model.Email, model.Phone, model.Password);
+        var result = await _contactMessageService.SendContactAsync(new ContactMessageRequest
+        {
+            FullName = model.FullName,
+            Email = model.Email,
+            Phone = model.Phone,
+            Topic = "Đăng ký tư vấn",
+            PreferredProgram = model.PreferredProgram,
+            CurrentLevel = string.Empty,
+            PreferredSchedule = model.PreferredSchedule,
+            PreferredContactMethod = model.PreferredContactMethod,
+            Message = model.Message,
+            SourcePage = "Trang đăng ký tư vấn"
+        }, cancellationToken);
+
         if (!result.Succeeded)
         {
             ModelState.AddModelError(string.Empty, result.Message);
-            return View(model);
+            return View("Register", model);
         }
 
         TempData[AppConstants.ToastMessageKey] = result.Message;
-        TempData[AppConstants.ToastTypeKey] = "success";
-        return RedirectToAction(nameof(Login));
+        TempData[AppConstants.ToastTypeKey] = result.EmailDelivered ? "success" : "warning";
+        return RedirectToAction(nameof(Consultation));
     }
 
     [HttpGet]
@@ -125,7 +150,7 @@ public class AccountController : Controller
         return View(new ForgotPasswordViewModel
         {
             Title = "Quên mật khẩu",
-            Subtitle = "Hướng dẫn lấy lại mật khẩu cho tài khoản học viên.",
+            Subtitle = "Hướng dẫn lấy lại mật khẩu cho tài khoản nội bộ có quyền truy cập khu quản trị.",
             Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Quên mật khẩu", IsActive = true }]
         });
     }
@@ -135,7 +160,7 @@ public class AccountController : Controller
     public IActionResult ForgotPassword(ForgotPasswordViewModel model)
     {
         model.Title = "Quên mật khẩu";
-        model.Subtitle = "Hướng dẫn lấy lại mật khẩu cho tài khoản học viên.";
+        model.Subtitle = "Hướng dẫn lấy lại mật khẩu cho tài khoản nội bộ có quyền truy cập khu quản trị.";
         model.Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Quên mật khẩu", IsActive = true }];
 
         if (!ModelState.IsValid)
@@ -143,7 +168,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        TempData[AppConstants.ToastMessageKey] = "Yêu cầu khôi phục đã được ghi nhận. Trung tâm sẽ liên hệ lại qua email đã đăng ký.";
+        TempData[AppConstants.ToastMessageKey] = "Yêu cầu khôi phục đã được ghi nhận. Quản trị hệ thống sẽ liên hệ lại qua email nội bộ đã đăng ký.";
         TempData[AppConstants.ToastTypeKey] = "success";
         return RedirectToAction(nameof(Login));
     }
@@ -162,8 +187,26 @@ public class AccountController : Controller
         return new LoginViewModel
         {
             Title = "Đăng nhập",
-            Subtitle = "Đăng nhập bằng tài khoản đang lưu trong cơ sở dữ liệu để truy cập đúng khu vực quản trị.",
+            Subtitle = "Đăng nhập bằng tài khoản nội bộ đang lưu trong cơ sở dữ liệu để truy cập đúng khu vực quản trị.",
             Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Đăng nhập", IsActive = true }]
         };
+    }
+
+    private static ConsultationRequestViewModel CreateConsultationModel()
+    {
+        var model = new ConsultationRequestViewModel
+        {
+            PreferredContactMethod = "Phone"
+        };
+
+        ApplyConsultationMeta(model);
+        return model;
+    }
+
+    private static void ApplyConsultationMeta(ConsultationRequestViewModel model)
+    {
+        model.Title = "Đăng ký tư vấn";
+        model.Subtitle = "Để lại thông tin để trung tâm ghi nhận hồ sơ tư vấn và liên hệ lại. Đây không phải là tạo tài khoản đăng nhập vào web quản trị.";
+        model.Breadcrumbs = [new BreadcrumbItemViewModel { Label = "Đăng ký tư vấn", IsActive = true }];
     }
 }

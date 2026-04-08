@@ -52,7 +52,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
         try
         {
             var username = Required(input.Username, "Tên đăng nhập là bắt buộc.");
-            var fullName = Required(input.FullName, "Họ và tên là bắt buộc.");
+            var fullName = Required(input.FullName, "Há» vÃ  tÃªn lÃ  báº¯t buá»™c.");
             var role = Required(input.Role, "Vai trò là bắt buộc.");
             var email = Optional(input.Email);
             var phone = Optional(input.Phone);
@@ -150,11 +150,10 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             };
     }
 
-    public ManagementResult SaveStudent(int? id, StudentInput input)
+        public ManagementResult SaveStudent(int? id, StudentInput input)
     {
         try
         {
-            var code = Required(input.StudentCode, "Mã học viên là bắt buộc.");
             var fullName = Required(input.FullName, "Tên học viên là bắt buộc.");
             var email = Optional(input.Email);
             var gender = Optional(input.Gender);
@@ -162,11 +161,6 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             if (!string.IsNullOrWhiteSpace(gender) && !ValidGenders.Contains(gender))
             {
                 return ManagementResult.Fail("Giới tính không hợp lệ.");
-            }
-
-            if (_dbContext.Students.Any(x => !x.IsDeleted && x.StudentCode == code && (!id.HasValue || x.Id != id.Value)))
-            {
-                return ManagementResult.Fail("Mã học viên đã tồn tại.");
             }
 
             if (!string.IsNullOrWhiteSpace(email) &&
@@ -183,7 +177,6 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                     return ManagementResult.Fail("Không tìm thấy học viên cần cập nhật.");
                 }
 
-                student.StudentCode = code;
                 student.FullName = fullName;
                 student.DateOfBirth = input.DateOfBirth;
                 student.Gender = gender;
@@ -197,9 +190,16 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                 return ManagementResult.Success("Cập nhật học viên thành công.");
             }
 
+            var generatedCode = GenerateSequentialCode(
+                _dbContext.Students
+                    .AsNoTracking()
+                    .Where(x => !x.IsDeleted)
+                    .Select(x => x.StudentCode),
+                "S");
+
             _dbContext.Students.Add(new StudentEntity
             {
-                StudentCode = code,
+                StudentCode = generatedCode,
                 FullName = fullName,
                 DateOfBirth = input.DateOfBirth,
                 Gender = gender,
@@ -212,7 +212,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             });
 
             _dbContext.SaveChanges();
-            return ManagementResult.Success("Tạo học viên thành công.");
+            return ManagementResult.Success($"Tạo học viên thành công. Hệ thống đã tự sinh mã {generatedCode}.");
         }
         catch (InvalidOperationException ex)
         {
@@ -536,7 +536,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             };
     }
 
-    public ManagementResult SaveEnrollment(int? id, EnrollmentInput input)
+        public ManagementResult SaveEnrollment(int? id, EnrollmentInput input)
     {
         try
         {
@@ -557,6 +557,20 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             if (student is null || courseClass is null)
             {
                 return ManagementResult.Fail("Không tìm thấy học viên hoặc lớp học đã chọn.");
+            }
+
+            string? convertedCode = null;
+            if (EfServiceMapper.IsConsultationLead(student.StudentCode))
+            {
+                convertedCode = GenerateSequentialCode(
+                    _dbContext.Students
+                        .AsNoTracking()
+                        .Where(x => !x.IsDeleted && x.Id != student.Id)
+                        .Select(x => x.StudentCode),
+                    "S");
+
+                student.StudentCode = convertedCode;
+                student.UpdatedAt = DateTime.Now;
             }
 
             var totalFee = input.TotalFee > 0 ? input.TotalFee : courseClass.Course.TuitionFee;
@@ -593,7 +607,9 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                 entity.UpdatedAt = DateTime.Now;
 
                 _dbContext.SaveChanges();
-                return ManagementResult.Success("Cập nhật ghi danh thành công.");
+                return convertedCode is null
+                    ? ManagementResult.Success("Cập nhật ghi danh thành công.")
+                    : ManagementResult.Success($"Cập nhật ghi danh thành công. Hồ sơ tư vấn đã được chuyển thành mã học viên {convertedCode}.");
             }
 
             _dbContext.Enrollments.Add(new EnrollmentEntity
@@ -610,7 +626,9 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             });
 
             _dbContext.SaveChanges();
-            return ManagementResult.Success("Tạo ghi danh thành công.");
+            return convertedCode is null
+                ? ManagementResult.Success("Tạo ghi danh thành công.")
+                : ManagementResult.Success($"Tạo ghi danh thành công. Hồ sơ tư vấn đã được chuyển thành mã học viên {convertedCode}.");
         }
         catch (InvalidOperationException ex)
         {
@@ -651,7 +669,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
 
             if (input.Amount <= 0)
             {
-                return ManagementResult.Fail("Số tiền phải lớn hơn 0.");
+                return ManagementResult.Fail("Sá»‘ tiá»n pháº£i lá»›n hơn 0.");
             }
 
             var paymentMethod = Required(input.PaymentMethod, "Phương thức thanh toán là bắt buộc.");
@@ -662,7 +680,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
 
             if (!_dbContext.Enrollments.Any(x => x.Id == input.EnrollmentId && !x.IsDeleted))
             {
-                return ManagementResult.Fail("Không tìm thấy ghi danh đã chọn.");
+                return ManagementResult.Fail("KhÃ´ng tÃ¬m tháº¥y ghi danh Ä‘ã chọn.");
             }
 
             if (id.HasValue)
@@ -749,13 +767,13 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     {
         try
         {
-            var classCode = Required(input.ClassCode, "Lớp học là bắt buộc.");
-            var topic = Required(input.Topic, "Chủ đề buổi học là bắt buộc.");
+            var classCode = Required(input.ClassCode, "Lá»›p há»c lÃ  báº¯t buá»™c.");
+            var topic = Required(input.Topic, "Chá»§ Ä‘á» buá»•i há»c lÃ  báº¯t buá»™c.");
             var courseClass = _dbContext.Classes.FirstOrDefault(x => !x.IsDeleted && x.ClassCode == classCode);
 
             if (courseClass is null)
             {
-                return ManagementResult.Fail("Không tìm thấy lớp học đã chọn.");
+                return ManagementResult.Fail("KhÃ´ng tÃ¬m tháº¥y lá»›p há»c Ä‘ã chọn.");
             }
 
             if (id.HasValue)
@@ -763,7 +781,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                 var session = _dbContext.ClassSessions.FirstOrDefault(x => x.Id == id.Value);
                 if (session is null)
                 {
-                    return ManagementResult.Fail("Không tìm thấy buổi học cần cập nhật.");
+                    return ManagementResult.Fail("KhÃ´ng tÃ¬m tháº¥y buá»•i học cần cập nhật.");
                 }
 
                 session.ClassId = courseClass.Id;
@@ -772,7 +790,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                 session.Note = Optional(input.Note);
 
                 _dbContext.SaveChanges();
-                return ManagementResult.Success("Cập nhật buổi học thành công.");
+                return ManagementResult.Success("Cáº­p nháº­t buá»•i học thành công.");
             }
 
             _dbContext.ClassSessions.Add(new ClassSessionEntity
@@ -785,7 +803,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             });
 
             _dbContext.SaveChanges();
-            return ManagementResult.Success("Tạo buổi học thành công.");
+            return ManagementResult.Success("Táº¡o buá»•i học thành công.");
         }
         catch (InvalidOperationException ex)
         {
@@ -804,12 +822,12 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             var session = _dbContext.ClassSessions.FirstOrDefault(x => x.Id == id);
             if (session is null)
             {
-                return ManagementResult.Fail("Không tìm thấy buổi học cần xóa.");
+                return ManagementResult.Fail("KhÃ´ng tÃ¬m tháº¥y buá»•i học cần xóa.");
             }
 
             _dbContext.ClassSessions.Remove(session);
             _dbContext.SaveChanges();
-            return ManagementResult.Success("Xóa buổi học thành công.");
+            return ManagementResult.Success("XÃ³a buá»•i học thành công.");
         }
         catch (DbUpdateException ex)
         {
@@ -837,7 +855,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
         {
             if (input.EnrollmentId <= 0 || input.ClassSessionId <= 0)
             {
-                return ManagementResult.Fail("Ghi danh và buổi học là bắt buộc.");
+                return ManagementResult.Fail("Ghi danh vÃ  buá»•i há»c lÃ  báº¯t buá»™c.");
             }
 
             var attendanceStatus = Required(input.AttendanceStatus, "Trạng thái điểm danh là bắt buộc.");
@@ -848,7 +866,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
 
             if (!AttendanceBelongsToSessionClass(input.EnrollmentId, input.ClassSessionId))
             {
-                return ManagementResult.Fail("Học viên không thuộc lớp của buổi học đã chọn.");
+                return ManagementResult.Fail("Há»c viÃªn khÃ´ng thuá»™c lá»›p cá»§a buá»•i há»c Ä‘ã chọn.");
             }
 
             if (id.HasValue)
@@ -942,7 +960,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     {
         try
         {
-            var classCode = Required(input.ClassCode, "Lớp học là bắt buộc.");
+            var classCode = Required(input.ClassCode, "Lá»›p há»c lÃ  báº¯t buá»™c.");
             var examName = Required(input.ExamName, "Tên bài kiểm tra là bắt buộc.");
             var examType = Required(input.ExamType, "Loại bài kiểm tra là bắt buộc.");
 
@@ -953,13 +971,13 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
 
             if (input.MaxScore <= 0)
             {
-                return ManagementResult.Fail("Điểm tối đa phải lớn hơn 0.");
+                return ManagementResult.Fail("Äiá»ƒm tá»‘i Ä‘a pháº£i lá»›n hơn 0.");
             }
 
             var classEntity = _dbContext.Classes.FirstOrDefault(x => !x.IsDeleted && x.ClassCode == classCode);
             if (classEntity is null)
             {
-                return ManagementResult.Fail("Không tìm thấy lớp học đã chọn.");
+                return ManagementResult.Fail("KhÃ´ng tÃ¬m tháº¥y lá»›p há»c Ä‘ã chọn.");
             }
 
             var duplicateExists = _dbContext.Exams.Any(x =>
@@ -971,7 +989,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
 
             if (duplicateExists)
             {
-                return ManagementResult.Fail("Bài kiểm tra này đã tồn tại cho lớp học đã chọn.");
+                return ManagementResult.Fail("BÃ i kiá»ƒm tra nÃ y Ä‘Ã£ tá»“n táº¡i cho lá»›p há»c Ä‘ã chọn.");
             }
 
             if (id.HasValue)
@@ -1076,12 +1094,12 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
 
             if (input.MaxScore <= 0)
             {
-                return ManagementResult.Fail("Điểm tối đa phải lớn hơn 0.");
+                return ManagementResult.Fail("Äiá»ƒm tá»‘i Ä‘a pháº£i lá»›n hơn 0.");
             }
 
             if (input.Score < 0)
             {
-                return ManagementResult.Fail("Điểm số phải lớn hơn hoặc bằng 0.");
+                return ManagementResult.Fail("Äiá»ƒm sá»‘ pháº£i lá»›n hơn hoặc bằng 0.");
             }
 
             var examName = Required(input.ExamName, "Tên bài kiểm tra là bắt buộc.");
@@ -1093,13 +1111,13 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
 
             if (!string.IsNullOrWhiteSpace(input.ResultStatus) && !ValidResultStatuses.Contains(input.ResultStatus))
             {
-                return ManagementResult.Fail("Kết quả học tập không hợp lệ.");
+                return ManagementResult.Fail("Káº¿t quáº£ há»c táº­p khÃ´ng há»£p lá»‡.");
             }
 
             var enrollment = _dbContext.Enrollments.FirstOrDefault(x => x.Id == input.EnrollmentId && !x.IsDeleted);
             if (enrollment is null)
             {
-                return ManagementResult.Fail("Không tìm thấy ghi danh đã chọn.");
+                return ManagementResult.Fail("KhÃ´ng tÃ¬m tháº¥y ghi danh Ä‘ã chọn.");
             }
 
             var strategy = _dbContext.Database.CreateExecutionStrategy();
@@ -1365,3 +1383,4 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
         return $"{prefix}{nextNumber:000}";
     }
 }
+

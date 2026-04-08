@@ -8,7 +8,7 @@ internal static class EfServiceMapper
     internal static string MapAccountStatus(bool isActive, byte status)
         => isActive && status == 1 ? "Đang hoạt động" : "Tạm khóa";
 
-    internal static string MapStudentStatus(string? enrollmentStatus, DateTime? classStartDate, DateTime? classEndDate, byte studentStatus)
+    internal static string MapStudentStatus(string studentCode, string? enrollmentStatus, DateTime? classStartDate, DateTime? classEndDate, byte studentStatus)
     {
         if (!string.IsNullOrWhiteSpace(enrollmentStatus))
         {
@@ -22,6 +22,11 @@ internal static class EfServiceMapper
                 "DangHoc" => "Đang học",
                 _ => "Đang học"
             };
+        }
+
+        if (IsConsultationLead(studentCode))
+        {
+            return "Chờ tư vấn";
         }
 
         return studentStatus == 1 ? "Đang học" : "Tạm khóa";
@@ -324,6 +329,9 @@ internal static class EfServiceMapper
 
         return builder.ToString().Trim('-');
     }
+
+    internal static bool IsConsultationLead(string studentCode)
+        => studentCode.StartsWith("TV", StringComparison.OrdinalIgnoreCase);
 
     private static string RemoveDiacritics(string value)
     {
