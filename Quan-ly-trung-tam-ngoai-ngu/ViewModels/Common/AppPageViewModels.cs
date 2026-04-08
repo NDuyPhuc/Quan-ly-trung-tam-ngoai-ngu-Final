@@ -133,6 +133,7 @@ public class FormFieldViewModel
     public bool Required { get; set; }
     public bool ReadOnly { get; set; }
     public string? Hint { get; set; }
+    public string? AttributesHtml { get; set; }
     public List<SelectOptionViewModel> Options { get; set; } = [];
 }
 

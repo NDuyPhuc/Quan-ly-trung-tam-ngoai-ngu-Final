@@ -203,7 +203,7 @@ public class ClassesController : TeacherControllerBase
             [
                 new QuickActionViewModel { Label = "Tạo buổi học", Url = "/Teacher/Schedule/Create", Icon = "bi-calendar-plus" },
                 new QuickActionViewModel { Label = "Tạo bài kiểm tra", Url = "/Teacher/Exams/Create", Icon = "bi-journal-plus", CssClass = "btn btn-outline-success" },
-                new QuickActionViewModel { Label = "Điểm danh", Url = "/Teacher/Attendance", Icon = "bi-list-check", CssClass = "btn btn-outline-primary" },
+                new QuickActionViewModel { Label = "Điểm danh", Url = "/Teacher/Attendance/Create", Icon = "bi-list-check", CssClass = "btn btn-outline-primary" },
                 new QuickActionViewModel { Label = "Quay lại", Url = "/Teacher/Classes", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
             ]
         });
@@ -260,6 +260,7 @@ public class ScheduleController : TeacherControllerBase
                     Actions =
                     [
                         new() { Label = "Chi tiết", Url = $"/Teacher/Schedule/Details/{item.Id}", Icon = "bi-eye" },
+                        new() { Label = "Điểm danh", Url = $"/Teacher/Attendance/Create?sessionId={item.Id}", Icon = "bi-list-check", CssClass = "btn btn-sm btn-outline-primary" },
                         new() { Label = "Sửa", Url = $"/Teacher/Schedule/Edit/{item.Id}", Icon = "bi-pencil-square", CssClass = "btn btn-sm btn-outline-secondary" },
                         new() { Label = "Xóa", Url = $"/Teacher/Schedule/Delete/{item.Id}", Icon = "bi-trash", CssClass = "btn btn-sm btn-outline-danger confirm-action", RequiresConfirm = true, ConfirmMessage = "Bạn muốn xóa buổi học này?" }
                     ]
@@ -376,7 +377,7 @@ public class ScheduleController : TeacherControllerBase
             Actions =
             [
                 new QuickActionViewModel { Label = "Sửa buổi học", Url = $"/Teacher/Schedule/Edit/{id}", Icon = "bi-pencil-square" },
-                new QuickActionViewModel { Label = "Điểm danh", Url = "/Teacher/Attendance/Create", Icon = "bi-list-check", CssClass = "btn btn-outline-primary" },
+                new QuickActionViewModel { Label = "Điểm danh", Url = $"/Teacher/Attendance/Create?sessionId={id}", Icon = "bi-list-check", CssClass = "btn btn-outline-primary" },
                 new QuickActionViewModel { Label = "Quay lại", Url = "/Teacher/Schedule", Icon = "bi-arrow-left", CssClass = "btn btn-outline-secondary" }
             ]
         });
@@ -479,9 +480,14 @@ public class AttendanceController : TeacherControllerBase
     }
 
     [HttpGet]
-    public IActionResult Create()
+    public IActionResult Create(int? sessionId, int? enrollmentId, string? selectedClassCode)
     {
-        return ManagementFormView(BuildAttendanceForm("Điểm danh theo buổi", "/Teacher/Attendance/Create", new AttendanceInput()));
+        return ManagementFormView(BuildAttendanceForm("Điểm danh theo buổi", "/Teacher/Attendance/Create", new AttendanceInput
+        {
+            SelectedClassCode = selectedClassCode ?? string.Empty,
+            ClassSessionId = sessionId ?? 0,
+            EnrollmentId = enrollmentId ?? 0
+        }));
     }
 
     [HttpPost]
@@ -499,13 +505,18 @@ public class AttendanceController : TeacherControllerBase
     }
 
     [HttpGet]
-    public IActionResult Edit(int id)
+    public IActionResult Edit(int id, string? selectedClassCode)
     {
         var input = _managementService.GetAttendance(id);
         if (input is null)
         {
             SetToast("Không tìm thấy dữ liệu điểm danh.", "danger");
             return RedirectToAction(nameof(Index));
+        }
+
+        if (!string.IsNullOrWhiteSpace(selectedClassCode))
+        {
+            input.SelectedClassCode = selectedClassCode;
         }
 
         return ManagementFormView(BuildAttendanceForm("Cập nhật điểm danh", $"/Teacher/Attendance/Edit/{id}", input));
@@ -576,8 +587,58 @@ public class AttendanceController : TeacherControllerBase
     private ManagementFormPageViewModel BuildAttendanceForm(string title, string actionUrl, AttendanceInput input, string? errorMessage = null)
     {
         var classCodes = GetTeacherClassCodes();
-        var enrollmentOptions = DataService.GetEnrollments()
+        var enrollments = DataService.GetEnrollments()
             .Where(item => classCodes.Contains(item.ClassCode))
+            .OrderBy(item => item.ClassCode)
+            .ThenBy(item => item.StudentName)
+            .ToList();
+
+        var sessions = DataService.GetSessions()
+            .Where(item => classCodes.Contains(item.ClassCode))
+            .OrderByDescending(item => item.SessionDate)
+            .ThenBy(item => item.ClassCode)
+            .ToList();
+
+        var selectedEnrollmentClassCode = enrollments
+            .FirstOrDefault(item => item.Id == input.EnrollmentId)?
+            .ClassCode;
+
+        var selectedSessionClassCode = sessions
+            .FirstOrDefault(item => item.Id == input.ClassSessionId)?
+            .ClassCode;
+
+        var targetClassCode = string.IsNullOrWhiteSpace(input.SelectedClassCode)
+            ? selectedEnrollmentClassCode ?? selectedSessionClassCode
+            : input.SelectedClassCode;
+
+        input.SelectedClassCode = targetClassCode ?? string.Empty;
+
+        var classOptions = GetTeacherClasses()
+            .OrderBy(item => item.Code)
+            .Select(item => new SelectOptionViewModel
+            {
+                Label = $"{item.Code} - {item.CourseName}",
+                Value = item.Code,
+                Selected = item.Code == input.SelectedClassCode
+            })
+            .ToList();
+
+        classOptions.Insert(0, new SelectOptionViewModel
+        {
+            Label = "Chọn lớp học để lọc",
+            Value = string.Empty,
+            Selected = string.IsNullOrWhiteSpace(input.SelectedClassCode)
+        });
+
+        var filteredEnrollments = string.IsNullOrWhiteSpace(targetClassCode)
+            ? enrollments
+            : enrollments.Where(item => item.ClassCode == targetClassCode).ToList();
+
+        var filteredSessions = string.IsNullOrWhiteSpace(targetClassCode)
+            ? sessions
+            : sessions.Where(item => item.ClassCode == targetClassCode).ToList();
+
+        var enrollmentOptions = filteredEnrollments
             .Select(item => new SelectOptionViewModel
             {
                 Label = $"{item.StudentName} - {item.ClassCode}",
@@ -585,14 +646,17 @@ public class AttendanceController : TeacherControllerBase
                 Selected = item.Id == input.EnrollmentId
             }).ToList();
 
-        var sessionOptions = DataService.GetSessions()
-            .Where(item => classCodes.Contains(item.ClassCode))
+        var sessionOptions = filteredSessions
             .Select(item => new SelectOptionViewModel
             {
                 Label = $"{item.ClassCode} - {item.SessionDate:dd/MM/yyyy} - {item.Topic}",
                 Value = item.Id.ToString(),
                 Selected = item.Id == input.ClassSessionId
             }).ToList();
+
+        var notice = !string.IsNullOrWhiteSpace(targetClassCode)
+            ? $"Đang lọc theo lớp {targetClassCode}. Danh sách ghi danh và buổi học bên dưới chỉ hiển thị dữ liệu thuộc lớp này."
+            : "Hãy chọn lớp học trước để hệ thống tự lọc danh sách học viên ghi danh và các buổi học tương ứng.";
 
         return new ManagementFormPageViewModel
         {
@@ -605,6 +669,7 @@ public class AttendanceController : TeacherControllerBase
             CancelUrl = "/Teacher/Attendance",
             SubmitLabel = "Lưu điểm danh",
             ErrorMessage = errorMessage,
+            Notice = notice,
             Sections =
             [
                 new FormSectionViewModel
@@ -612,6 +677,16 @@ public class AttendanceController : TeacherControllerBase
                     Title = "Thông tin điểm danh",
                     Fields =
                     [
+                        new FormFieldViewModel
+                        {
+                            Label = "Lớp học",
+                            Name = "SelectedClassCode",
+                            Type = "select",
+                            ColClass = "col-12",
+                            Options = classOptions,
+                            Hint = "Khi đổi lớp, biểu mẫu sẽ tự tải lại để lọc học viên và buổi học theo lớp đã chọn.",
+                            AttributesHtml = $"data-auto-submit-url=\"{actionUrl}\" data-auto-submit-param=\"SelectedClassCode\""
+                        },
                         new FormFieldViewModel { Label = "Ghi danh", Name = "EnrollmentId", Type = "select", Required = true, Options = enrollmentOptions },
                         new FormFieldViewModel { Label = "Buổi học", Name = "ClassSessionId", Type = "select", Required = true, Options = sessionOptions },
                         new FormFieldViewModel

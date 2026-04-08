@@ -110,6 +110,7 @@ public sealed class SessionInput
 
 public sealed class AttendanceInput
 {
+    public string SelectedClassCode { get; set; } = string.Empty;
     public int EnrollmentId { get; set; }
     public int ClassSessionId { get; set; }
     public string AttendanceStatus { get; set; } = "Present";
