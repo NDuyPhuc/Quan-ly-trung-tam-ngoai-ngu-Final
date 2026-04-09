@@ -1,4 +1,4 @@
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Quan_ly_trung_tam_ngoai_ngu.Data;
 using Quan_ly_trung_tam_ngoai_ngu.Models;
@@ -56,7 +56,9 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             var role = Required(input.Role, "Vai trò là bắt buộc.");
             var email = Optional(input.Email);
             var phone = Optional(input.Phone);
-            var password = id.HasValue ? (input.Password?.Trim() ?? string.Empty) : Required(input.Password, "Mật khẩu là bắt buộc.");
+            var password = id.HasValue
+                ? (input.Password?.Trim() ?? string.Empty)
+                : Required(input.Password, "Mật khẩu là bắt buộc.");
 
             if (!ValidRoles.Contains(role))
             {
@@ -130,7 +132,11 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     }
 
     public ManagementResult DeleteAccount(int id) =>
-        SoftDelete(_dbContext.Accounts.FirstOrDefault(x => x.Id == id && !x.IsDeleted), "delete account", "Xóa tài khoản thành công.", "Không tìm thấy tài khoản cần xóa.");
+        SoftDelete(
+            _dbContext.Accounts.FirstOrDefault(x => x.Id == id && !x.IsDeleted),
+            "delete account",
+            "Xóa tài khoản thành công.",
+            "Không tìm thấy tài khoản cần xóa.");
 
     public StudentInput? GetStudent(int id)
     {
@@ -150,7 +156,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             };
     }
 
-        public ManagementResult SaveStudent(int? id, StudentInput input)
+    public ManagementResult SaveStudent(int? id, StudentInput input)
     {
         try
         {
@@ -225,7 +231,11 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     }
 
     public ManagementResult DeleteStudent(int id) =>
-        SoftDelete(_dbContext.Students.FirstOrDefault(x => x.Id == id && !x.IsDeleted), "delete student", "Xóa học viên thành công.", "Không tìm thấy học viên cần xóa.");
+        SoftDelete(
+            _dbContext.Students.FirstOrDefault(x => x.Id == id && !x.IsDeleted),
+            "delete student",
+            "Xóa học viên thành công.",
+            "Không tìm thấy học viên cần xóa.");
 
     public TeacherInput? GetTeacher(int id)
     {
@@ -247,14 +257,8 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     {
         try
         {
-            var code = Required(input.TeacherCode, "Mã giáo viên là bắt buộc.");
             var fullName = Required(input.FullName, "Tên giáo viên là bắt buộc.");
             var email = Optional(input.Email);
-
-            if (_dbContext.Teachers.Any(x => !x.IsDeleted && x.TeacherCode == code && (!id.HasValue || x.Id != id.Value)))
-            {
-                return ManagementResult.Fail("Mã giáo viên đã tồn tại.");
-            }
 
             if (!string.IsNullOrWhiteSpace(email) &&
                 _dbContext.Teachers.Any(x => !x.IsDeleted && x.Email == email && (!id.HasValue || x.Id != id.Value)))
@@ -270,7 +274,6 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                     return ManagementResult.Fail("Không tìm thấy giáo viên cần cập nhật.");
                 }
 
-                teacher.TeacherCode = code;
                 teacher.FullName = fullName;
                 teacher.Phone = Optional(input.Phone);
                 teacher.Email = email;
@@ -282,9 +285,17 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                 return ManagementResult.Success("Cập nhật giáo viên thành công.");
             }
 
+            var generatedCode = GenerateSequentialCodeByPrefixes(
+                _dbContext.Teachers
+                    .AsNoTracking()
+                    .Where(x => !x.IsDeleted)
+                    .Select(x => x.TeacherCode),
+                "GV",
+                "T");
+
             _dbContext.Teachers.Add(new TeacherEntity
             {
-                TeacherCode = code,
+                TeacherCode = generatedCode,
                 FullName = fullName,
                 Phone = Optional(input.Phone),
                 Email = email,
@@ -295,7 +306,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             });
 
             _dbContext.SaveChanges();
-            return ManagementResult.Success("Tạo giáo viên thành công.");
+            return ManagementResult.Success($"Tạo giáo viên thành công. Hệ thống đã tự sinh mã {generatedCode}.");
         }
         catch (InvalidOperationException ex)
         {
@@ -308,7 +319,11 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     }
 
     public ManagementResult DeleteTeacher(int id) =>
-        SoftDelete(_dbContext.Teachers.FirstOrDefault(x => x.Id == id && !x.IsDeleted), "delete teacher", "Xóa giáo viên thành công.", "Không tìm thấy giáo viên cần xóa.");
+        SoftDelete(
+            _dbContext.Teachers.FirstOrDefault(x => x.Id == id && !x.IsDeleted),
+            "delete teacher",
+            "Xóa giáo viên thành công.",
+            "Không tìm thấy giáo viên cần xóa.");
 
     public CourseInput? GetCourse(int id)
     {
@@ -330,7 +345,6 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     {
         try
         {
-            var code = Required(input.CourseCode, "Mã khóa học là bắt buộc.");
             var name = Required(input.CourseName, "Tên khóa học là bắt buộc.");
 
             if (input.DurationHours <= 0)
@@ -343,11 +357,6 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                 return ManagementResult.Fail("Học phí phải lớn hơn hoặc bằng 0.");
             }
 
-            if (_dbContext.Courses.Any(x => !x.IsDeleted && x.CourseCode == code && (!id.HasValue || x.Id != id.Value)))
-            {
-                return ManagementResult.Fail("Mã khóa học đã tồn tại.");
-            }
-
             if (id.HasValue)
             {
                 var course = _dbContext.Courses.FirstOrDefault(x => x.Id == id.Value && !x.IsDeleted);
@@ -356,7 +365,6 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                     return ManagementResult.Fail("Không tìm thấy khóa học cần cập nhật.");
                 }
 
-                course.CourseCode = code;
                 course.CourseName = name;
                 course.Description = Optional(input.Description);
                 course.DurationHours = input.DurationHours;
@@ -368,9 +376,17 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                 return ManagementResult.Success("Cập nhật khóa học thành công.");
             }
 
+            var generatedCode = GenerateSequentialCodeByPrefixes(
+                _dbContext.Courses
+                    .AsNoTracking()
+                    .Where(x => !x.IsDeleted)
+                    .Select(x => x.CourseCode),
+                "KH",
+                "C");
+
             _dbContext.Courses.Add(new CourseEntity
             {
-                CourseCode = code,
+                CourseCode = generatedCode,
                 CourseName = name,
                 Description = Optional(input.Description),
                 DurationHours = input.DurationHours,
@@ -381,7 +397,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             });
 
             _dbContext.SaveChanges();
-            return ManagementResult.Success("Tạo khóa học thành công.");
+            return ManagementResult.Success($"Tạo khóa học thành công. Hệ thống đã tự sinh mã {generatedCode}.");
         }
         catch (InvalidOperationException ex)
         {
@@ -394,7 +410,11 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     }
 
     public ManagementResult DeleteCourse(int id) =>
-        SoftDelete(_dbContext.Courses.FirstOrDefault(x => x.Id == id && !x.IsDeleted), "delete course", "Xóa khóa học thành công.", "Không tìm thấy khóa học cần xóa.");
+        SoftDelete(
+            _dbContext.Courses.FirstOrDefault(x => x.Id == id && !x.IsDeleted),
+            "delete course",
+            "Xóa khóa học thành công.",
+            "Không tìm thấy khóa học cần xóa.");
 
     public ClassInput? GetClass(int id)
     {
@@ -424,7 +444,6 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     {
         try
         {
-            var code = Required(input.ClassCode, "Mã lớp là bắt buộc.");
             var className = Required(input.ClassName, "Tên lớp là bắt buộc.");
             var courseCode = Required(input.CourseCode, "Khóa học là bắt buộc.");
             var teacherCode = Optional(input.TeacherCode);
@@ -455,11 +474,6 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                 }
             }
 
-            if (_dbContext.Classes.Any(x => !x.IsDeleted && x.ClassCode == code && (!id.HasValue || x.Id != id.Value)))
-            {
-                return ManagementResult.Fail("Mã lớp đã tồn tại.");
-            }
-
             if (id.HasValue)
             {
                 var entity = _dbContext.Classes.FirstOrDefault(x => x.Id == id.Value && !x.IsDeleted);
@@ -468,7 +482,6 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                     return ManagementResult.Fail("Không tìm thấy lớp học cần cập nhật.");
                 }
 
-                entity.ClassCode = code;
                 entity.ClassName = className;
                 entity.CourseId = course.Id;
                 entity.TeacherId = teacher?.Id;
@@ -483,9 +496,18 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
                 return ManagementResult.Success("Cập nhật lớp học thành công.");
             }
 
+            var generatedCode = GenerateSequentialCodeByPrefixes(
+                _dbContext.Classes
+                    .AsNoTracking()
+                    .Where(x => !x.IsDeleted)
+                    .Select(x => x.ClassCode),
+                "LH",
+                "C",
+                "L");
+
             _dbContext.Classes.Add(new ClassEntity
             {
-                ClassCode = code,
+                ClassCode = generatedCode,
                 ClassName = className,
                 CourseId = course.Id,
                 TeacherId = teacher?.Id,
@@ -499,7 +521,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             });
 
             _dbContext.SaveChanges();
-            return ManagementResult.Success("Tạo lớp học thành công.");
+            return ManagementResult.Success($"Tạo lớp học thành công. Hệ thống đã tự sinh mã {generatedCode}.");
         }
         catch (InvalidOperationException ex)
         {
@@ -512,7 +534,11 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     }
 
     public ManagementResult DeleteClass(int id) =>
-        SoftDelete(_dbContext.Classes.FirstOrDefault(x => x.Id == id && !x.IsDeleted), "delete class", "Xóa lớp học thành công.", "Không tìm thấy lớp học cần xóa.");
+        SoftDelete(
+            _dbContext.Classes.FirstOrDefault(x => x.Id == id && !x.IsDeleted),
+            "delete class",
+            "Xóa lớp học thành công.",
+            "Không tìm thấy lớp học cần xóa.");
 
     public EnrollmentInput? GetEnrollment(int id)
     {
@@ -536,7 +562,7 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
             };
     }
 
-        public ManagementResult SaveEnrollment(int? id, EnrollmentInput input)
+    public ManagementResult SaveEnrollment(int? id, EnrollmentInput input)
     {
         try
         {
@@ -641,7 +667,11 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
     }
 
     public ManagementResult DeleteEnrollment(int id) =>
-        SoftDelete(_dbContext.Enrollments.FirstOrDefault(x => x.Id == id && !x.IsDeleted), "delete enrollment", "Xóa ghi danh thành công.", "Không tìm thấy ghi danh cần xóa.");
+        SoftDelete(
+            _dbContext.Enrollments.FirstOrDefault(x => x.Id == id && !x.IsDeleted),
+            "delete enrollment",
+            "Xóa ghi danh thành công.",
+            "Không tìm thấy ghi danh cần xóa.");
 
     public ReceiptInput? GetReceipt(int id)
     {
@@ -1382,5 +1412,22 @@ public sealed class EfLanguageCenterManagementService : ILanguageCenterManagemen
 
         return $"{prefix}{nextNumber:000}";
     }
-}
 
+    private static string GenerateSequentialCodeByPrefixes(IEnumerable<string?> codes, params string[] prefixes)
+    {
+        var normalizedCodes = codes
+            .Where(code => !string.IsNullOrWhiteSpace(code))
+            .Select(code => code!.Trim())
+            .ToList();
+
+        foreach (var prefix in prefixes)
+        {
+            if (normalizedCodes.Any(code => code.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
+            {
+                return GenerateSequentialCode(normalizedCodes, prefix);
+            }
+        }
+
+        return GenerateSequentialCode(normalizedCodes, prefixes[0]);
+    }
+}

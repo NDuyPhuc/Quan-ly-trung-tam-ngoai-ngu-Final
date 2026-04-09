@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Quan_ly_trung_tam_ngoai_ngu.Infrastructure;
 using Quan_ly_trung_tam_ngoai_ngu.Models;
 using Quan_ly_trung_tam_ngoai_ngu.Services.Interfaces;
@@ -178,7 +178,7 @@ public class CoursesController : AdminControllerBase
                     Title = "Thông tin khóa học",
                     Fields =
                     [
-                        new FormFieldViewModel { Label = "Mã khóa học", Name = "CourseCode", Value = input.CourseCode, Required = true },
+                        new FormFieldViewModel { Label = "Mã khóa học", Name = "CourseCode", Value = input.CourseCode, ReadOnly = true, Placeholder = "Hệ thống tự sinh sau khi lưu", Hint = string.IsNullOrWhiteSpace(input.CourseCode) ? "Mã khóa học sẽ được hệ thống tự sinh khi tạo mới." : "Mã khóa học được hệ thống quản lý tự động." },
                         new FormFieldViewModel { Label = "Tên khóa học", Name = "CourseName", Value = input.CourseName, Required = true },
                         new FormFieldViewModel { Label = "Thời lượng (giờ)", Name = "DurationHours", Value = input.DurationHours.ToString(), Type = "number", Required = true },
                         new FormFieldViewModel { Label = "Học phí", Name = "TuitionFee", Value = input.TuitionFee.ToString("0"), Type = "number", Required = true },
@@ -394,7 +394,7 @@ public class ClassesController : AdminControllerBase
                     Title = "Thông tin lớp học",
                     Fields =
                     [
-                        new FormFieldViewModel { Label = "Mã lớp", Name = "ClassCode", Value = input.ClassCode, Required = true },
+                        new FormFieldViewModel { Label = "Mã lớp", Name = "ClassCode", Value = input.ClassCode, ReadOnly = true, Placeholder = "Hệ thống tự sinh sau khi lưu", Hint = string.IsNullOrWhiteSpace(input.ClassCode) ? "Mã lớp sẽ được hệ thống tự sinh khi mở lớp mới." : "Mã lớp được hệ thống quản lý tự động." },
                         new FormFieldViewModel { Label = "Tên lớp", Name = "ClassName", Value = input.ClassName, Required = true },
                         new FormFieldViewModel { Label = "Ngày bắt đầu", Name = "StartDate", Value = input.StartDate.ToString("yyyy-MM-dd"), Type = "date", Required = true },
                         new FormFieldViewModel { Label = "Ngày kết thúc", Name = "EndDate", Value = input.EndDate.ToString("yyyy-MM-dd"), Type = "date", Required = true },

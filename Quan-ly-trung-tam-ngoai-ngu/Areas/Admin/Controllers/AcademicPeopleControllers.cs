@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Quan_ly_trung_tam_ngoai_ngu.Infrastructure;
 using Quan_ly_trung_tam_ngoai_ngu.Models;
 using Quan_ly_trung_tam_ngoai_ngu.Services.Interfaces;
@@ -413,7 +413,7 @@ public class TeachersController : AdminControllerBase
                     Title = "Thông tin giáo viên",
                     Fields =
                     [
-                        new FormFieldViewModel { Label = "Mã giáo viên", Name = "TeacherCode", Value = input.TeacherCode, Required = true },
+                        new FormFieldViewModel { Label = "Mã giáo viên", Name = "TeacherCode", Value = input.TeacherCode, ReadOnly = true, Placeholder = "Hệ thống tự sinh sau khi lưu", Hint = string.IsNullOrWhiteSpace(input.TeacherCode) ? "Mã giáo viên sẽ được hệ thống tự sinh khi tạo mới." : "Mã giáo viên được hệ thống quản lý tự động." },
                         new FormFieldViewModel { Label = "Họ và tên", Name = "FullName", Value = input.FullName, Required = true },
                         new FormFieldViewModel { Label = "Email", Name = "Email", Value = input.Email, Type = "email" },
                         new FormFieldViewModel { Label = "Số điện thoại", Name = "Phone", Value = input.Phone },
